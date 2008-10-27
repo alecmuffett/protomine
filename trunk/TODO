@@ -1,0 +1,136 @@
+Things and relationships.
+
+	ui->
+
+	Relation->
+
+
+	Object->match(context)
+		reject if private
+		reject if not:rid
+		
+
+
+
+general search context criteria:
+
+	rid (matched against intra-object for:rid and not:rid)
+	except_tid
+	require_tid
+	interests
+	created_before
+	created_after
+	modified_before
+	modified_after
+
+
+
+
+ADD INCLUDE AND EXCLUDE AS SYNONYMS FOR REQUIRE AND EXCEPT
+
+
+
+implement a /public hierarchy for hosting public javascript, etc
+
+put /feeds to /private
+
+
+
+ping kevin about marking-up in-feed-document URLs with
+rel=submitcomment or something.
+
+comments on objects get written as key=value files in
+database/objects/OID.comments/CID
+
+	CREATE /ui/object/OID/comment.html <- UI skin aware?
+
+	CREATE /api/object/OID/comment.xml
+	READ /api/object/OID/comment.xml
+	READ /api/object/OID/comment/CID.xml
+	UPDATE /api/object/OID/comment/CID.xml
+	DELETE /api/object/OID/comment/CID.xml
+
+API for comment-lists-ing
+
+first plugin: HTML sticky-note
+
+
+
+
+
+
+brilliant flashes of inspiration
+	in config define SKINNAME, maps to /ui/SKINNAME/...
+	default SKINNAME is "basic"
+	config picks up homepage url
+
+	
+	define FEEDDEPTH
+		sort order of Object->list promotes MRM to top of list
+		keep filling feed for RELATION until FEEDDEPTH met
+		generate feed
+
+
+
+- the Thing->toAtomHTML method is really easy; if the type is
+  text/html then return that, otherwise put a link stub as HTML and
+  return that
+
+- if Object is DRAFT 
+	it will be seen only by You.
+
+- if Object is FINAL but not PUBLIC, 
+	it will be seen by you
+	it will be seen by ALICE if it is labelled FOR:ALICE
+
+- if Object is PUBLIC 
+	it is subject to tagging rules
+
+- add relationSourceIPAddress doing substring match against "192.168.1." for subnet ACL accesss 
+
+- relationNames need to be single word tokens, no spaces
+
+- all thingNames must begine with an alphanumeric and not contain spaces
+
+- add bulk tag-creation method
+
+- add read() supermethod to Object, to add stuff like objectSize to metadata
+
+- add Extension-keys to the Thing, so anything beginning xxx is
+  permitted?
+
+- make Mine multiuser, through database/USERNAME/[...]
+
+- fix the trap_exception_to_http method to give traceback to file
+  regardless of setting
+
+- re-do the API documentation
+
+- special testing of the actual PUT method, it has not been tested yet
+
+- put a shim into "thing" for populating tags, subclass it
+  appropriately, bunging the data field names into boot()
+
+- document magic-tags
+
+	on Objects: for:RELATION / not:RELATION
+	eg: myself-naked.jpg - for:boyfriend not:enemy
+
+	on Relations: require:TAG / except:TAG
+	winelover - food drink except:beer
+		where drink = "wine beer spirits"
+		and bottle.jpg is tagged with "wine"
+
+- implement and test object cloning
+
+- implement JSON and ATOM output formats for API calls
+
+- document and implement
+	objectParent: OID (a clone knows who its parent is)
+	objectThumbnail: OID (an object knows who its thumbnail is)
+
+- finish remote-mine
+
+- use lastmod data on both DATA and META to determine sort-order for
+  objects which are to be considered for feed inclusion...
+

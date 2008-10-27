@@ -1,0 +1,3 @@
+check case-insensitivity of tag/relation name lookup
+
+clone() does not apply to Tags or Comments

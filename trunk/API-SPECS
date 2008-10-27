@@ -1,0 +1,182 @@
+work in progress
+alec muffett
+20081012164454
+
+
+------------------------------------------------------------------
+
+* General Notes
+
+- all references herein to "protomine" may be generalised to all mines
+
+- all datestamps that protomine uses are "inclusive" to the second,
+  thus for example if a relationship is embargoed before
+  20081012164721 then that means up to and including the 21st second
+  of that minute.
+
+- three forms of datestamp are in use by protomine in various
+  locations; unix time, yyyymmddhhmmss time in the ZULU/GMT timezone
+  (henceforth 'YYYY format'), and ATOM time in ZULU/GMT format; only
+  the latter two will be published outside the mine, in appropriate
+  contexts.
+
+- the preferred date format is YYYY format, why bother inserting
+  colons into something only to rip them out again later?
+
+- tagwords
+
+------------------------------------------------------------------
+
+* Things
+
+Objects, Comments, Relations and Tags are sub-classes of "Thing";
+Things define in their boot() method, three hashes:
+
+- REQUIRED_KEYS: the keys for this hash are the names of parameters
+  which are MANDATORY for the object to be written to storage; the
+  values are integer booleans, 1/0
+
+- WRITABLE_KEYS: the keys for this hash are the names of parameters
+  which are MAY be written to storage as part of the object, and MUST
+  be equal to or a superset of REQUIRED_KEYS; parameters which are not
+  cited in this list MUST NOT be written to storage; the values are
+  integer booleans, 1/0
+
+- VALID_KEYS: the keys for this hash are the names of parameters which
+  are PERMITTED for mine-internal manipulation of the Thing, and and
+  MUST be equal to or a superset of VALID_KEYS; the values are integer
+  booleans, 1/0 - OR the value may be a LISTREF which enumerates the
+  permitted values to which the parameter may be set.
+
+- Enumerating potential parameter values using VALID_KEYS and setting
+  parameters as REQUIRED_KEYS is the standard way of enforcing status
+  settings in the Mine.
+
+- Parameter names for a given Thing must follow the convention
+  "thingFoo" or "thingFooBar" a-la Java method naming conventions;
+  they must be purely Alphabetic.
+
+- The term "Id" as in "Identifier" is treated as an English word
+  rather than as an acronym, and is capitalised as shown.
+
+- For each "thing" there is a "thingId" parameter, this MUST NOT be
+  written to disk as it is implicit in the numeric key which indexes
+  the thing in the database (eg: the filename containing the
+  information)
+
+- thingIds are integer numbers greater than or equal to 1; negative
+  and zero thingIds are not valid, and are used thusly in the code to
+  signify lack-of-existence or other negative states.
+
+- Parameter values may not contain CR or LF (carriage return or
+  newline) and will have any whitespace "crushed" to a single SPC
+  character on writing to storage
+
+- If you are writing a plugin mine application or which requires
+  whitespace preservation - or indeed any other form of data storage -
+  then create an Object and use its auxilliary data for storage, and
+  create another Object to act as a directory of data objects, and ask
+  the user to store the objectId for *that* in the Mine configuration
+  registry.
+
+- The Mine Configuration Registry is a single atomic "Thing" - it is
+  not a Thing database - in which parameters may be stored to "root"
+  object tree searches.
+
+------------------------------------------------------------------
+
+* Thing Parameters
+
+-- Object Parameters --
+
+objectCreated: YYYY date of creation
+
+objectDescription: HTML text describing the object auxilliary data
+
+objectHideAfter: YYYY date after which the object SHALL NOT be
+visible other than to the USER
+
+objectHideBefore: YYYY date before which the object SHALL NOT be
+visible other than to the USER
+
+objectId: database key
+
+objectLastModified: YYYY date last modified
+
+objectName: plain text (verbatim) naming the object
+
+objectParent: set in clones only, objectId of the original object
+
+objectStatus: enumerated status flag for object
+
+objectTags: (on disk, encoded) forms of Object tags
+
+objectThumbnail: objectId of a PNG, or other representational
+thumbnail for aux data of this object
+
+objectType: valid, standardised MIME type for the auxilliary data
+for this object
+
+-- Comment Parameters --
+
+commentBody: HTML text of feedback provided to user, max size
+implementation defined, at least 64Kb
+
+commentCreated: YYYY date of creation
+
+commentId: database key
+
+commentLastModified: YYYY date of last modification
+
+commentRelationId: relationId of submitter
+
+commentSubject: plain text (verbatim) describing the comment, max
+size implementation defined, at least 1Kb
+
+- Relation Parameters
+
+relationContact: URI (mailto:... http:// https://) for point of contact with relationship
+
+relationCreated:  YYYY date of creation
+
+relationDescription: HTML text describing the relationship
+
+relationEmbargoAfter: YYYY date after which the relationship will effectively not exist
+
+relationEmbargoBefore: YYYY date before which the relationship will effectively not exist
+
+relationId: database key
+
+relationImageURL: informational URL regarding the relationship
+
+relationInterests: (on disk, encoded) tags strings to match against objectTags
+
+relationLastModified: YYYY date of last modification
+
+relationName: tagname naming the relationship
+
+relationNetworkAddress: complete or partial dotted-quad IPv4 address
+of remote relationship host, no zero padding, for string matching to
+provide limited network access control.
+
+relationURL: informational URL regarding the relationship
+
+relationVersion: integer version number for relationship
+
+- Tag Parameters
+ 
+tagCreated: YYYY date of creation
+
+tagId: database key
+
+tagLastModified: YYYY date of last modification
+
+tagName: tagword name for / representation of this tag 
+
+tagParents: (on disk, encoded) list of parental (more generic) tags for this tag
+
+------------------------------------------------------------------
+
+* API URIs
+
+------------------------------------------------------------------
