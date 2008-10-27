@@ -1,0 +1,21 @@
+<form method="post" enctype="multipart/form-data" action="create-object.html">
+
+<input type="text" size="40" name="objectName" value="A Garden Landscape"/> name <br/>
+<input type="text" size="40" name="objectType" value="image/jpeg"/> type <br/>
+<input type="file" size="40" name="data" value="garden.jpg"/> select a file to upload <br/>
+<p/>
+
+description (html, spaces/newlines not preserved) <br/>
+<textarea cols="40" rows="10" name="objectDescription" value=""/>description goes here</textarea> <br/>
+<input type="text" size="60" name="objectTags" value="garden plants pictures"/> tags <br/>
+<p/>
+
+<input type="radio" name="objectStatus" value="draft"/ checked> draft <br/>
+<input type="radio" name="objectStatus" value="final"/> final <br/>
+<input type="radio" name="objectStatus" value="public"/> public <br/>
+<p/>
+
+<input type="reset" value="reset"/> 
+<input type="submit" value="upload"/> <br/>
+
+</form>

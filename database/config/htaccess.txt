@@ -1,0 +1,4 @@
+RewriteEngine  On
+RewriteBase    /~alecm
+RewriteRule    ^mine(.*)      cgi-bin/protomine.cgi$1
+
