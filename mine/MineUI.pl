@@ -235,7 +235,7 @@ sub printError {
 sub printFile {
     my $self = shift;
     my $arg = shift;
-    my $type = &_mimeType($arg);
+    my $type = &mime_type($arg);
     my $q = $self->cgi;
     print $q->header(-type => $type);
     $self->catFile($arg);
@@ -525,7 +525,7 @@ sub formatDirectory {           # format a filesystem directory
 	    $size = 0;
 	}
 	else {
-	    $type = &_mimeType($file);
+	    $type = &mime_type($file);
 	    $size = (-s $this);
 	}
 
@@ -727,43 +727,6 @@ sub toString {
     push(@retval, "========================================\n");
 
     return join('', @retval);
-}
-
-##################################################################
-
-sub _mimeType {
-    my $filesuffix = shift;
-    $filesuffix =~ s!^.*\.!!o; # greedy match to destroy as much as possible
-    $filesuffix =~ tr/A-Z/a-z/; # force lowercase
-
-    # start by fast-tracking certain extensions
-    # approximate order of likliehood
-    return "text/html" if ($filesuffix eq 'html');
-    return "image/jpeg" if ($filesuffix eq 'jpg');
-    return "image/png" if ($filesuffix eq 'png');
-    return "text/css" if ($filesuffix eq 'css');
-    return "text/plain" if ($filesuffix eq 'txt');
-    return "image/gif" if ($filesuffix eq 'gif');
-    return "image/jpeg" if ($filesuffix eq 'jpeg');
-    return "text/html" if ($filesuffix eq 'htm');
-
-    # insert a mime.types lookup here
-    my $mimefile = "database/config/mime.types";
-
-    open(MIME, $mimefile) || die "open: $mimefile: $!\n";
-    while (<MIME>) {
-	next if m!^\s*(\#.*)?$!o;
-	my ($type, @suffixes) = split;
-	foreach my $suffix (@suffixes) {
-	    if ($suffix eq $filesuffix) {
-		return $type;
-	    }
-	}
-    }
-    close(MIME);
-
-    # fall through
-    return "application/octet-stream";
 }
 
 1;

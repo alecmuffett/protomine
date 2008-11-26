@@ -18,28 +18,21 @@ things
 animals
 plants
 transport
-
 wine drink
 white-wine wine
 red-wine wine
-
 tannins
-
 cats animals
-
 shoes
 stiletto shoes
 sneakers shoes
 trainers shoes
 pumps shoes
-
 france
 italy
 spain
-
 rioja  red-wine tannins
 chardonnay white-wine
-
 documents
 flowers plants
 mine
@@ -96,6 +89,4 @@ rose.jpg
 stonehenge.jpg
 suzi.jpg
 woodland.jpg
-network-cloud.jpg
-fall-communism.jpg
 EOF
