@@ -16,7 +16,7 @@
 
 #### THIS IS IN THE USERS PUBLIC HTML DIRECTORY
 
-CGI=$$HOME/Sites/cgi-bin 
+CGI=$$HOME/Sites/cgi-bin
 
 #### THIS IS IN THE PROTOMINE WORKING DIRECTORY
 
@@ -50,8 +50,8 @@ $(UI)/index.html: bin/generate-homepage.pl
 
 $(CGI)/protomine.cgi: protomine.cgi
 	perl -wc $?
-	cp $? $@
-	chmod 755 $@
+	cp $? $(CGI)/protomine.cgi
+	chmod 755 $(CGI)/protomine.cgi
 
 ###
 # check the mine library files for syntax errors
