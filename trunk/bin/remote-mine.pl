@@ -20,7 +20,7 @@ $root = 'http://localhost/~alecm/mine';
 
 require "mine/pm-mime.pl";
 
-my $debug = 1;
+my $debug = 0;
 push(@curlopts, '--fail') if (0); # curl dies silently on failure
 push(@curlopts, '--digest') if (0);  # curl http digest authentication
 push(@curlopts, '--user', 'alecm:sesame') if (0); # user and pw for authentication
@@ -51,8 +51,8 @@ sub Mine {
 	push(@curlargs, '-F', $arg);
     }
 
-    if ($j) {
-	$api =~ s!\.xml$!.json!o; # to JSON if "-j"
+    if ($j) {			# # to JSON if "-j"
+	$api =~ s!\.xml$!.json!o; 
     }
 
     @cmd = ("curl", @curlopts, "$root$api$query", @curlargs);
@@ -131,8 +131,26 @@ while (<DATA>) {
 	}
     }
 
-    # UPLOAD: magic special case for uploading files
-    elsif ($call_how eq 'FASTUPLOAD') {
+    # FRELATION: magic special case for uploading files
+    elsif ($call_how eq 'FRELATION') {
+
+	foreach my $filename (@ARGV) {
+	    my $relationname = shift(@ARGV);
+	    my $relationversion = shift(@ARGV);
+	    my $relationdescription = shift(@ARGV);
+
+	    &Mine($method,
+		  $api,
+		  "relationName=$relationname",
+		  "relationVersion=$relationversion",
+		  "relationDescription=$relationdescription",
+		  "relationInterests=@ARGV",
+		);
+	}		  
+    }
+
+    # FUPLOAD: magic special case for uploading files
+    elsif ($call_how eq 'FUPLOAD') {
 
 	foreach my $filename (@ARGV) {
 	    my $filetype = &mime_type($filename);
@@ -145,10 +163,11 @@ while (<DATA>) {
 		  "objectStatus=draft",
 		  "objectDescription=bulk-uploaded file, sourced from $filename");
 	}
-		  
     }
 
-    elsif ($call_how eq 'FASTTAGS') {
+
+    # FTAGS: magic special case for creating tags
+    elsif ($call_how eq 'FTAGS') {
 
 	foreach my $foo (@ARGV) {
 	    my ($tagname, @tagparents) = split(m!/!o, $foo);
@@ -160,9 +179,7 @@ while (<DATA>) {
 	}
     }
 
-
     # THIS CAN'T HAPPEN
-
     else {
 	die "LOL WHUT?\n";
     }
@@ -172,6 +189,7 @@ while (<DATA>) {
 
 unless ($we_did_something) {
     warn "usage:\t$0 [-j] [command] [args ... ]\n";
+    warn "option: -j # select JSON output rather than XML\n";
     warn "commands:\n";
     warn join ('',  @cmdlist);
     exit 1;
@@ -194,8 +212,9 @@ __END__;
 #select-tags       PASSARGS  read    /api/select/tag.xml
 
 # builtins which speed things up
-fast-upload  FASTUPLOAD  create  /api/object.xml  file  ...
-fast-tags    FASTTAGS    create  /api/tag.xml     tag1  tag2/parent  tag3/parent/parent  ...
+fast-upload    FUPLOAD    create  /api/object.xml    file  ...
+fast-tags      FTAGS      create  /api/tag.xml       tag1  tag2/p1  tag3/p1/p2  ...
+fast-relation  FRELATION  create  /api/relation.xml  name  vers     desc        tag  ...
 
 # raw API calls
 clone-object     SUB1PASS  create  /api/object/OID/clone.xml  42
