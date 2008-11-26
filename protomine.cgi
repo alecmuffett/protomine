@@ -34,7 +34,7 @@ my $base_directory = "/Users/alecm/protomine";
 my $log_dir = "database/logs";
 
 # set to 0 for debugging in apache errlog
-my $trap_exceptions_to_http = 0;
+my $trap_exceptions_to_http = 1;
 
 ##################################################################
 

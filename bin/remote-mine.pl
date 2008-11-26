@@ -1,4 +1,5 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -s
+
 ##
 ## Copyright 2008 Adriana Lukas & Alec Muffett
 ##
@@ -20,7 +21,7 @@ $root = 'http://localhost/~alecm/mine';
 require "mine/pm-mime.pl";
 
 my $debug = 1;
-push(@curlopts, '--fail') if (1); # curl dies silently on failure
+push(@curlopts, '--fail') if (0); # curl dies silently on failure
 push(@curlopts, '--digest') if (0);  # curl http digest authentication
 push(@curlopts, '--user', 'alecm:sesame') if (0); # user and pw for authentication
 push(@curlopts, '--verbose') if (0); # curl acts verbosely
@@ -48,6 +49,10 @@ sub Mine {
 
     foreach $arg (@args) {
 	push(@curlargs, '-F', $arg);
+    }
+
+    if ($j) {
+	$api =~ s!\.xml$!.json!o; # to JSON if "-j"
     }
 
     @cmd = ("curl", @curlopts, "$root$api$query", @curlargs);
@@ -127,7 +132,7 @@ while (<DATA>) {
     }
 
     # UPLOAD: magic special case for uploading files
-    elsif ($call_how eq 'UPLOAD') {
+    elsif ($call_how eq 'FASTUPLOAD') {
 
 	foreach my $filename (@ARGV) {
 	    my $filetype = &mime_type($filename);
@@ -138,9 +143,21 @@ while (<DATA>) {
 		  "objectName=$filename",
 		  "objectType=$filetype",
 		  "objectStatus=draft",
-		  "objectDescription=bulk-uploaded, sourced from $filename");
+		  "objectDescription=bulk-uploaded file, sourced from $filename");
 	}
 		  
+    }
+
+    elsif ($call_how eq 'FASTTAGS') {
+
+	foreach my $foo (@ARGV) {
+	    my ($tagname, @tagparents) = split(m!/!o, $foo);
+	    my @tagargs = ();
+
+	    push(@tagargs, "tagName=$tagname");
+	    push(@tagargs, "tagParents=@tagparents") if ($#tagparents >= 0);
+	    &Mine($method, $api, @tagargs);
+	}
     }
 
 
@@ -154,7 +171,7 @@ while (<DATA>) {
 # did the user goof?
 
 unless ($we_did_something) {
-    warn "usage:\t$0 [command] [args ... ]\n";
+    warn "usage:\t$0 [-j] [command] [args ... ]\n";
     warn "commands:\n";
     warn join ('',  @cmdlist);
     exit 1;
@@ -175,7 +192,12 @@ __END__;
 #select-objects    PASSARGS  read    /api/select/object.xml
 #select-relations  PASSARGS  read    /api/select/relation.xml
 #select-tags       PASSARGS  read    /api/select/tag.xml
-upload           UPLOAD    create  /api/object.xml            filename    ...
+
+# builtins which speed things up
+fast-upload  FASTUPLOAD  create  /api/object.xml  file  ...
+fast-tags    FASTTAGS    create  /api/tag.xml     tag1  tag2/parent  tag3/parent/parent  ...
+
+# raw API calls
 clone-object     SUB1PASS  create  /api/object/OID/clone.xml  42
 create-object    PASSARGS  create  /api/object.xml            data=@file  a=b         c=d  ...
 create-relation  PASSARGS  create  /api/relation.xml          a=b         c=d         ...
