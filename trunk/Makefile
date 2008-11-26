@@ -14,11 +14,14 @@
 ## permissions and limitations under the License.
 ##
 
+#### THIS IS IN THE USERS PUBLIC HTML DIRECTORY
+
+CGI=$$HOME/Sites/cgi-bin 
+
+#### THIS IS IN THE PROTOMINE WORKING DIRECTORY
+
 UI=database/ui
 DOC=database/doc
-CGI=/Users/alecm/Sites/cgi-bin
-
-BACKUPHOST=inet-luther
 
 LIBFILES=mine/MineUI.pl mine/Object.pl mine/Relation.pl \
 	mine/Tag.pl mine/Thing.pl mine/pm-time.pl \
@@ -27,51 +30,68 @@ LIBFILES=mine/MineUI.pl mine/Object.pl mine/Relation.pl \
 
 ##################################################################
 
+###
+# top rule: installs notes into mine document database
+###
+
 all: $(UI)/index.html perms $(CGI)/protomine.cgi
 	for i in LICENSE NOTICE TECHNOTES TODO ; do cp $$i database/doc/$$i.txt ; done
+
+###
+# mechanically generate the mine document database homepage
+###
 
 $(UI)/index.html: bin/generate-homepage.pl
 	$? > $@
 
-perms:
-	find . | closeperm > /dev/null 2>&1
-	find . | openperm > /dev/null
-	( cd database ; chmod 01777 objects tags relations logs )
+###
+# check and install the CGI script
+###
 
 $(CGI)/protomine.cgi: protomine.cgi
 	perl -wc $?
 	cp $? $@
 	chmod 755 $@
 
+###
+# check the mine library files for syntax errors
+###
+
 protomine.cgi: $(LIBFILES)
 	for i in $? ; do perl -wc $$i || exit 1 ; done
 	touch $@
 
-##################################################################
-
-clean: perms
-	sync # macos
-	-rm `find . -name '*~'`
-	-rm MANIFEST
-
-# not doing: rm -f database/logs/* - because i like logs
-clobber: clean
-	rm -f database/objects/*
-	rm -f database/relations/*
-	rm -f database/tags/*
+###
+# basic setup
+###
 
 setup: all clobber
 	./bin/sample-data-setup.sh
 
-backup: clobber
-	rsync -av --delete /Users/alecm/protomine/ $(BACKUPHOST):protomine/
+### 
+# blow away the environment 
+###
 
-MANIFEST:
-	find . ! -type l | \
-		egrep -v 'database/(logs|objects|relations|tags)/.' | \
-		egrep -vi 'slideware/' | \
-		egrep -vi '\.(jpg|png)$$' | \
-		sort > $@
+clobber: clean
+	rm -f database/objects/*
+	rm -f database/relations/*
+	rm -f database/tags/* # leave logs alone
 
-tarball: clean MANIFEST
-	cpio -ovH ustar < MANIFEST | gzip -9 > ../protomine-`date "+%Y%m%d.%H%M%S"`.tar.gz
+###
+# delete scratch files
+###
+
+clean: perms
+	-rm `find . -name '*~'`
+
+###
+# coersce the permissions to plausible values for development
+###
+
+perms:
+	chmod 0755 `find . -type d -print`
+	chmod 0644 `find . -type f -print`
+	chmod 0755 protomine.cgi
+	chmod 0755 bin/*
+	( cd database ; chmod 01777 objects tags relations logs )
+

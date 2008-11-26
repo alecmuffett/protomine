@@ -47,6 +47,7 @@ chdir($base_directory) or die "chdir: $base_directory: $!";
 require 'mine/pm-api.pl';
 require 'mine/pm-ui.pl';
 require 'mine/pm-time.pl';
+require 'mine/pm-mime.pl';
 
 require 'mine/MineUI.pl';
 
