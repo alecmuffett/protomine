@@ -8,13 +8,18 @@ Key to this is that when you choose to move your Mine! from one hosting provider
 
 = Details =
 
-* a Mine! export file is a Zip file
-* rooted _under_ but not _containing_ the database directory
-* containing mandatory subdirectories: config, objects, relations, tags
-* containing optional subdirectories: anything else, at risk of deletion by the user
+  * a Mine! export file is a Zip file
+  * rooted _under_ but not _containing_ the database directory
+  * containing mandatory subdirectories
+    * config
+    * objects
+    * relations
+    * tags
+  * containing optional subdirectories
+    * anything else, at risk of deletion by the user
 
-* N is an integer string (eg: "42")
-* N is greater than zero
+  * N is an integer string (eg: "42")
+  * N is greater than zero
 
 
 
