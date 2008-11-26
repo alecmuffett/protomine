@@ -5,51 +5,37 @@ exec 2>&1
 DIR=database/doc/sample-data
 CMD=remote-mine.pl
 
-# set up some tags
-while read tagName tagParents
-do
+# set up some basic tags
+$CMD fast-tags \
+     animals documents drink food france italy mine motorbikes people \
+     plants shoes spain tannins things transport vrm weather
 
-    test "$tagName" = "" && continue
-    $CMD create-tag \
-	"tagName=$tagName" \
-	"tagParents=$tagParents" || exit 1
+# set up tags with parents (must pre-define) for implicit tagging
+$CMD fast-tags \
+     cats/animals \
+     flowers/plants \
+     pumps/shoes \
+     sneakers/shoes \
+     stiletto/shoes \
+     trainers/shoes
 
-done <<EOF
-food
-drink
-people
-things
-animals
-plants
-transport
-wine drink
-white-wine wine
-red-wine wine
-tannins
-cats animals
-shoes
-stiletto shoes
-sneakers shoes
-trainers shoes
-pumps shoes
-france
-italy
-spain
-rioja  red-wine tannins
-chardonnay white-wine
-documents
-flowers plants
-mine
-motorbikes
-vrm
-weather
-EOF
+# the wine hierarchy, just to drive the point home
+$CMD fast-tags \
+     wine/drink \
+     white-wine/wine \
+     red-wine/wine \
+     chardonnay/white-wine \
+     rioja/red-wine/tannins
 
-# set up some relations
-while read relationName relationVersion relationDescription relationContact relationInterests
+# upload some objects without individual tagging
+$CMD fast-upload $DIR/*
+
+# verbosely set up some relations
+while read relationName relationVersion relationDescription relationInterests
 do
 
     test "$relationName" = "" && continue
+
     $CMD create-relation \
 	"relationName=$relationName" \
 	"relationVersion=$relationVersion" \
@@ -58,14 +44,11 @@ do
 	"relationInterests=$relationInterests" || exit 1
 
 done <<EOF
-alec 1 Alec-Muffett alec.muffett@gmail.com wine cats motorbikes mine
-adriana 1 Adriana-Lukas adriana.lukas@gmail.com italy motorbikes cats vrm mine
-carrie 1 Carrie-Bishop fake.address@fake.domain sneakers trainers mine vrm
-ben 1 Ben-Laurie fake.address@fake.domain wine food motorbikes
+alec     1  Alec-Muffett   wine      cats        motorbikes  mine
+adriana  1  Adriana-Lukas  italy     motorbikes  cats        vrm   mine
+carrie   1  Carrie-Bishop  sneakers  trainers    mine        vrm
+ben      1  Ben-Laurie     wine      food        motorbikes
 EOF
-
-# set up some objects
-$CMD upload $DIR/*
 
 # done
 exit 0
