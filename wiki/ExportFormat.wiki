@@ -9,20 +9,44 @@ Key to this is that when you choose to move your Mine! from one hosting provider
 = Details =
 
   * a Mine! export file is a Zip file
-  * rooted _under_ but not _containing_ the database directory
+    * rooted _under_ but not _containing_ the database directory
+
   * containing mandatory subdirectories
-    * config
-    * objects
-    * relations
-    * tags
+    * config/
+    * objects/
+    * relations/
+    * tags/
+
   * containing optional subdirectories
     * anything else, at risk of deletion by the user
 
-  * N is an integer string (eg: "42")
-  * N is greater than zero
+  * Given where
+    * N or M is an integer string (eg: "42")
+    * N or M is greater than zero
 
+  * Metadata for objects/relations/tags is stored in files named
+    * objects/N
+    * relations/N
+    * tags/N
 
+  * Ancilliary data for object N is stored in a file named
+    * objects/N.data
 
-== Issues ==
+  * Comments for object N are stored in a directory
+    * objects/N.comments/
 
-How to scale sensibly when N >= 100 ?
+  * Comments are stored as metadata files
+    * objects/N.comments/M
+
+  * Where N or M is greater than value K
+    * it will be replaced with a directory bucket named X ...
+    * and reference a file named N in that directory X
+    * X = K * int( N / K )
+    * hence where for example K = 100:
+      * tags/500/512
+      * relations/1100/1199
+      * objects/12800/12804.data
+      * objects/100/123.comments/400/456
+
+  * TODO: define a good value for K (100? 256? 1024?)
+  * TODO: find a better scaling mechanism?
