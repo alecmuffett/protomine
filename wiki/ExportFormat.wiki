@@ -1,0 +1,23 @@
+#summary Discussion of the export-format for compliant Mines
+
+= Introduction =
+
+One of the precepts of The Mine! Project is that _you_ are hosting _your_ data.
+
+Key to this is that when you choose to move your Mine! from one hosting provider to another, or onto a device like an iPhone or GooglePhone, or into or from cloud storage, you need a common format to simplify your life.
+
+= Details =
+
+* a Mine! export file is a Zip file
+* rooted _under_ but not _containing_ the database directory
+* containing mandatory subdirectories: config, objects, relations, tags
+* containing optional subdirectories: anything else, at risk of deletion by the user
+
+* N is an integer string (eg: "42")
+* N is greater than zero
+
+
+
+== Issues ==
+
+How to scale sensibly when N >= 100 ?
