@@ -64,8 +64,9 @@ my $we_did_something = 0;
 
 while (<DATA>) {
     next if (/^\s*(\#.*)?$/o);  # skip comment lines and blanks
-    s/\#.*$//o;                 # strip comments
-    chomp;			# strip newline
+    s/\#.*$//go;		# strip comments
+    s/\s+/ /go;			# strip multi-whitespace
+    s/\s$//o;;			# strip trailing whitespace
 
     # split on spaces
     my ($cmd, $call_how, $method, $api, $doc) = split(" ", $_, 5);
