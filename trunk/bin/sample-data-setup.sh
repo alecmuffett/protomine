@@ -1,15 +1,19 @@
 #!/bin/sh
-exec 2>&1 
+exec 2>&1
 #set -x
 
-CMD=remote-mine.sh
 DIR=database/doc/sample-data
+CMD=remote-mine.pl
 
 # set up some tags
-while read tag parents
+while read tagName tagParents
 do
-    test "$tag" = "" && continue
-    $CMD create-tag $tag $parents|| exit 1
+
+    test "$tagName" = "" && continue
+    $CMD create-tag \
+	"tagName=$tagName" \
+	"tagParents=$tagParents" || exit 1
+
 done <<EOF
 food
 drink
@@ -42,14 +46,17 @@ weather
 EOF
 
 # set up some relations
-while read name version comment contact interests
+while read relationName relationVersion relationDescription relationContact relationInterests
 do
+
+    test "$relationName" = "" && continue
     $CMD create-relation \
-	"$name" \
-	"$version" \
-	"$comment" \
-	"$contact" \
-	"$interests" || exit 1
+	"relationName=$relationName" \
+	"relationVersion=$relationVersion" \
+	"relationDescription=$relationDescription" \
+	"relationContact=$relationContact" \
+	"relationInterests=$relationInterests" || exit 1
+
 done <<EOF
 alec 1 Alec-Muffett alec.muffett@gmail.com wine cats motorbikes mine
 adriana 1 Adriana-Lukas adriana.lukas@gmail.com italy motorbikes cats vrm mine
@@ -58,35 +65,7 @@ ben 1 Ben-Laurie fake.address@fake.domain wine food motorbikes
 EOF
 
 # set up some objects
-while read filename type
-do
-    $CMD create \
-	$DIR/$filename \
-	"upload from $filename" \
-	`bin/lookup-mime.pl $filename` \
-	draft \
-	"this is a comment about $filename" || exit 1
-done <<EOF
-adriana.jpg
-alecm.png
-austen.txt
-bridge.jpg
-buster.jpg
-cloud.jpg
-dam.jpg
-fashion1.jpg
-feeds-based-vrm.pdf
-italy.jpg
-milan.jpg
-mine-diagram.jpg
-mine-paper-v2.pdf
-monument.jpg
-moon.jpg
-mountains.jpg
-pimpernel.jpg
-rome.jpg
-rose.jpg
-stonehenge.jpg
-suzi.jpg
-woodland.jpg
-EOF
+$CMD upload $DIR/*
+
+# done
+exit 0
