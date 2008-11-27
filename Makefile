@@ -97,7 +97,7 @@ errs:
 ###
 
 protomine-config.pl: generate-config.sh
-	generate-config.sh > protomine-config.pl
+	./generate-config.sh > protomine-config.pl
 	chmod 755 protomine-config.pl
 
 ###
