@@ -1,6 +1,14 @@
 cd
+
 svn checkout http://protomine.googlecode.com/svn/trunk/ protomine
+
 cd protomine
+
 ./osx-setup.sh
+
 make
+
 ./populate-mine.sh
+
+./open-browser.pl
+
