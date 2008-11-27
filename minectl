@@ -143,19 +143,17 @@ while (<DATA>) {
     # FRELATION: magic special case for uploading files
     elsif ($call_how eq 'FRELATION') {
 
-	foreach my $filename (@ARGV) {
-	    my $relationname = shift(@ARGV);
-	    my $relationversion = shift(@ARGV);
-	    my $relationdescription = shift(@ARGV);
+	my $relationname = shift(@ARGV);
+	my $relationversion = shift(@ARGV);
+	my $relationdescription = shift(@ARGV);
 
-	    &Mine($method,
-		  $api,
-		  "relationName=$relationname",
-		  "relationVersion=$relationversion",
-		  "relationDescription=$relationdescription",
-		  "relationInterests=@ARGV",
-		);
-	}		  
+	&Mine($method,
+	      $api,
+	      "relationName=$relationname",
+	      "relationVersion=$relationversion",
+	      "relationDescription=$relationdescription",
+	      "relationInterests=@ARGV",
+	    );
     }
 
     # FUPLOAD: magic special case for uploading files

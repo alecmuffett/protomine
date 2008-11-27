@@ -35,7 +35,7 @@ all: permissions protomine-config.pl syntaxcheck webpages test
 ###
 
 test:
-	minectl.pl version
+	minectl version
 
 ###
 # install webpages into mine document database
@@ -49,7 +49,7 @@ webpages: $(UI)/index.html
 ###
 
 syntaxcheck:
-	for i in lib/*.pl protomine.cgi ; do perl -wc $$i || exit 1 ; done
+	for i in lib/*.pl protomine.cgi minectl ; do perl -wc $$i || exit 1 ; done
 
 ###
 # blow away the environment
@@ -76,7 +76,7 @@ clean: permissions
 permissions:
 	chmod 0755 `find . -type d -print`
 	chmod 0644 `find . -type f -print`
-	chmod 0755 *.pl *.sh *.cgi
+	chmod 0755 *.pl *.sh minectl protomine.cgi
 	( cd database ; chmod 01777 objects tags relations logs )
 
 

@@ -23,13 +23,13 @@ exec 2>&1
 # can't be arsed to poke filenames in everywhere
 
 DIR=database/doc/sample-data
-REMOTE=minectl.pl
+MINECTL=minectl
 
 
 ###
 # set up some basic tags
 
-$REMOTE fast-tags \
+$MINECTL fast-tags \
      animals documents drink food mine motorbikes people plants shoes \
      things transport vrm weather french italian spanish
 
@@ -38,7 +38,7 @@ $REMOTE fast-tags \
 # set up tags with parents for implicit tagging; 
 # NB: you must pre-declare a tag before you use it as a parent
 
-$REMOTE fast-tags \
+$MINECTL fast-tags \
      cats/animals \
      hippos/animals \
      cookery/food \
@@ -52,7 +52,7 @@ $REMOTE fast-tags \
 ###
 # the wine hierarchy, just to drive the point home
 
-$REMOTE fast-tags \
+$MINECTL fast-tags \
      wine/drink \
      white-wine/wine \
      red-wine/wine \
@@ -64,7 +64,7 @@ $REMOTE fast-tags \
 ###
 # upload some objects without individual tagging
 
-$REMOTE fast-upload $DIR/* # my, isn't this easy?
+$MINECTL fast-upload $DIR/* # my, isn't this easy?
 
 
 ###
@@ -79,7 +79,7 @@ do
     # this shell script can't preserve space easily, hence this hack
     relationDescription=`echo $relationDescription | sed -e 's/_/ /'`
 
-    $REMOTE create-relation \
+    $MINECTL create-relation \
 	"relationName=$relationName" \
 	"relationVersion=$relationVersion" \
 	"relationDescription=$relationDescription" \
@@ -96,7 +96,7 @@ EOF
 ###
 # quick hack to demo fast-relation
 
-$REMOTE fast-relation perry 1 "Perry de Havilland" red-wine food hippos
+$MINECTL fast-relation perry 1 "Perry de Havilland" red-wine food hippos
 
 
 ###
