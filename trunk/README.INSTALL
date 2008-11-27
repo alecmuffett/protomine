@@ -1,14 +1,24 @@
-cd
+------------------------------------------------------------------
+Administrator priviliges for your account *will* be required.
+Installation will be in "protomine" directory in your homedir.
+Enable "Personal Web Sharing" before proceeding.
 
-svn checkout http://protomine.googlecode.com/svn/trunk/ protomine
 
-cd protomine
+Commands:
+---------
 
-./osx-setup.sh
+  cd
 
-make
+  svn checkout http://protomine.googlecode.com/svn/trunk/ protomine
 
-./populate-mine.sh
+  cd protomine
 
-./open-browser.pl
+  ./osx-setup.sh
 
+  make
+
+  ./populate-mine.sh
+
+  ./open-browser.pl
+
+------------------------------------------------------------------
