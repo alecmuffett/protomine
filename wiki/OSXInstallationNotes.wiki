@@ -7,6 +7,8 @@ Installation notes for OSX
 
 = Details =
 
+File /etc/apache2/users/USERNAME.conf
+
 {{{
 <Directory "/Users/USERNAME/Sites/">
     Options Indexes FollowSymlinks MultiViews
@@ -21,4 +23,12 @@ Installation notes for OSX
 </Directory>
 
 AccessFileName .htaccess
+}}}
+
+File /Users/USERNAME/Sites/.htaccess
+
+{{{
+RewriteEngine  On
+RewriteBase    /~USERNAME
+RewriteRule    ^mine(.*)      cgi-bin/protomine.cgi$1
 }}}
