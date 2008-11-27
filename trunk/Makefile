@@ -14,84 +14,75 @@
 ## permissions and limitations under the License.
 ##
 
-#### THIS IS IN THE USERS PUBLIC HTML DIRECTORY
-
-CGI=$$HOME/Sites/cgi-bin
 
 #### THIS IS IN THE PROTOMINE WORKING DIRECTORY
 
 UI=database/ui
 DOC=database/doc
 
-LIBFILES=mine/MineUI.pl mine/Object.pl mine/Relation.pl \
-	mine/Tag.pl mine/Thing.pl mine/pm-time.pl \
-	mine/pm-api.pl mine/pm-ui.pl
-
-
 ##################################################################
 
+# top dependency: is there a config file
+
+all: permissions bin/config.pl syntaxcheck webpages
+
+# make the config file
+
+bin/config.pl:
+	bin/configure-setup.sh > bin/config.pl
+	chmod 755 bin/config.pl
+
 ###
-# top rule: installs notes into mine document database
+# top rule: installs webpages into mine document database
 ###
 
-all: $(UI)/index.html perms $(CGI)/protomine.cgi
-	for i in LICENSE NOTICE TECHNOTES TODO ; do cp $$i database/doc/$$i.txt ; done
+webpages: $(UI)/index.html
+	for i in LICENSE NOTICE TECHNOTES TODO ; do cp $$i $(DOC)/$$i.txt ; done
 
 ###
-# mechanically generate the mine document database homepage
+# generate the mine document database homepage
 ###
 
 $(UI)/index.html: bin/generate-homepage.pl
 	$? > $@
 
 ###
-# check and install the CGI script
+# syntaxcheck the CGI script
 ###
 
-$(CGI)/protomine.cgi: protomine.cgi
-	perl -wc $?
-	cp $? $(CGI)/protomine.cgi
-	chmod 755 $(CGI)/protomine.cgi
-
-###
-# check the mine library files for syntax errors
-###
-
-protomine.cgi: $(LIBFILES)
-	for i in $? ; do perl -wc $$i || exit 1 ; done
-	touch $@
+syntaxcheck:
+	for i in mine/*.pl bin/protomine.cgi ; do perl -wc $$i || exit 1 ; done
 
 ###
 # basic setup
 ###
 
-setup: all clobber
+setup: clobber all
 	./bin/sample-data-setup.sh
 
-### 
-# blow away the environment 
+###
+# blow away the environment
 ###
 
 clobber: clean
 	rm -f database/objects/*
 	rm -f database/relations/*
 	rm -f database/tags/* # leave logs alone
+	rm -f bin/config.pl
 
 ###
 # delete scratch files
 ###
 
-clean: perms
+clean: permissions
 	-rm `find . -name '*~'`
 
 ###
 # coersce the permissions to plausible values for development
 ###
 
-perms:
+permissions:
 	chmod 0755 `find . -type d -print`
 	chmod 0644 `find . -type f -print`
-	chmod 0755 protomine.cgi
 	chmod 0755 bin/*
 	( cd database ; chmod 01777 objects tags relations logs )
-
