@@ -18,7 +18,7 @@
 
 DIRECTORY=`dirname $0`
 
-cd $DIRECTORY/..
+cd $DIRECTORY
 
 DIRECTORY=`pwd`
 
