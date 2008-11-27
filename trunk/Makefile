@@ -21,44 +21,35 @@ UI=database/ui
 DOC=database/doc
 
 ##################################################################
-
-# top dependency: is there a config file
-
-all: permissions bin/config.pl syntaxcheck webpages
-
-# make the config file
-
-bin/config.pl:
-	bin/configure-setup.sh > bin/config.pl
-	chmod 755 bin/config.pl
+# METATARGETS
 
 ###
-# top rule: installs webpages into mine document database
+# top dependency: is there a local-config file
+###
+
+all: permissions local-config.pl syntaxcheck webpages
+	echo done.
+
+###
+# install webpages into mine document database
 ###
 
 webpages: $(UI)/index.html
 	for i in LICENSE NOTICE TECHNOTES TODO ; do cp $$i $(DOC)/$$i.txt ; done
 
 ###
-# generate the mine document database homepage
-###
-
-$(UI)/index.html: bin/generate-homepage.pl
-	$? > $@
-
-###
 # syntaxcheck the CGI script
 ###
 
 syntaxcheck:
-	for i in mine/*.pl bin/protomine.cgi ; do perl -wc $$i || exit 1 ; done
+	for i in mine/*.pl protomine.cgi ; do perl -wc $$i || exit 1 ; done
 
 ###
 # basic setup
 ###
 
 setup: clobber all
-	./bin/sample-data-setup.sh
+	./sample-data-setup.sh
 
 ###
 # blow away the environment
@@ -68,7 +59,7 @@ clobber: clean
 	rm -f database/objects/*
 	rm -f database/relations/*
 	rm -f database/tags/* # leave logs alone
-	rm -f bin/config.pl
+	rm -f local-config.pl
 
 ###
 # delete scratch files
@@ -85,5 +76,24 @@ clean: permissions
 permissions:
 	chmod 0755 `find . -type d -print`
 	chmod 0644 `find . -type f -print`
-	chmod 0755 bin/*
+	chmod 0755 *.pl *.sh *.cgi
 	( cd database ; chmod 01777 objects tags relations logs )
+
+##################################################################
+# PHYSICAL TARGETS
+
+###
+# make the local-config file
+###
+
+local-config.pl: configure-setup.sh
+	configure-setup.sh > local-config.pl
+	chmod 755 local-config.pl
+
+###
+# generate the mine document database homepage
+###
+
+$(UI)/index.html: generate-homepage.pl
+	$? > $@
+
