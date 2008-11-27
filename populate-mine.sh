@@ -23,7 +23,7 @@ exec 2>&1
 # can't be arsed to poke filenames in everywhere
 
 DIR=database/doc/sample-data
-MINECTL=minectl
+MINECTL=./minectl
 
 
 ###
