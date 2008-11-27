@@ -18,7 +18,7 @@
 
 use strict;
 use warnings;
-use diagnostics;
+#use diagnostics;
 
 use CGI qw/:standard/;
 use CGI::Carp;
