@@ -2,12 +2,15 @@
 
 = Introduction =
 
-Installation notes for OSX
+Installation notes for OSX Leopard (10.5)
 
 
-= Details =
+= Method =
 
-File `/etc/apache2/users/USERNAME.conf`
+1) enable Web Sharing (System Preferences > Sharing > Web Sharing)
+
+
+2) Create file `/etc/apache2/users/USERNAME.conf`
 
 {{{
 <Directory "/Users/USERNAME/Sites/">
@@ -25,7 +28,8 @@ File `/etc/apache2/users/USERNAME.conf`
 AccessFileName .htaccess
 }}}
 
-File `/Users/USERNAME/Sites/.htaccess`
+
+3) Create file `/Users/USERNAME/Sites/.htaccess`
 
 {{{
 RewriteEngine  On
