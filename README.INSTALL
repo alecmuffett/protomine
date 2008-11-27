@@ -1,0 +1,8 @@
+
+
+./osx-setup.sh
+
+make
+
+./populate-mine.sh
+
