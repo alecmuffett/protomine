@@ -75,7 +75,8 @@ clobber: clean
 ###
 
 clean: permissions
-	-rm `find . -name '*~'`
+	-rm `find . -name '*~'` 
+	-rm *.tmp
 
 ###
 # coersce the permissions to plausible values for development
