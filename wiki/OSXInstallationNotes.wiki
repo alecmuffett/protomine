@@ -7,7 +7,7 @@ Installation notes for OSX
 
 = Details =
 
-File /etc/apache2/users/USERNAME.conf
+File `/etc/apache2/users/USERNAME.conf`
 
 {{{
 <Directory "/Users/USERNAME/Sites/">
@@ -25,7 +25,7 @@ File /etc/apache2/users/USERNAME.conf
 AccessFileName .htaccess
 }}}
 
-File /Users/USERNAME/Sites/.htaccess
+File `/Users/USERNAME/Sites/.htaccess`
 
 {{{
 RewriteEngine  On
