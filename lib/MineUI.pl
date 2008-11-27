@@ -235,7 +235,7 @@ sub printError {
 sub printFile {
     my $self = shift;
     my $arg = shift;
-    my $type = &mime_type($arg);
+    my $type = &main::mime_type($arg);
     my $q = $self->cgi;
     print $q->header(-type => $type);
     $self->catFile($arg);
@@ -525,7 +525,7 @@ sub formatDirectory {           # format a filesystem directory
 	    $size = 0;
 	}
 	else {
-	    $type = &mime_type($file);
+	    $type = &main::mime_type($file);
 	    $size = (-s $this);
 	}
 
