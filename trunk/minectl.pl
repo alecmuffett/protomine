@@ -16,16 +16,32 @@
 ## permissions and limitations under the License.
 ##
 
-$root = 'http://localhost/~alecm/mine';
+package remotemine;
 
-require "mine/pm-mime.pl";
+# standard config for this system
 
-my $debug = 0;
+$execdir = $0;
+
+$execdir =~ s![^/]+$!!g;
+
+require "protomine-config.pl" || die "require failed\n";
+
+# use imported values
+$root = $MINE_HTTP_FULLPATH;
+
+die "woot: $root ++ @INC\n";
+
+# load the MIME lookup library
+require "pm-mime.pl";
+
+# debugging switches of varying verbosity
+my $debug = 1;			  # print curl cmdline before execution
 push(@curlopts, '--fail') if (0); # curl dies silently on failure
 push(@curlopts, '--digest') if (0);  # curl http digest authentication
 push(@curlopts, '--user', 'alecm:sesame') if (0); # user and pw for authentication
 push(@curlopts, '--verbose') if (0); # curl acts verbosely
 
+# that which calls curl
 sub Mine {
     my ($method, $api, @args) = @_;
     my $query;
@@ -51,7 +67,7 @@ sub Mine {
 	push(@curlargs, '-F', $arg);
     }
 
-    if ($j) {			# # to JSON if "-j"
+    if ($j) {			# to JSON if "-j"
 	$api =~ s!\.xml$!.json!o; 
     }
 

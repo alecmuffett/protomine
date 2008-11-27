@@ -17,18 +17,21 @@
 ##
 
 DIRECTORY=`dirname $0`
-
 cd $DIRECTORY
-
 DIRECTORY=`pwd`
-
 HTTP_SERVER="http://localhost"
-HTTP_PATH="/~$USER/mine"
+HTTP_PATH="/~$USER/mine" # NO TRAILING SLASH
 
-echo "#!/usr/bin/perl"
-echo "\$mine_directory   = \"$DIRECTORY\";"
-echo "\$mine_http_server = \"$HTTP_SERVER\";"
-echo "\$mine_http_path   = \"$HTTP_PATH\";"
-echo "1;"
+cat <<EOF
+#!/usr/bin/perl
+\$MINE_HTTP_SERVER     = "$HTTP_SERVER";
+\$MINE_HTTP_PATH       = "$HTTP_PATH";
+\$MINE_HTTP_FULLPATH   = \$MINE_HTTP_SERVER . \$MINE_HTTP_PATH;
+
+\$MINE_DIRECTORY       = "$DIRECTORY";
+
+unshift(@INC, "\$MINE_DIRECTORY/mine");
+1;
+EOF
 
 exit 0

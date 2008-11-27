@@ -24,10 +24,10 @@ DOC=database/doc
 # METATARGETS
 
 ###
-# top dependency: is there a local-config file
+# top dependency: is there a protomine-config file
 ###
 
-all: permissions local-config.pl syntaxcheck webpages test
+all: permissions protomine-config.pl syntaxcheck webpages test
 	echo done.
 
 ###
@@ -59,7 +59,7 @@ clobber: clean
 	rm -f database/objects/*
 	rm -f database/relations/*
 	rm -f database/tags/* # leave logs alone
-	rm -f local-config.pl
+	rm -f protomine-config.pl
 
 ###
 # delete scratch files
@@ -84,6 +84,8 @@ permissions:
 # quickie
 ###
 
+config: protomine-config.pl
+
 errs:
 	tail -128 /var/log/apache2/error_log
 
@@ -91,12 +93,12 @@ errs:
 # PHYSICAL TARGETS
 
 ###
-# make the local-config file
+# make the protomine-config file
 ###
 
-local-config.pl: generate-config.sh
-	generate-config.sh > local-config.pl
-	chmod 755 local-config.pl
+protomine-config.pl: generate-config.sh
+	generate-config.sh > protomine-config.pl
+	chmod 755 protomine-config.pl
 
 ###
 # generate the mine document database homepage
