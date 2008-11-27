@@ -35,7 +35,7 @@ sub mime_type {
     return "text/html" if ($filesuffix eq 'htm');
 
     # insert a mime.types lookup here
-    my $mimefile = "database/config/mime.types";
+    my $mimefile = "$MINE_DIRECTORY/database/config/mime.types";
 
     open(MIME, $mimefile) || die "open: $mimefile: $!\n";
     while (<MIME>) {
