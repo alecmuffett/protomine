@@ -49,7 +49,7 @@ webpages: $(UI)/index.html
 ###
 
 syntaxcheck:
-	for i in mine/*.pl protomine.cgi ; do perl -wc $$i || exit 1 ; done
+	for i in lib/*.pl protomine.cgi ; do perl -wc $$i || exit 1 ; done
 
 ###
 # blow away the environment

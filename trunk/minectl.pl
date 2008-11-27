@@ -16,26 +16,19 @@
 ## permissions and limitations under the License.
 ##
 
-package remotemine;
-
 # standard config for this system
-
 $execdir = $0;
-
 $execdir =~ s![^/]+$!!g;
-
-require "protomine-config.pl" || die "require failed\n";
+require "$execdir/protomine-config.pl";
 
 # use imported values
 $root = $MINE_HTTP_FULLPATH;
-
-die "woot: $root ++ @INC\n";
 
 # load the MIME lookup library
 require "pm-mime.pl";
 
 # debugging switches of varying verbosity
-my $debug = 1;			  # print curl cmdline before execution
+my $debug = 0;			  # print curl cmdline before execution
 push(@curlopts, '--fail') if (0); # curl dies silently on failure
 push(@curlopts, '--digest') if (0);  # curl http digest authentication
 push(@curlopts, '--user', 'alecm:sesame') if (0); # user and pw for authentication

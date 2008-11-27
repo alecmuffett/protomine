@@ -134,3 +134,6 @@ brilliant flashes of inspiration
 - use lastmod data on both DATA and META to determine sort-order for
   objects which are to be considered for feed inclusion...
 
+check case-insensitivity of tag/relation name lookup
+
+clone() does not apply to Tags or Comments

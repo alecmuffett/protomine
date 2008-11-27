@@ -106,7 +106,7 @@ chmod 644 .htaccess
 
 cd cgi-bin || exit 1
 
-rm protomine.cgi
+rm protomine.cgi protomine-config.pl
 
 ln -s ../../protomine/protomine.cgi || exit 1
 ln -s ../../protomine/protomine-config.pl || exit 1 # for the benefit of $0 in the cgi script, kludge
@@ -164,11 +164,10 @@ sudo apachectl graceful
 
 :
 :
+: osx protomine installation completed. 
+: please ensure that you have enabled web-page sharing.
 :
-:
-: completed. please ensure that you have enabled web-page sharing.
-:
-:
+: now please do "make" and "populate-mine.sh"
 :
 :
 
