@@ -52,13 +52,6 @@ syntaxcheck:
 	for i in mine/*.pl protomine.cgi ; do perl -wc $$i || exit 1 ; done
 
 ###
-# basic setup
-###
-
-setup: clobber all
-	./populate-mine.sh
-
-###
 # blow away the environment
 ###
 
@@ -101,8 +94,8 @@ errs:
 # make the local-config file
 ###
 
-local-config.pl: configure-setup.sh
-	configure-setup.sh > local-config.pl
+local-config.pl: generate-config.sh
+	generate-config.sh > local-config.pl
 	chmod 755 local-config.pl
 
 ###
