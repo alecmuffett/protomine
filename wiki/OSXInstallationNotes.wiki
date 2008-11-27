@@ -2,12 +2,23 @@
 
 = Introduction =
 
-Add your content here.
+Installation notes for OSX
 
 
 = Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+{{{
+<Directory "/Users/USERNAME/Sites/">
+    Options Indexes FollowSymlinks MultiViews
+    AllowOverride All
+    Order allow,deny
+    Allow from all
+</Directory>
+
+<Directory "/Users/USERNAME/Sites/cgi-bin/">
+    Options ExecCGI FollowSymLinks
+    SetHandler cgi-script
+</Directory>
+
+AccessFileName .htaccess
+}}}
