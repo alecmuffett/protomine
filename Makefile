@@ -27,9 +27,15 @@ DOC=database/doc
 # top dependency: is there a local-config file
 ###
 
-all: permissions local-config.pl syntaxcheck webpages
-	remote-mine.pl version
+all: permissions local-config.pl syntaxcheck webpages test
 	echo done.
+
+###
+# does the thing work
+###
+
+test:
+	remote-mine.pl version
 
 ###
 # install webpages into mine document database
