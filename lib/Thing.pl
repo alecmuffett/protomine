@@ -30,7 +30,7 @@ use Fcntl qw(:DEFAULT :flock);
 # CONSTRUCTOR
 ##################################################################
 
-## new -- returns new blank object
+## new -- returns new blank thing
 
 sub new {
     my $class = shift;          # what am i
@@ -60,7 +60,7 @@ sub new {
 # CLASS METHODS
 ##################################################################
 
-## boot -- initialises a blank object with the key settings; meant to be overridden in subclasses
+## boot -- initialises a blank thing with the key settings; meant to be overridden in subclasses
 
 sub boot {
     my $self = shift;
@@ -68,9 +68,9 @@ sub boot {
     # purposely not a valid directory in this example
     $self->{DIRECTORY} = '/dev/null'; # directory where things are stored
 
-    $self->{ENFORCE_UNIQUE_NAMES} = undef; # object names must be unique
-    $self->{NAME_KEY} = undef;  # key for name of object in %DATA
-    $self->{ID_KEY} = undef;    # passive key for id of object in %DATA
+    $self->{ENFORCE_UNIQUE_NAMES} = undef; # thing names must be unique
+    $self->{NAME_KEY} = undef;  # key for name of thing in %DATA
+    $self->{ID_KEY} = undef;    # passive key for id of thing in %DATA
 
     $self->{VALID_KEYS} = {};    # keys which may be present, ever
     $self->{WRITABLE_KEYS} = {}; # keys which may be present to write
@@ -89,7 +89,7 @@ sub boot {
 ##################################################################
 ##################################################################
 
-## list -- returns listref of integers, id's of valid objects
+## list -- returns listref of integers, id's of valid things
 
 sub list {
     my $self = shift;
@@ -203,7 +203,7 @@ sub enforce_unique_names {
     return $self->{ENFORCE_UNIQUE_NAMES};
 }
 
-## directory -- returns readonly scalar, the thing's object directory
+## directory -- returns readonly scalar, the thing's directory
 
 sub directory {
     my $self = shift ;
@@ -293,7 +293,7 @@ sub get {
     my $key = shift;
 
     unless ($self->validKey($key)) {
-	die "get($key) however key $key is not valid for this object\n";
+	die "get($key) however key $key is not valid for this thing\n";
     }
 
     return $self->{DATA}->{$key};
@@ -321,7 +321,7 @@ sub set {
     die "set($key, $value) however that key is not setable\n";
 }
 
-## setFrom (hashref) -- populates object from a hashref, applying writable validity rules
+## setFrom (hashref) -- populates thing from a hashref, applying writable validity rules
 
 sub setFrom {
     my $self = shift;
@@ -363,7 +363,7 @@ sub name {
 ##################################################################
 ##################################################################
 
-## load (number) -- loads an existing object into thing
+## load (number) -- loads an existing thing into thing
 
 sub load {
     my $self = shift;
@@ -372,7 +372,7 @@ sub load {
     my $old_id = $self->id;
 
     if (defined($old_id)) {
-	die "load: trying to re-read object $id atop object $old_id\n";
+	die "load: trying to re-read thing $id atop thing $old_id\n";
     }
 
     my $file = $self->filepath($id);
@@ -413,12 +413,12 @@ sub save {
     my $name = $self->name;
 
     if (defined($id)) {
-	die "save: trying to re-save object $id\n" . $self->toString . "\n";
+	die "save: trying to re-save thing $id\n" . $self->toString . "\n";
     }
 
     if ($self->enforce_unique_names) {
 	if ($self->existsName($name)) {
-	    die "save: trying to save a second object with name $name\n" . $self->toString . "\n";
+	    die "save: trying to save a second thing with name $name\n" . $self->toString . "\n";
 	}
     }
 
