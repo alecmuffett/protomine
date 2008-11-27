@@ -16,20 +16,24 @@
 ## permissions and limitations under the License.
 ##
 
-DIRECTORY=`dirname $0`
-cd $DIRECTORY
-DIRECTORY=`pwd`
-HTTP_SERVER="http://localhost"
-HTTP_PATH="/~$USER/mine" # NO TRAILING SLASH
+thisdir=`dirname $0`
+
+cd $thisdir
+
+thisdir=`pwd`
+
+http_server="http://localhost"
+
+http_path="/~$USER/mine" # no trailing slash
 
 cat <<EOF
 #!/usr/bin/perl
 
-\$MINE_HTTP_SERVER     = "$HTTP_SERVER";
-\$MINE_HTTP_PATH       = "$HTTP_PATH";
-\$MINE_HTTP_FULLPATH   = \$MINE_HTTP_SERVER . \$MINE_HTTP_PATH;
+\$main::MINE_HTTP_SERVER     = "$http_server";
+\$main::MINE_HTTP_PATH       = "$http_path";
+\$main::MINE_HTTP_FULLPATH   = \$MINE_HTTP_SERVER . \$MINE_HTTP_PATH;
 
-\$MINE_DIRECTORY       = "$DIRECTORY";
+\$main::MINE_DIRECTORY       = "$thisdir";
 
 unshift(@INC, "\$MINE_DIRECTORY/lib");
 

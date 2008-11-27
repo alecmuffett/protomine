@@ -24,11 +24,16 @@ use CGI qw/:standard/;
 use CGI::Carp;
 use CGI::Pretty;
 
+# standard config for this system
+my $execdir = $0;
+$execdir =~ s![^/]+$!!g;
+require "$execdir/protomine-config.pl";
+
 # what the mine base URL is
-my $cgi_mine = "/~alecm/mine";	# NO TRAILING SLASH
+my $cgi_mine = $main::MINE_HTTP_PATH;	# NO TRAILING SLASH
 
 # where the mine lives
-my $base_directory = "/Users/alecm/protomine";
+my $base_directory = $main::MINE_DIRECTORY;
 
 # directory where we write log info; must be writable by http daemon
 my $log_dir = "database/logs";
@@ -44,17 +49,17 @@ chdir($base_directory) or die "chdir: $base_directory: $!";
 
 # get the extra stuff we need
 
-require 'mine/pm-api.pl';
-require 'mine/pm-ui.pl';
-require 'mine/pm-time.pl';
-require 'mine/pm-mime.pl';
+require 'pm-api.pl';
+require 'pm-ui.pl';
+require 'pm-time.pl';
+require 'pm-mime.pl';
 
-require 'mine/MineUI.pl';
+require 'MineUI.pl';
 
-require 'mine/Thing.pl';
-require 'mine/Object.pl';
-require 'mine/Relation.pl';
-require 'mine/Tag.pl';
+require 'Thing.pl';
+require 'Object.pl';
+require 'Relation.pl';
+require 'Tag.pl';
 
 # impose a 10Mb ceiling on POST data
 
