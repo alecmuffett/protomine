@@ -35,7 +35,7 @@ all: permissions protomine-config.pl syntaxcheck webpages test
 ###
 
 test:
-	remote-mine.pl version
+	minectl.pl version
 
 ###
 # install webpages into mine document database
