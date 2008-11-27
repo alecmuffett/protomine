@@ -112,6 +112,10 @@ cat <<EOF | sudo dd of=$ACFGFILE
     AllowOverride All
     Order allow,deny
     Allow from all
+    # AuthName "${__MY__USERNAME__} mine"
+    # AuthType Digest
+    # AuthUserFile /Users/${__MY__USERNAME__}/.htpasswd
+    # require valid-user
 </Directory>
 <Directory "/Users/${__MY__USERNAME__}/Sites/cgi-bin/">
     Options ExecCGI FollowSymLinks
@@ -120,6 +124,10 @@ cat <<EOF | sudo dd of=$ACFGFILE
 EOF
 
 sudo chmod 644 $ACFGFILE
+
+: restarting apache
+
+sudo apachectl graceful
 
 # done
 
