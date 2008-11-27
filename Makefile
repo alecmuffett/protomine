@@ -28,6 +28,7 @@ DOC=database/doc
 ###
 
 all: permissions local-config.pl syntaxcheck webpages
+	remote-mine.pl version
 	echo done.
 
 ###
@@ -49,7 +50,7 @@ syntaxcheck:
 ###
 
 setup: clobber all
-	./sample-data-setup.sh
+	./populate-mine.sh
 
 ###
 # blow away the environment

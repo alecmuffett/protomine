@@ -68,7 +68,7 @@ fi
 
 cat > .htaccess <<EOF
 # $DATESTAMP
-AccessFileName  .htaccess
+# AccessFileName  .htaccess
 RewriteEngine   On
 RewriteBase     /~${__MY__USERNAME__}
 RewriteRule     ^mine(.*)              cgi-bin/protomine.cgi$1
