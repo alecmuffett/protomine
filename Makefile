@@ -79,6 +79,14 @@ permissions:
 	chmod 0755 *.pl *.sh *.cgi
 	( cd database ; chmod 01777 objects tags relations logs )
 
+
+###
+# quickie
+###
+
+errs:
+	tail -128 /var/log/apache2/error_log
+
 ##################################################################
 # PHYSICAL TARGETS
 
