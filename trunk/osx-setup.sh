@@ -4,6 +4,16 @@
 exec 2>&1
 set -x
 
+# let the user know
+
+:
+:
+: SOME OF THIS SCRIPT REQUIRES AN ADMINISTRATOR PASSWORD TO EXECUTE
+: PRESS RETURN TO CONTINUE, CONTROL-C IN ORDER TO QUIT
+:
+:
+read foo
+
 # strip bits off temp files
 umask 077
 
