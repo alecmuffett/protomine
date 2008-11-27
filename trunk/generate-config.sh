@@ -24,13 +24,15 @@ HTTP_PATH="/~$USER/mine" # NO TRAILING SLASH
 
 cat <<EOF
 #!/usr/bin/perl
+
 \$MINE_HTTP_SERVER     = "$HTTP_SERVER";
 \$MINE_HTTP_PATH       = "$HTTP_PATH";
 \$MINE_HTTP_FULLPATH   = \$MINE_HTTP_SERVER . \$MINE_HTTP_PATH;
 
 \$MINE_DIRECTORY       = "$DIRECTORY";
 
-unshift(@INC, "\$MINE_DIRECTORY/mine");
+unshift(@INC, "\$MINE_DIRECTORY/lib");
+
 1;
 EOF
 
