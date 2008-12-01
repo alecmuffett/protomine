@@ -1,0 +1,5 @@
+Remote Access URLs
+
+	/get?key=COOKIE
+		READ -> retreive the object represented by cookie
+		cookie -> B64(AES(magic)

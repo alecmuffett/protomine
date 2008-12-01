@@ -1,0 +1,31 @@
+Feed Generation
+
+Version 1.0 of the algorithm for feed generation is:
+
+1) consider a relationship/feed for someone named "Perry"
+
+2) for Perry, extract the list of "inclusive" and "exclusive" tags
+   which are associated with that relationship, for instance:
+
+	INCLUSIVE TAGS: "wine", "women", "song", "hippos"
+
+	EXCLUSIVE TAGS: "not:white-wine" 
+
+3) for each and every object in the database, extract the list of tags
+   that are associated with the object.
+
+4a) if the object lacks status:published, move on
+
+4b) if any of those object tags match the list of Perry's inclusive
+    tags then CONSIDER INCLUDING the object in the feed.
+
+4c) if any of those object tags match the list of Perry's exclusive
+    tags (eg: "white-wine" matches Perry's "not:white-wine") then
+    RESCIND ANY CONSIDERATION OF INCLUDING the object in the feed.
+
+4d) if any of those object tags are explicitly "for:perry", then
+    ABSOLUTELY INCLUDE the object in the feed, irrespective of the
+    above considerations.
+
+4e) The feed will contain any objects which are absolutely included,
+    and any for which consideration was not rescinded.

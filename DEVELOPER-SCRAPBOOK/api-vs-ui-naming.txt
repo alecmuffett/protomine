@@ -1,0 +1,24 @@
+Aux data is stuff like the JPEG which is attached to the Object/Thing
+with OID 42; for the REST API there are READ and UPDATE methods
+defined for (eg) "/api/object/42":
+
+    [ '/api/object/OID', 'READ', \&api_read_oid_aux, 'OID' ], # *** AUX ***
+    [ '/api/object/OID', 'UPDATE', \&api_update_oid_aux, 'OID' ], # *** AUX ***
+
+...and these are separate to the READ/UPDATE/DELETE methods which are
+defined for the very similarly named "/api/object/42.xml"; the
+difference is easy to explain: the latter operate on the image
+metadata (image title, tags, stuff like that) whereas the former reads
+and updates the actual JPEG.
+
+In the UI, naming is marginally more complex since verbs are embedded
+in the URLs and prettymuch the only method we have available is
+GET/POST; so the equivalents we have got are:
+
+    [ '/ui/read-data/OID', 'READ', \&handle_noop ], # *** AUX, RAW ***
+    [ '/ui/update-data/OID.html', 'POST', \&handle_noop ], # *** AUX ***
+
+The former returns the JPEG (or MP3, whatever) and so does not take a
+".html" suffix; the latter is not a PUT operation so is likely to be a
+form generating a HTML "success" message, hence it takes a ".html"
+suffix.

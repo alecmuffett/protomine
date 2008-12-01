@@ -1,0 +1,12 @@
+Hooks into /api/select: (may cause pushback on "/api"))
+
+	IDEAS ONLY
+	/ui/select/object/date/YYYY[/MM/DD/HH/MM/SS]
+	/ui/select/object/embargoed # not yet visible
+	/ui/select/object/expired # was previously visible
+	/ui/select/object/hidden # either embargoed or expired
+	/ui/select/object/recent # last N
+	/ui/select/object/recent/<integer>
+	/ui/select/object/tagged/<tag>
+	/ui/select/object/visibleto/<relationID>
+	/ui/select/object/visibleto/<relationName>

@@ -1,0 +1,87 @@
+There *is* a rough system to the Mine code naming schemes, although
+there are still deviations, bugs and ambiguities.
+
+
+Approximately it runs like this:
+
+* Protomine is procedural code which calls a lot of OOPS code
+
+* Procedural subroutines are typically named "foo_bar" all lowercase/underbar
+
+* The OOPS classes are typically named Java-style, "FooBar", capital first letter
+
+* This is also reflected in filenames
+
+* The OOPS method calls are also Java style, "fooBar", lowercase first letter
+
+* Where no uppercase letter/underbar separator would exist, you are outta luck, sorry
+
+* non-oops subroutines within a class, have a leading underbar ("_foo")
+
+* non-oops filenames tend to be named "foo-bar.pl"
+
+* Perl OOPS has method inheritance, but not data inheritance.  The
+  code is written so the constructor (method "new") need not be
+  overridden in subclasses; instead subclass initialisation is left to
+  a method ("boot") which MUST BE DEFINED IN EACH SUBCLASS and which
+  is called by the parent's constructor.
+
+
+There are two primary classes which form the bulk of the codebase,
+they are "Thing" and "MineUI"
+
+* Thing is the parent class for all database types; it manages a
+  directory of files named by integers "1" upwards; this number is
+  known generically as "the Id" but in each subclass will have a
+  different name - objectId, tagId, relationId, etc...
+
+  The file contains metadata for the object, a set of key/value pairs
+  in the java parameter syntax, accepting all of:
+
+	foo bar
+	foo=bar
+	foo: bar
+
+  ...but only emitting output in the last of these formats.
+
+  Like most Perl objects, Thing is a hashref; it defines several keys:
+
+    $self->{CLASS} - what I am
+    $self->{DATA} - a hashref for holding the data from the above file
+    $self->{DIRECTORY} - name of directory containing the files 
+    $self->{ID_KEY} - what to refer to the "Id" as, in this class
+    $self->{NAME_KEY} - What data key will hold the Thing's "name"
+    $self->{DO_UNIQUE_NAMES} - boolean, enforce name uniqueness in this database?
+
+
+    for the next section, the keys of these hashrefs correspond to the
+    keys of %{DATA}; 
+
+    $self->{VALID_KEYS} - hashref, defines what keys may be set/got from %{DATA}
+    $self->{REQUIRED_KEYS} - these keys must be present for the Thing to be considered valid
+    $self->{WRITABLE_KEYS} - hashref, these keys are the only ones which will be stored to disk
+
+    for instance if $self->{REQUIRED_KEYS}->{foo} has a defined value,
+    it means that "foo" is a *required* key for the Thing if it is to
+    be considered valid.
+
+    for instance if $self->{VALID_KEYS}->{bar} is not a defined value,
+    any attempt to set the 'bar' parameter for the thing, will abort;
+    as a special case if the value for $self->{VALID_KEYS}->{bar} is a
+    listref, then the list defines the permitted values to which 'bar'
+    may be set, effectively turning 'bar' into an enumeration.
+
+    Most of the above are meant to be dealt with via accessor methods;
+    note also that the name of the "thingName" parameter will vary
+    between subclasses, hence the reason for the NAME_KEY setting, and
+    the behaviour of the Thing->name() method.
+
+    Subclasses of Thing include: Relation, Tag and Object; the first
+    two are trivial, the third extends Thing to add the concept of
+    "Auxilliary Data".
+
+    From the perspective of the Mine, an object exists because there
+    exists a file containing metadata about it.  What the object
+    actually is - a JPEG, PDF, HTML - is almost irrelevant to the
+    database bookkeeping, and is stored in an auxilliary file "1.data"
+    alongside the "1" file which stores metadata for objectId #1.

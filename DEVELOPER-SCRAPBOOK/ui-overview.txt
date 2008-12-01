@@ -1,0 +1,22 @@
+Human User Interface URLs:
+
+The protomine will also be equipped with a basic HTML user interface;
+largely this can shadow the ReST API for fundamental operations, and
+then can be extended out to provide extra functionality for the
+protomine.
+
+Later, "full" implementations are expected to implement tools and
+plugins either on the server side, or as AJAX objects using the ReST
+API, so the pure HTML user interface will gradually die out.
+
+The pure HTML user interface is inherently limited to READ(GET) and
+maybe CREATE(POST) operations, so commands that require UPDATE or
+DELETE will need be faked with custom POST dialogues; thus we cheat
+orthogonally by suffinxing API URIs with "/delete" etc, to make HTML
+analogues.
+
+Certain tasks need to be available to the user, which in "full" Mine!
+implementations will be performed by sucking a JSON object from the
+Mine, updating it and squirting it back up to the Mine; the pure HTML
+Mine UI will not have that capability, so the "update" URLs of various
+objects must provide them.
