@@ -175,8 +175,3 @@ tagName: tagword name for / representation of this tag
 
 tagParents: (on disk, encoded) list of parental (more generic) tags for this tag
 
-------------------------------------------------------------------
-
-* API URIs
-
-------------------------------------------------------------------
