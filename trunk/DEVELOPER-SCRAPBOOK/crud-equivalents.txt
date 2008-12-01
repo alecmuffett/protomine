@@ -1,0 +1,21 @@
+ReST CRUD Mappings to HTTP methods:
+
+	CREATE (POST)
+	READ (GET)
+	UPDATE (PUT)
+	DELETE (DELETE)
+
+PUT can be faked via POST of a http-uri-encoded object with:
+
+	"_method" set to "POST"
+
+	"_data" set to the object data (TBD)
+
+	"_type" set to the content-type of the PUT request; given the
+	"update" nature of the fake PUT, this latter MAY be ignored by
+	the server, but clients MUST send it.
+
+DELETE can be faked via POST of a http-uri-encoded object with:
+
+	"_method" set to "DELETE"
+

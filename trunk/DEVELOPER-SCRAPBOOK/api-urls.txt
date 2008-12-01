@@ -1,0 +1,63 @@
+ReST API URLs:
+
+	/api/config
+		READ -> retreive config object
+		UPDATE -> update of config object
+
+	/api/meta
+		READ -> redirect to /api/object
+
+	/api/meta/<objectID>
+		READ -> retreive meta object
+		UPDATE -> update of meta object
+		DELETE -> redirect to /api/object/<objectID>
+
+	/api/object
+		READ -> retreive list of objectIDs
+		CREATE -> insert new object+meta; option to clone?
+
+	/api/object/<objectID>
+		READ -> retreive object
+		UPDATE -> update of object
+		DELETE -> deletion of object+meta
+
+	/api/object/<objectID>/clone
+		READ -> retreive list of clones of <objectID>
+		CREATE -> create duplicate of <objectID>
+
+	/api/relation
+		READ -> retreive list of relationIDs
+		CREATE -> insert of new
+
+	/api/relation/<relationID>
+		READ -> retreive relation object
+		UPDATE -> update of relation object
+		DELETE -> deletion of relation
+
+	/api/tag
+		READ -> retreive list of tagIDs
+		CREATE -> insert of new
+
+	/api/tag/<tagID>
+		READ -> retreive tag object
+		UPDATE -> update of tag object
+		DELETE -> deletion of tag
+
+** TODO - work out search/select syntax
+** eg: using CREATE to pass objects in/out of
+**   /api/select/object
+**   /api/select/relation
+**   /api/select/tag
+
+	/api/share/url/RID
+		READ -> get the URL for feed to RID
+
+	/api/share/url/RID/OID
+		READ -> get the URL for OID shared to RID
+
+	/api/share/redirect/RID
+		READ -> issue a redirect to the feed for RID
+
+	/api/share/redirect/RID/OID
+		READ -> issue a redirect to OID shared to RID
+

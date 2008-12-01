@@ -1,0 +1,7 @@
+Authentication:
+
+For Version 1.0, HTTP Basic Authentication is used to authenticate the
+user for all interaction with the "/ui" and "/api" hierarchies ; it is
+assumed that access will be made secret by HTTPS.
+
+There is no authentication for "/pub" URLs.

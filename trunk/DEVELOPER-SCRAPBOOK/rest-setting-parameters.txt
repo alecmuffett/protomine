@@ -1,0 +1,32 @@
+I've been doing a lot of thought about the REST interface, notably how
+there is no means to create or update (say) the objectTags of an
+Object without rewriting ALL the metadata of the object.
+
+This is partly a simplicity thing, and partly a REST amd security
+thing, and partly a laziness thing.
+
+The simplicity is obvious: create or update a whole Thing's metadata
+is trivial to implement.  Having created the "CREATE" code, then the
+"UPDATE" code is nearly the same.  Locking will be easy to fix.
+
+The REST thing: I have vague and fuzzy concerns about people breaking
+REST philosophy; I don't *think* letting people set a single parameter
+of a thing will break REST - you're still idempotent, etc - but it
+moves away from Things to Parameters-of-Things as being what is
+manipulated by REST.  I am not in that headspace yet.
+
+Security?  Just mention "TEST AND SET TIMERACE" to a security geek and
+see what they say.
+
+Finally there is the simplicity thing - what would the interface look
+like?  I would like it to be generalised, maybe:
+
+	/api/{object,tag,relation}/ID/param.xml
+	CREATE -> ???
+	READ -> get
+	UPDATE -> set
+	DELETE -> delete
+
+Would CREATE and UPDATE be identical? Should they be separate?  Should
+parameters auto-instantiate?
+
