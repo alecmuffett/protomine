@@ -263,72 +263,96 @@ sub api_update_tid {
 
 ## api_object_create_param --
 sub api_object_create_param {
+    my ($ui, $info, $phr, $id) = @_;
+    die "method not yet implemented";
 }
 
 ##################################################################
 
 ## api_object_delete_param --
 sub api_object_delete_param {
+    my ($ui, $info, $phr, $id) = @_;
+    die "method not yet implemented";
 }
 
 ##################################################################
 
 ## api_object_read_param --
 sub api_object_read_param {
+    my ($ui, $info, $phr, $id) = @_;
+    die "method not yet implemented";
 }
 
 ##################################################################
 
 ## api_object_update_param --
 sub api_object_update_param {
+    my ($ui, $info, $phr, $id) = @_;
+    die "method not yet implemented";
 }
 
 ##################################################################
 
 ## api_relation_create_param --
 sub api_relation_create_param {
+    my ($ui, $info, $phr, $id) = @_;
+    die "method not yet implemented";
 }
 
 ##################################################################
 
 ## api_relation_delete_param --
 sub api_relation_delete_param {
+    my ($ui, $info, $phr, $id) = @_;
+    die "method not yet implemented";
 }
 
 ##################################################################
 
 ## api_relation_read_param --
 sub api_relation_read_param {
+    my ($ui, $info, $phr, $id) = @_;
+    die "method not yet implemented";
 }
 
 ##################################################################
 
 ## api_relation_update_param --
 sub api_relation_update_param {
+    my ($ui, $info, $phr, $id) = @_;
+    die "method not yet implemented";
 }
 
 ##################################################################
 
 ## api_tag_create_param --
 sub api_tag_create_param {
+    my ($ui, $info, $phr, $id) = @_;
+    die "method not yet implemented";
 }
 
 ##################################################################
 
 ## api_tag_delete_param --
 sub api_tag_delete_param {
+    my ($ui, $info, $phr, $id) = @_;
+    die "method not yet implemented";
 }
 
 ##################################################################
 
 ## api_tag_read_param --
 sub api_tag_read_param {
+    my ($ui, $info, $phr, $id) = @_;
+    die "method not yet implemented";
 }
 
 ##################################################################
 
 ## api_tag_update_param --
 sub api_tag_update_param {
+    my ($ui, $info, $phr, $id) = @_;
+    die "method not yet implemented";
 }
 
 ##################################################################
