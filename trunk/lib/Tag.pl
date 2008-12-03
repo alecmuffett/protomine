@@ -61,14 +61,14 @@ sub boot {
 
 my $MAGIC_TAG_KEY = 'tagParents';
 
-# tags can only be created with names matching /[\-\w]+/ (ie:
-# alphanumeric plus underscore plus hyphen)
+# tags can only be created with names matching /[a-z0-9][\-\w]*/ - ie:
+# alphanumeric/underscore/hyphen, but requiring a leading alphanumeric
 
 sub set {
     my ($self, $key, $value) = @_;
 
     if ($key eq $self->{NAME_KEY}) {
-	unless ($value =~ m!^[\-\w]+$!o) {
+	unless ($value =~ m!^[a-z0-9][\-\w]*$!oi) {
 	    die "Tag: cannot set $key=$value as '$value' has illegal format\n";
 	}
     }
