@@ -29,14 +29,20 @@ http_path="/~$USER/mine" # no trailing slash
 cat <<EOF
 #!/usr/bin/perl
 
+# important: unambiguous, fully qualified hostname
 \$main::MINE_HTTP_SERVER     = "$http_server";
-\$main::MINE_HTTP_PATH       = "$http_path";
-\$main::MINE_HTTP_FULLPATH   = \$MINE_HTTP_SERVER . \$MINE_HTTP_PATH;
 
+# important: no trailing slash on this URL
+\$main::MINE_HTTP_PATH       = "$http_path";
+
+# path to the mine installation directory
 \$main::MINE_DIRECTORY       = "$thisdir";
 
+# these should not need editing
+\$main::MINE_HTTP_FULLPATH   = \$MINE_HTTP_SERVER . \$MINE_HTTP_PATH;
 unshift(@INC, "\$MINE_DIRECTORY/lib");
 
+# done
 1;
 EOF
 

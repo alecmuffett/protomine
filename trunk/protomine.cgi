@@ -99,12 +99,14 @@ my @raw_action_list = (
     # empty / root request
     [ '', 'GET', \&do_redirect, '/ui/' ],
 
-    # documentation
+    # public files and documentation
+    [ '/pub', 'GET', \&do_document, 'database/pub', '.' ],
+    [ '/pub/SUFFIX', 'GET', \&do_document, 'database/pub', 'SUFFIX' ],
     [ '/doc', 'GET', \&do_document, 'database/doc', '.' ],
     [ '/doc/SUFFIX', 'GET', \&do_document, 'database/doc', 'SUFFIX' ],
 
-    # the /feed/ hierarchy is a special case HTTP
-    [ '/feed/COOKIE', 'GET', \&do_feed, 'GET', ],
+    # the /get URL is a special case HTTP
+    [ '/get', 'GET', \&do_remote_request, 'GET', ],
 
     # the /ui/ hierarchy lives in HTTP space -- POST METHODS
     [ '/ui/update-tag/TID.html', 'POST', \&ui_update_tag, 'TID' ], # NEEDS A DYNAMIC GET
@@ -471,7 +473,7 @@ sub do_xml {
 
 ##################################################################
 
-sub do_feed {
+sub do_remote_request {
     die "method not yet implemented";
 }
 
