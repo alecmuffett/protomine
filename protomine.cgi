@@ -152,9 +152,9 @@ my @raw_action_list = (
     [ '/ui/show-objects.html', 'GET', \&ui_show_objects ],
     [ '/ui/show-config.html', 'GET', \&ui_show_config ],
     [ '/ui/show-clones/OID.html', 'GET', \&ui_show_clones, 'OID' ],
-    [ '/ui/select/tag.html', 'GET', \&ui_select_tag ],
-    [ '/ui/select/relation.html', 'GET', \&ui_select_relation ],
-    [ '/ui/select/object.html', 'GET', \&ui_select_object ],
+    [ '/ui/select/tag.html', 'GET', \&noop ],
+    [ '/ui/select/relation.html', 'GET', \&noop ],
+    [ '/ui/select/object.html', 'GET', \&noop ],
     [ '/ui/read-tag/TID.html', 'GET', \&ui_read_tag, 'TID' ],
     [ '/ui/read-relation/RID.html', 'GET', \&ui_read_relation, 'RID' ],
     [ '/ui/read-object/OID.html', 'GET', \&ui_read_object, 'OID' ],
@@ -179,11 +179,11 @@ my @raw_action_list = (
     # unfinished crap
     ###
 
-    [ '/api/share/url/RID/OID.xml', 'READ', \&do_xml, \&api_share_url, 'OID', 'RID' ],
-    [ '/api/share/url/RID.xml', 'READ', \&do_xml, \&api_share_url, 'RID' ],
-    [ '/api/share/redirect/RID/OID.xml', 'READ', \&do_xml, \&api_share_redir, 'OID', 'RID' ],
-    [ '/api/share/redirect/RID.xml', 'READ', \&do_xml, \&api_share_redir, 'RID' ],
-    [ '/api/share/raw/RID/RVSN/OID.xml', 'READ', \&do_xml, \&api_share_url, 'OID', 'RID', 'RVSN' ],
+    [ '/api/share/url/RID/OID.xml', 'READ', \&noop, 'OID', 'RID' ],
+    [ '/api/share/url/RID.xml', 'READ', \&noop, 'RID' ],
+    [ '/api/share/redirect/RID/OID.xml', 'READ', \&noop, 'OID', 'RID' ],
+    [ '/api/share/redirect/RID.xml', 'READ', \&noop, 'RID' ],
+    [ '/api/share/raw/RID/RVSN/OID.xml', 'READ', \&noop, 'OID', 'RID', 'RVSN' ],
 
     ###
     # the /api/ hierarchy lives in REST space
@@ -199,9 +199,9 @@ my @raw_action_list = (
     [ '/api/tag/TID.xml', 'DELETE', \&do_xml, \&api_delete_tid, 'TID' ],
     [ '/api/tag.xml', 'READ', \&do_xml, \&api_list_tags ],
     [ '/api/tag.xml', 'CREATE', \&do_xml, \&api_create_tag ],
-    [ '/api/select/tag.xml', 'READ', \&do_xml, \&api_noop ],
-    [ '/api/select/relation.xml', 'READ', \&do_xml, \&api_noop ],
-    [ '/api/select/object.xml', 'READ', \&do_xml, \&api_noop ],
+    [ '/api/select/tag.xml', 'READ', \&noop ],
+    [ '/api/select/relation.xml', 'READ', \&noop ],
+    [ '/api/select/object.xml', 'READ', \&noop ],
     [ '/api/relation/RID/param.xml', 'UPDATE', \&do_xml, \&api_relation_update_param, 'RID' ],
     [ '/api/relation/RID/param.xml', 'READ', \&do_xml, \&api_relation_read_param, 'RID' ],
     [ '/api/relation/RID/param.xml', 'DELETE', \&do_xml, \&api_relation_delete_param, 'RID' ],
@@ -482,7 +482,7 @@ sub match_and_execute {
 # this is the dummy no-op handler, use it as a template for other
 # handlers; it just dumps information to the browser
 
-sub do_noop {
+sub noop {
     my ($ui, $info, $phr, @args) = @_;
     $ui->printPage("noop @args");
 }
