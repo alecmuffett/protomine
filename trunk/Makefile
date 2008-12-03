@@ -76,7 +76,7 @@ clean: permissions
 permissions:
 	chmod 0755 `find . -type d -print`
 	chmod 0644 `find . -type f -print`
-	chmod 0755 *.pl *.sh minectl protomine.cgi
+	chmod 0755 *.pl *.sh minectl protomine.cgi lib/* tools/*
 	( cd database ; chmod 01777 objects tags relations logs )
 
 
@@ -85,6 +85,9 @@ permissions:
 ###
 
 config: protomine-config.pl
+
+lint:
+	tools/perllint protomine.cgi lib/*.pl
 
 errs:
 	tail -128 /var/log/apache2/error_log

@@ -122,16 +122,15 @@ my @raw_action_list = (
 
     [ '/get', 'GET', \&do_remote_request, 'GET', ],
 
-
     ###
     # unfinished crap
     ###
 
-    [ '/ui/share/url/RID/OID.html', 'GET', \&ui_share_url, 'RID', 'RVSN', 'OID' ],
-    [ '/ui/share/url/RID.html', 'GET', \&ui_share_url, 'RID', 'RVSN', 'OID' ],
-    [ '/ui/share/redirect/RID/OID', 'GET', \&ui_share_redirect, 'RID', 'RVSN', 'OID' ],
-    [ '/ui/share/redirect/RID', 'GET', \&ui_share_redirect, 'RID', 'RVSN', 'OID' ],
-    [ '/ui/share/raw/RID/RVSN/OID', 'GET', \&ui_share_raw, 'RID', 'RVSN', 'OID' ],
+    [ '/ui/share/url/RID/OID.html', 'GET', \&noop, 'RID', 'RVSN', 'OID' ],
+    [ '/ui/share/url/RID.html', 'GET', \&noop, 'RID', 'RVSN', 'OID' ],
+    [ '/ui/share/redirect/RID/OID', 'GET', \&noop, 'RID', 'RVSN', 'OID' ],
+    [ '/ui/share/redirect/RID', 'GET', \&noop, 'RID', 'RVSN', 'OID' ],
+    [ '/ui/share/raw/RID/RVSN/OID', 'GET', \&noop, 'RID', 'RVSN', 'OID' ],
 
     ###
     # the /ui/ hierarchy lives in HTTP space

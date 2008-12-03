@@ -82,22 +82,6 @@ sub ui_read_tag {		# TID
     die "method not yet implemented\n";
 }
 
-sub ui_select {			# takes 3 semi-optional arguments
-    die "method not yet implemented\n";
-}
-
-sub ui_share_raw {
-    die "method not yet implemented\n";
-}
-
-sub ui_share_redirect {
-    die "method not yet implemented\n";
-}
-
-sub ui_share_url {
-    die "method not yet implemented\n";
-}
-
 sub ui_show_clones {		# OID
     die "method not yet implemented\n";
 }
