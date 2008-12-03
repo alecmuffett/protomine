@@ -19,16 +19,72 @@
 # performs a sweep of perl scripts given as arguments, looking for
 # undefined function calls
 
-@input = <>;
+while (<>) {
+    push(@lines, [ $_, "$ARGV:$." ] );
+    close ARGV if eof;		# reset $.
+}
 
-foreach $line (@input) {
+foreach $input (@lines) {
+    ($line, $debug) = @{$input};
+
     $line =~ s!#.*!!o;
-    $calls{$1}++ while ($line =~ s!\&(\w+)!!go);
+
+    if ($line =~ /^\s*sub\s+(\w+)/o) {
+	push(@{$defns{$1}}, $debug);
+    }
+
+    while ($line =~ s!\&(\w+)!!o) {
+	push(@{$calls{$1}}, $debug);
+    }
+
+    while ($line =~ s!->(\w+)!!o) {
+	push(@{$calls{$1}}, $debug);
+    }
 }
 
-foreach $func (sort keys %calls) {
-    print "$func";
-    print " undefined" unless (grep(/sub\s+$func/, @input));
-    print "\n";
+print "-- checking definition\n";
+
+foreach $call (sort keys %calls) {
+    $ndefns = ($#{$defns{$call}} + 1);
+    @xdefns = @{$defns{$call}};
+
+    $ncalls = ($#{$calls{$call}} + 1);
+    @xcalls = @{$calls{$call}};
+
+    if ($ndefns == 0) {
+	print "$call undefined, called at:\n\t";
+	print join("\n\t", @xcalls);
+	print "\n\n";
+    }
+    elsif ($ndefns > 1) {
+	print "$call defined $ndefns times:\n\t";
+	print join("\n\t", @xdefns);
+	print "\n\n";
+    }
+
 }
+print "\n";
+
+print "-- checking usage\n";
+
+foreach $defn (sort keys %defns) {
+    $ncalls = ($#{$calls{$defn}} + 1);
+    @xcalls = @{$calls{$defn}};
+
+    $ndefns = ($#{$defns{$defn}} + 1);
+    @xdefns = @{$defns{$defn}};
+
+    if ($ncalls == 0) {
+	print "$defn uncalled, defined at:\n\t";
+	print join("\n\t", @xdefns);
+	print "\n\n";
+    }
+    elsif (0 && ($ncalls > 1)) {
+	print "$defn called $ncalls times:\n\t";
+	print join("\n\t", @xcalls);
+	print "\n\n";
+    }
+
+}
+print "\n";
 
