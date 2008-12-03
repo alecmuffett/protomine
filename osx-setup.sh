@@ -36,8 +36,22 @@ umask 077
 # nice and visible for template substitution, below
 __MY__USERNAME__=$USER
 
+# check for apache install
+
+if [ -d "/etc/apache2" ]
+then
+    APACHEDIR=/etc/apache2 # leopard/10.5
+elif [ -d "/etc/httpd" ]
+then
+    APACHEDIR=/etc/httpd # panther/10.4
+else
+    :
+    : cannot locate apache config directory, aborting.
+    exit 1
+fi
+
 # Apache per-user config dir
-ACFGFILE=/etc/apache2/users/${__MY__USERNAME__}.conf
+ACFGFILE=$APACHEDIR/users/${__MY__USERNAME__}.conf
 
 # for backups of files
 DATESTAMP=`date "+%Y%m%d%H%M%S"`
