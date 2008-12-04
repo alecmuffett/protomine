@@ -158,6 +158,37 @@ sub get {
     return $value;
 }
 
+sub getInterestsBlob {
+    my ($self) = @_;
+
+    my $iblob = {};
+    my $rawtags = $self->SUPER::get($MAGIC_TAG_KEY);
+    my @srcs = split(" ", $rawtags);
+
+    $iblob->{'rid'} = $self->id;
+    $iblob->{'interests'} = {};
+    $iblob->{'except'} = {};
+    $iblob->{'require'} = {};
+
+    foreach my $src (@srcs) {
+	unless ($src =~ m!^(t[-+])?(\d+)$!o) {
+	    die "Relation: getInterestsBlob: bad format for elements of $MAGIC_TAG_KEY: '$src'\n";
+	}
+
+	if ($1 eq 't+') {
+	    $iblob->{'require'}->{$2} = 1;
+	}
+	elsif ($1 eq 't-') {
+	    $iblob->{'except'}->{$2} = 1;
+	}
+	else {
+	    $iblob->{'interests'}->{$2} = 1;
+	}
+    }
+
+    return $iblob;
+}
+
 ##################################################################
 
 1;

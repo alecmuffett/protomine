@@ -96,7 +96,7 @@ EOF
 ###
 # quick hack to demo fast-relation
 
-$MINECTL fast-relation perry 1 "Perry de Havilland" red-wine food hippos
+$MINECTL fast-relation perry 1 "Perry de Havilland" red-wine food require:hippos except:white-wine
 
 
 ###
