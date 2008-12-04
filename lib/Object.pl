@@ -146,12 +146,10 @@ sub auxGet {
 
 # overrides for get and set
 
-my $MAGIC_TAG_KEY = 'objectTags';
-
 sub set {
     my ($self, $key, $value) = @_;
 
-    if ($key eq $MAGIC_TAG_KEY) {
+    if ($key eq 'objectTags') {
 	my @srcs = split(" ", $value);
 	my @dsts;
 
@@ -195,7 +193,7 @@ sub get {
     my ($self, $key) = @_;
     my $value = $self->SUPER::get($key);
 
-    if ($key eq $MAGIC_TAG_KEY) {
+    if ($key eq 'objectTags') {
 	my @srcs = split(" ", $value);
 	my @dsts;
 
@@ -234,75 +232,88 @@ sub matchInterestsBlob {
     my $iblob = shift;
 
     # load the raw tags describing this object
-
-    my $rawtags = $self->SUPER::get($MAGIC_TAG_KEY);
+    my $rawtags = $self->SUPER::get('objectTags');
 
     # split the raw tags on space
-
     my @tags = split(" ", $rawtags);
     my $tag;
 
     # upon whose we are checking
-
     my $rid = $iblob->{rid};
 
-    # first sweep, for not:RELATION
-
+    # first sweep: fail fast if "not:RELATION"
     foreach $tag (@tags) {
 	return 0 if ($tag eq "r-$rid");	 # is marked not:RELATION
     }
 
-    # second sweep, for for:RELATION
-
+    # second sweep: succeed fast if "for:RELATION"
     foreach $tag (@tags) {
 	return 1 if ($tag eq "r+$rid"); # is marked for:RELATION
     }
 
-    # FEED INCLUSION LOGIC IMPLEMENTED HERE
-    my @hitlist = grep(/^\d+$/, @tags);
-    # EXPAND @hitlist - THIS NEEDS WORK
-    # EXPAND @hitlist - THIS NEEDS WORK
-    # EXPAND @hitlist - THIS NEEDS WORK
-    # EXPAND @hitlist - THIS NEEDS WORK
-    # EXPAND @hitlist - THIS NEEDS WORK
-    # EXPAND @hitlist - THIS NEEDS WORK
-    # EXPAND @hitlist - THIS NEEDS WORK
-    # EXPAND @hitlist - THIS NEEDS WORK
-    # EXPAND @hitlist - THIS NEEDS WORK
-    # EXPAND @hitlist - THIS NEEDS WORK
-  
-    # third sweep, return 0 for exclude:TAG 
- 
-   my %except;
-    map { $except{$_}++ } @{$iblob->{except}};
-    foreach $tag (@hitlist) {
-	return 0 if ($except{$tag});
+    # expand the tagParents to permit implicit matching
+    my %tobedone;
+    my @tbd;
+
+    # states in %tobedone :=
+    # state 0/undef - not known
+    # state 1 - known but not expanded
+    # state 2 - known and expanded
+
+    # populate %tobedone with initial tags
+    foreach $tag (grep(/^\d+$/, @tags)) {
+	$tobedone{$tag} = 1;
     }
 
-    # fourth (inverse) sweep
-    # check for presence of all "requires" in @hitlist
-    # if requirements are missing
+    # repeatedly scan over the members of %tobedone looking for
+    # anything with keys where state==1; the list of those keys (tags)
+    # is then expanded to retreive their PARENT TAGS who are then
+    # populated into %tobedone iff they have not already been expanded
+    # (ie: iff state==2)
 
+    while (@tbd = grep { $tobedone{$_} == 1 } keys %tobedone) {
+	foreach $tag (@tbd) {
+	    my $x = Tag->new($tag);
+	    my $xrawtags = $x->SUPER::get('tagParents');
+	    my @xtags = grep(/^\d+$/, split(" ", $xrawtags));
+	    foreach my $xtag (@xtags) {
+		next if ($tobedone{$xtag} == 2);
+		$tobedone{$xtag} = 1;
+	    }
+	    $tobedone{$tag} = 2;
+	}
+    }
+
+    # flatten the keys of %tobedone to provide the expanded tag list
+    my @expanded_tags = keys %tobedone;
+  
+    # third sweep: fail fast for for exclude:TAG 
+    my %user_excepts;
+    map { $user_excepts{$_}++ } @{$iblob->{except}};
+    foreach $tag (@expanded_tags) {
+	return 0 if ($user_excepts{$tag});
+    }
+
+    # fourth (inverse) sweep: check for presence of all
+    # user_requirements in @expanded_tags; fail fast if ANY
+    # user_requirements are missing
     my $reqctr = 0;
-    foreach my $requirement (@{$iblob->{require}}) {
-	return 0 unless (grep { $_ == $requirement } @hitlist);
+    foreach my $user_requirement (@{$iblob->{require}}) {
+	return 0 unless (grep { $_ == $user_requirement } @expanded_tags);
 	$reqctr++;
     }
 
-    # fast track: if all requirements (of which there are more than
-    # zero) have been met, this is a fast-track to success
-
+    # fast track: succeed fast if all user_requirements (and of which
+    # there are more than zero) have been met
     return 2 if ($reqctr);
 
-    # final sweep: check for tag overlap, 
-    # for any remaining reason to match it
-
+    # final sweep: check for tag overlap, for any remaining reason to
+    # match it
     foreach my $interest (@{$iblob->{interests}}) {
-	return 3 if (grep { $_ == $interest } @hitlist);
+	return 3 if (grep { $_ == $interest } @expanded_tags);
     }
 
     # we didnae find reason to share this one
-
     return 0;
 }
 

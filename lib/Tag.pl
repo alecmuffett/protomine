@@ -59,8 +59,6 @@ sub boot {
 
 # overrides for get and set
 
-my $MAGIC_TAG_KEY = 'tagParents';
-
 # tags can only be created with names matching /[a-z0-9][\-\w]*/ - ie:
 # alphanumeric/underscore/hyphen, but requiring a leading alphanumeric
 
@@ -72,7 +70,7 @@ sub set {
 	    die "Tag: cannot set $key=$value as '$value' has illegal format\n";
 	}
     }
-    elsif ($key eq $MAGIC_TAG_KEY) { 
+    elsif ($key eq 'tagParents') { 
 	my @srcs = split(" ", $value);
 	my @dsts;
 
@@ -97,7 +95,7 @@ sub get {
     my ($self, $key) = @_;
     my $value = $self->SUPER::get($key);
 
-    if ($key eq $MAGIC_TAG_KEY) { 
+    if ($key eq 'tagParents') { 
 	my @srcs = split(" ", $value);
 	my @dsts;
 

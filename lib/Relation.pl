@@ -73,8 +73,6 @@ sub boot {
 
 # overrides for get and set
 
-my $MAGIC_TAG_KEY = 'relationInterests';
-
 # relationship name can only be created with names matching /[\-\w]+/
 # (ie: alphanumeric plus underscore plus hyphen)
 
@@ -87,7 +85,7 @@ sub set {
 	}
 	$value =~ tr/_A-Z/-a-z/; # force relation names lowercase, force underscore to hyphen
     }
-    elsif ($key eq $MAGIC_TAG_KEY) {
+    elsif ($key eq 'relationInterests') {
 	my @srcs = split(" ", $value);
 	my @dsts;
 
@@ -128,7 +126,7 @@ sub get {
     my ($self, $key) = @_;
     my $value = $self->SUPER::get($key);
 
-    if ($key eq $MAGIC_TAG_KEY) {
+    if ($key eq 'relationInterests') {
 	my @srcs = split(" ", $value);
 	my @dsts;
 
@@ -162,7 +160,7 @@ sub getInterestsBlob {
     my ($self) = @_;
 
     # load the raw tags describing this object
-    my $rawtags = $self->SUPER::get($MAGIC_TAG_KEY);
+    my $rawtags = $self->SUPER::get('relationInterests');
 
     # split the raw tags on space
     my @tags = split(" ", $rawtags);
@@ -174,7 +172,7 @@ sub getInterestsBlob {
     # for each of the tags, file it in the appropriate category
     foreach my $tag (@tags) {
 	unless ($tag =~ m!^(t[-+])?(\d+)$!o) {
-	    die "Relation: getInterestsBlob: bad format for elements of $MAGIC_TAG_KEY: '$tag'\n";
+	    die "Relation: getInterestsBlob: bad format for elements of 'relationInterests': '$tag'\n";
 	}
 
 	if ($1 eq 't+') {
