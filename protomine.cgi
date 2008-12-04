@@ -550,22 +550,9 @@ sub do_document {
 sub test_code {
     my ($ui, $info, $phr) = @_;
 
-    my $oids = Object->list;
-    my @output;
-
-    push(@output, "<ul>" );
-    foreach my $oid (@{$oids}) {
-	push(@output, "<li> <b>$oid:</b> " );
-	push(@output, { "api/object/$oid/", "[view]" } );
-	push(@output, { "api/object/$oid/", "[update]" } );
-	push(@output, { "api/object/$oid/", "[view description]" } );
-	push(@output, { "api/object/$oid/", "[update description]" } );
-	push(@output, { "api/object/$oid/", "[delete]" } );
-	push(@output, "</li>\n" );
-    }
-    push(@output, "</ul>\n" );
-
-    $ui->printPage(\@output);
+    my $foo = Relation->new(5);
+    my $bar = $foo->getInterestsBlob;
+    $ui->printResult($bar);
 }
 
 ##################################################################

@@ -27,7 +27,7 @@ DOC=database/doc
 # top dependency: is there a protomine-config file
 ###
 
-all: permissions protomine-config.pl syntaxcheck webpages test
+all: permissions protomine-config.pl syntax webpages test
 	echo done.
 
 ###
@@ -45,10 +45,10 @@ webpages: $(UI)/index.html
 	for i in LICENSE NOTICE TECHNOTES TODO ; do cp $$i $(DOC)/$$i.txt ; done
 
 ###
-# syntaxcheck the CGI script
+# syntax the CGI script
 ###
 
-syntaxcheck:
+syntax:
 	for i in lib/*.pl protomine.cgi minectl ; do perl -wc $$i || exit 1 ; done
 
 ###
@@ -88,6 +88,11 @@ config: protomine-config.pl
 
 lint:
 	tools/perllint protomine.cgi lib/*.pl
+
+reset:
+	make clobber
+	make
+	./populate-mine.sh
 
 errs:
 	tail -128 /var/log/apache2/error_log
