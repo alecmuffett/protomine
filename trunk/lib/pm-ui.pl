@@ -149,20 +149,20 @@ sub ui_show_relations {
 sub ui_show_tags {
     my ($ui, $info, $phr) = @_;
     $ui->setBase("ui/");	# everything will be relative to this
-    my $rids = Tag->list;
+    my $tids = Tag->list;
     my @output;
     push(@output, "<dl>" );
-    foreach my $rid (@{$rids}) {
-	my $thing = Tag->new($rid);
+    foreach my $tid (@{$tids}) {
+	my $thing = Tag->new($tid);
 	my $name = $thing->name;
 
-	push(@output, "<dt>tag $rid: $name</dt>\n");
+	push(@output, "<dt>tag $tid: $name</dt>\n");
 	push(@output, "<dd>");
 	push(@output, 
 	     $ui->formatCloud({
-		 "delete-tag/$rid.html", "[delete]",
-		 "read-tag/$rid.html", "[info]",
-		 "update-tag/$rid.html", "[update info]",
+		 "delete-tag/$tid.html", "[delete]",
+		 "read-tag/$tid.html", "[info]",
+		 "update-tag/$tid.html", "[update info]",
 				       }));
 	push(@output, "<br/>\n" );
 	push(@output, $thing->toString);
