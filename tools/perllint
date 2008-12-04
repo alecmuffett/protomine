@@ -19,9 +19,17 @@
 # performs a sweep of perl scripts given as arguments, looking for
 # undefined function calls
 
+$pkg = "";
 while (<>) {
-    push(@lines, [ $_, "$ARGV:$." ] );
-    close ARGV if eof;		# reset $.
+    if (/^\s*package\s+(\w+)/o) {
+	$pkg = " package $1";
+    }
+
+    push(@lines, [ $_, "$ARGV:$.$pkg" ] );
+    if (eof) {
+	close ARGV; # reset $.
+	$pkg = "";
+    }
 }
 
 foreach $input (@lines) {
