@@ -161,31 +161,34 @@ sub get {
 sub getInterestsBlob {
     my ($self) = @_;
 
-    my $iblob = {};
+    # load the raw tags describing this object
     my $rawtags = $self->SUPER::get($MAGIC_TAG_KEY);
-    my @srcs = split(" ", $rawtags);
 
-    $iblob->{'rid'} = $self->id;
-    $iblob->{'interests'} = {};
-    $iblob->{'except'} = {};
-    $iblob->{'require'} = {};
+    # split the raw tags on space
+    my @tags = split(" ", $rawtags);
 
-    foreach my $src (@srcs) {
-	unless ($src =~ m!^(t[-+])?(\d+)$!o) {
-	    die "Relation: getInterestsBlob: bad format for elements of $MAGIC_TAG_KEY: '$src'\n";
+    # the iblob is our return value
+    my $iblob = {};
+    $iblob->{rid} = $self->id; # who this iblob prepresents
+
+    # for each of the tags, file it in the appropriate category
+    foreach my $tag (@tags) {
+	unless ($tag =~ m!^(t[-+])?(\d+)$!o) {
+	    die "Relation: getInterestsBlob: bad format for elements of $MAGIC_TAG_KEY: '$tag'\n";
 	}
 
 	if ($1 eq 't+') {
-	    $iblob->{'require'}->{$2} = 1;
+	    push(@{$iblob->{require}}, $2); # require
 	}
 	elsif ($1 eq 't-') {
-	    $iblob->{'except'}->{$2} = 1;
+	    push(@{$iblob->{except}}, $2); # except
 	}
 	else {
-	    $iblob->{'interests'}->{$2} = 1;
+	    push(@{$iblob->{interests}}, $2); # interests
 	}
     }
 
+    # return the reference for the iblob
     return $iblob;
 }
 
