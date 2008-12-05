@@ -105,14 +105,17 @@ sub set {
 		die "Relation: unknown tags given in $key: '$src'\n";
 	    }
 
-	    if ($1 eq 'require:') {
+	    if (!defined($1)) {
+		$foo = $id;
+	    }
+	    elsif ($1 eq 'require:') {
 		$foo = "t+$id";
 	    }
 	    elsif ($1 eq 'except:') {
 		$foo = "t-$id";
 	    }
 	    else {
-		$foo = $id;
+		die "this can't happen\n";
 	    }
 
 	    push(@dsts, $foo);

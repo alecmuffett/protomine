@@ -160,7 +160,7 @@ sub set {
 		die "Object: get: bad format for elements of $key: '$src'\n";
 	    }
 
-	    if ($1 eq '') {
+	    if (!defined($1)) {	# no "for:" or "not:" prefix
 		my $id = Tag->existsName($2);
 		$foo = $id;
 	    }
