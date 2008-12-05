@@ -16,36 +16,6 @@
 ## permissions and limitations under the License.
 ##
 
-# some of this is the sort of stuff I could get by loading POSIX, but
-# really do I want that overhead when I can just use zulu?
-
-##################################################################
-
-# yyyyLogInfo: provide filename and tag for logging purposes
-
-sub yyyyLogInfo {
-    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) = gmtime(time);
-    my $file = sprintf "%04d%02d%02d", $year + 1900, $mon+1, $mday;
-    my $tag = sprintf "%02d:%02d:%02d",$hour, $min, $sec;
-    return ( $file, $tag );
-}
-
-##################################################################
-
-# yyyyFormat: converts a Unix timestamp into YYYY format based on
-# Zulu/GMT timezone
-
-sub yyyyFormat {
-    my $t = shift;
-
-    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) = gmtime($t);
-
-    return 
-	sprintf "%04d%02d%02d%02%d%02d%02d",
-	$year + 1900, $mon+1, $mday, $hour, $min, $sec;
-}
-
-
 ##################################################################
 
 # atomFormat: converts a Unix timestamp into ATOM format based on
@@ -59,24 +29,6 @@ sub atomFormat {
     return
 	sprintf "%04d-%02d-%02dT%02d:%02d:%02dZ",
 	$year + 1900, $mon+1, $mday, $hour, $min, $sec;
-}
-
-##################################################################
-
-sub atomFileLastAccessed {
-    my $f= shift;
-    my $t = (stat($f))[8];
-    die "atomFileLastAccessed: stat: $f: $!\n" unless (defined($t));
-    return &atomFormat($t);
-}
-
-##################################################################
-
-sub atomFileLastModified {
-    my $f = shift;
-    my $t = (stat($f))[9];
-    die "atomFileLastModified: stat: $f: $!\n" unless (defined($t));
-    return &atomFormat($t);
 }
 
 ##################################################################
