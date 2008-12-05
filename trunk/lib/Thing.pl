@@ -67,11 +67,9 @@ sub boot {
 
     # purposely not a valid directory in this example
     $self->{DIRECTORY} = '/dev/null'; # directory where things are stored
-
     $self->{ENFORCE_UNIQUE_NAMES} = undef; # thing names must be unique
     $self->{NAME_KEY} = undef;  # key for name of thing in %DATA
     $self->{ID_KEY} = undef;    # passive key for id of thing in %DATA
-
     $self->{VALID_KEYS} = {};    # keys which may be present, ever
     $self->{WRITABLE_KEYS} = {}; # keys which may be present to write
     $self->{REQUIRED_KEYS} = {}; # keys which must be present to write
@@ -245,7 +243,6 @@ sub keysValid {
 ## validKey (key) -- returns scalar, whether argument is a valid key;
 ## if scalar is a reference it is a hashref keyed by valid VALUES for
 ## the key (ie: an implementation of 'enum')
-
 
 sub validKey {
     my $self = shift ;
@@ -681,6 +678,28 @@ sub bump {
 #   warn "bump called, returning $retval\n";
 
     return $retval;
+}
+
+##################################################################
+
+sub lastModified {
+    my $self = shift;
+    my $id = $self->id;
+    my $file = $self->filepath($id);
+    my $date = (stat($file))[9];
+    die "atomFileLastModified: stat: $file: $!\n" unless (defined($date));
+    return $date;
+}
+
+##################################################################
+
+sub lastAccessed {
+    my $self = shift;
+    my $id = $self->id;
+    my $file = $self->filepath($id);
+    my $date = (stat($file))[8];
+    die "atomFileLastAccessed: stat: $file: $!\n" unless (defined($date));
+    return $date;
 }
 
 ##################################################################

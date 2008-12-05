@@ -383,7 +383,6 @@ sub matchInterestsBlob {
 
 sub toAtom {
     my $self = shift;
-    my @atom;
 
     # <entry> 
     # <title>Atom-Powered Robots Run Amok</title> 
@@ -393,7 +392,32 @@ sub toAtom {
     # <summary>Some text.</summary> 
     # </entry> 
 
+    # TODO: the ID field needs to be a GUID of some sort, or a URL;
+    # but the private permalink should not be exposed, and the
+    # per-user shared permalink is too changable... so we should
+    # probably HMAC the private permalink with a nonce which is NOT
+    # the same as the mine's cryptokey.  For the moment, though, we'll
+    # fake something up.
 
+    my $rid = shift;		# on behalf of whom this is being prepared
+    my $oid = $self->id;	# the object number
+    my @atom;			# where the results are stored
+
+    my $title = $self->get('objectName') || "(title undefined)";
+    my $permalink = "/api/read-data/$oid";
+    my $id = "";		# this needs to be generated/permanent
+    my $updated = "";
+    my $summary = $self->get('objectDescription') || "(summary undefined)";
+    my $content = "";
+
+    push(@atom, "<entry xml:base='$main::MINE_HTTP_FULLPATH'>\n");
+    push(@atom, "<title>$title</title>\n");
+    push(@atom, "<link href='$permalink'/>\n");
+    push(@atom, "<id>$id</id>\n");
+    push(@atom, "<updated>$updated</updated>\n");
+    push(@atom, "<summary>$summary</summary>\n");
+    push(@atom, "<content>$content</content>\n");
+    push(@atom, "</entry>\n");
 
     return \@atom;
 }

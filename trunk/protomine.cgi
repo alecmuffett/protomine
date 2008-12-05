@@ -158,7 +158,11 @@ my @raw_action_list = (
     [ '/ui/read-tag/TID.html', 'GET', \&ui_read_tag, 'TID' ],
     [ '/ui/read-relation/RID.html', 'GET', \&ui_read_relation, 'RID' ],
     [ '/ui/read-object/OID.html', 'GET', \&ui_read_object, 'OID' ],
-    [ '/ui/read-data/OID', 'GET', \&api_read_oid_aux, 'OID' ], # <---- AUX, SAME AS API
+
+    # this method deleted for security reasons; use the API version.
+    # there is no point in having TWO urls to rewrite, outbound
+    # [ '/ui/read-data/OID', 'GET', \&api_read_oid_aux, 'OID' ], # <---- AUX, SAME AS API
+
     [ '/ui/delete-tag/TID.html', 'GET', \&ui_delete_tag, 'TID' ],
     [ '/ui/delete-relation/RID.html', 'GET', \&ui_delete_relation, 'RID' ],
     [ '/ui/delete-object/OID.html', 'GET', \&ui_delete_object, 'OID' ],

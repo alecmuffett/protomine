@@ -45,40 +45,6 @@ sub yyyyFormat {
 	$year + 1900, $mon+1, $mday, $hour, $min, $sec;
 }
 
-
-##################################################################
-
-# atomFormat: converts a Unix timestamp into ATOM format based on
-# Zulu/GMT timezone
-
-sub atomFormat {
-    my $t = shift;
-
-    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) = gmtime($t);
-
-    return
-	sprintf "%04d-%02d-%02dT%02d:%02d:%02dZ",
-	$year + 1900, $mon+1, $mday, $hour, $min, $sec;
-}
-
-##################################################################
-
-sub atomFileLastAccessed {
-    my $f= shift;
-    my $t = (stat($f))[8];
-    die "atomFileLastAccessed: stat: $f: $!\n" unless (defined($t));
-    return &atomFormat($t);
-}
-
-##################################################################
-
-sub atomFileLastModified {
-    my $f = shift;
-    my $t = (stat($f))[9];
-    die "atomFileLastModified: stat: $f: $!\n" unless (defined($t));
-    return &atomFormat($t);
-}
-
 ##################################################################
 
 1;
