@@ -231,29 +231,34 @@ sub get {
 sub matchInterestsBlob {
     my $self = shift;
     my $iblob = shift;
-    my $mdebug = undef;
-
-    # load the raw tags describing this object
-    my $rawtags = $self->SUPER::get('objectTags');
-
-    # split the raw tags on space
-    my @tags = split(" ", $rawtags);
-    my $tag;
+    my $mdebug = 0;
 
     # upon whose we are checking
     my $rid = $iblob->{rid};
 
+    # debug
     if ($mdebug) {
 	my $oid = $self->id;
 	warn "considering object $oid on behalf of relation $rid\n";
     }
 
-    # first sweep: fail fast if "not:RELATION"
+    # load the raw tags describing this object
+    my $rawtags = $self->SUPER::get('objectTags');
 
+    # no tags -> fast fail
+    unless (defined($rawtags)) {
+	warn "FAIL: object has no tags\n" if ($mdebug);
+	return 0;
+    }
+
+    # split the raw tags on space
+    my @tags = split(" ", $rawtags);
+    my $tag;
+
+    # first sweep: fail fast if "not:RELATION"
     foreach $tag (@tags) {
 	if ($tag eq "r-$rid") { # is marked not:RELATION
-	    warn "FAIL: is marked not:$rid\n"
-		if ($mdebug);
+	    warn "FAIL: is marked not:$rid\n" if ($mdebug);
 	    return 0;
 	}
     }
