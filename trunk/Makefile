@@ -95,7 +95,7 @@ reset:
 	./populate-mine.sh
 
 errs:
-	tail -128 /var/log/apache2/error_log
+	tail -f /var/log/apache2/error_log
 
 ##################################################################
 # PHYSICAL TARGETS

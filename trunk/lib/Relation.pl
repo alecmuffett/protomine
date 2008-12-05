@@ -175,15 +175,19 @@ sub getInterestsBlob {
 	    die "Relation: getInterestsBlob: bad format for elements of 'relationInterests': '$tag'\n";
 	}
 
-	if ($1 eq 't+') {
+	if (!defined($1)) {
+	    push(@{$iblob->{interests}}, $2); # interests
+	}
+	elsif ($1 eq 't+') {
 	    push(@{$iblob->{require}}, $2); # require
 	}
 	elsif ($1 eq 't-') {
 	    push(@{$iblob->{except}}, $2); # except
 	}
 	else {
-	    push(@{$iblob->{interests}}, $2); # interests
+	    die "this can't happen\n";
 	}
+
     }
 
     # return the reference for the iblob

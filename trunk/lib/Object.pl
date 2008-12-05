@@ -227,9 +227,11 @@ sub get {
 ##################################################################
 
 # returns non-zero on match, 0 on fail
+
 sub matchInterestsBlob {
     my $self = shift;
     my $iblob = shift;
+    my $mdebug = undef;
 
     # load the raw tags describing this object
     my $rawtags = $self->SUPER::get('objectTags');
@@ -241,17 +243,33 @@ sub matchInterestsBlob {
     # upon whose we are checking
     my $rid = $iblob->{rid};
 
+    if ($mdebug) {
+	my $oid = $self->id;
+	warn "considering object $oid on behalf of relation $rid\n";
+    }
+
     # first sweep: fail fast if "not:RELATION"
+
     foreach $tag (@tags) {
-	return 0 if ($tag eq "r-$rid");	 # is marked not:RELATION
+	if ($tag eq "r-$rid") { # is marked not:RELATION
+	    warn "FAIL: is marked not:$rid\n"
+		if ($mdebug);
+	    return 0;
+	}
     }
 
     # second sweep: succeed fast if "for:RELATION"
+
     foreach $tag (@tags) {
-	return 1 if ($tag eq "r+$rid"); # is marked for:RELATION
+	if ($tag eq "r+$rid") { # is marked for:RELATION
+	    warn "PASS: is marked for:$rid\n"
+		if ($mdebug);
+	    return 1;
+	}
     }
 
     # expand the tagParents to permit implicit matching
+
     my %tobedone;
     my @tbd;
 
@@ -261,6 +279,7 @@ sub matchInterestsBlob {
     # state 2 - known and expanded
 
     # populate %tobedone with initial tags
+
     foreach $tag (grep(/^\d+$/, @tags)) {
 	$tobedone{$tag} = 1;
     }
@@ -271,49 +290,87 @@ sub matchInterestsBlob {
     # populated into %tobedone iff they have not already been expanded
     # (ie: iff state==2)
 
+    # OBVIOUS FUTURE OPTIMISATION: add the exclude/require code into
+    # this expansion, for fast tracking...
+
     while (@tbd = grep { $tobedone{$_} == 1 } keys %tobedone) {
 	foreach $tag (@tbd) {
 	    my $x = Tag->new($tag);
 	    my $xrawtags = $x->SUPER::get('tagParents');
-	    my @xtags = grep(/^\d+$/, split(" ", $xrawtags));
-	    foreach my $xtag (@xtags) {
-		next if ($tobedone{$xtag} == 2);
-		$tobedone{$xtag} = 1;
+
+	    if (defined($xrawtags)) {
+		my @xtags = grep(/^\d+$/, split(" ", $xrawtags));
+
+		foreach my $xtag (@xtags) {
+		    if (defined($tobedone{$xtag}) and $tobedone{$xtag} == 2) {
+			next;   # already done, so skip
+		    }
+		    $tobedone{$xtag} = 1; # mark it to be done
+		}
 	    }
-	    $tobedone{$tag} = 2;
+	    $tobedone{$tag} = 2; # mark it done
 	}
     }
 
     # flatten the keys of %tobedone to provide the expanded tag list
+
     my @expanded_tags = keys %tobedone;
-  
-    # third sweep: fail fast for for exclude:TAG 
+
+    # third sweep: fail fast for for exclude:TAG
+
     my %user_excepts;
+
     map { $user_excepts{$_}++ } @{$iblob->{except}};
+
     foreach $tag (@expanded_tags) {
-	return 0 if ($user_excepts{$tag});
+	if ($user_excepts{$tag}) {
+	    warn "FAIL: relation $rid marked as except:$tag (in @expanded_tags)\n"
+		if ($mdebug);
+	    return 0;
+	}
     }
 
     # fourth (inverse) sweep: check for presence of all
     # user_requirements in @expanded_tags; fail fast if ANY
     # user_requirements are missing
+
     my $reqctr = 0;
+
     foreach my $user_requirement (@{$iblob->{require}}) {
-	return 0 unless (grep { $_ == $user_requirement } @expanded_tags);
+	unless (grep { $_ == $user_requirement } @expanded_tags) {
+	    warn "FAIL: relation $rid has require:$user_requirement (not in @expanded_tags)\n"
+		if ($mdebug);
+	    return 0;
+	}
+
 	$reqctr++;
     }
 
     # fast track: succeed fast if all user_requirements (and of which
     # there are more than zero) have been met
-    return 2 if ($reqctr);
+
+    if ($reqctr) {
+	warn "PASS: relation satisfies all require: tags (in @expanded_tags)\n"
+	    if ($mdebug);
+	return 2;
+    }
 
     # final sweep: check for tag overlap, for any remaining reason to
     # match it
+
     foreach my $interest (@{$iblob->{interests}}) {
-	return 3 if (grep { $_ == $interest } @expanded_tags);
+
+	if (grep { $_ == $interest } @expanded_tags) {
+	    warn "PASS: object overlaps relation's interest $interest (in @expanded_tags)\n"
+		if ($mdebug);
+	    return 3;
+	}
     }
 
     # we didnae find reason to share this one
+    warn "FAIL: relation not interested in object\n"
+	if ($mdebug);
+
     return 0;
 }
 
