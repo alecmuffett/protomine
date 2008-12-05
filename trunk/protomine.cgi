@@ -551,15 +551,18 @@ sub do_document {
 sub test_code {
     my ($ui, $info, $phr) = @_;
 
-    my $rid = Relation->new(5);
-    my $ib = $rid->getInterestsBlob;
+    my @ofeed;
 
-    foreach my $oid (23..34) {
+    my $rid = 5;
+    my $relation = Relation->new($rid);
+    my $ib = $relation->getInterestsBlob;
+
+    foreach my $oid (@{Object->list}) {
 	my $o = Object->new($oid);
-	my $boolean = $o->matchInterestsBlob($ib);
+	push(@ofeed, $oid) if ($o->matchInterestsBlob($ib));
     }
 
-    $ui->printResult($ib);
+    $ui->printResult( { objectIds => \@ofeed });
 }
 
 ##################################################################
