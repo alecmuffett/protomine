@@ -29,12 +29,6 @@ my $execdir = $0;
 $execdir =~ s![^/]+$!!g;
 require "$execdir/protomine-config.pl";
 
-# what the mine base URL is
-my $cgi_mine = $main::MINE_HTTP_PATH;	# NO TRAILING SLASH
-
-# where the mine lives
-my $base_directory = $main::MINE_DIRECTORY;
-
 # directory where we write log info; must be writable by http daemon
 my $log_dir = "database/logs";
 
@@ -43,9 +37,16 @@ my $trap_exceptions_to_http = 1;
 
 ##################################################################
 
+# stop perl debugger filling the apache logfile about single use variables
+
+if (0) {
+    print $main::MINE_DIRECTORY;
+    print $main::MINE_HTTP_PATH;
+}
+
 # go to the mine home directory
 
-chdir($base_directory) or die "chdir: $base_directory: $!";
+chdir($main::MINE_DIRECTORY) or die "chdir: $main::MINE_DIRECTORY: $!";
 
 # get the extra stuff we need
 
@@ -68,13 +69,13 @@ $CGI::POST_MAX = 10 * (1024**2);
 # mappings from CRUD to HTTP for readability
 
 my %crud = (
-    CREATE => 'POST',		# REST
-    READ => 'GET',		# REST
-    UPDATE => 'PUT',		# REST
-    DELETE => 'DELETE',		# REST/HTTP
-    POST => 'POST',		# HTTP
-    GET => 'GET',		# HTTP
-    PUT => 'PUT',		# HTTP
+    CREATE => 'POST',           # REST
+    READ => 'GET',              # REST
+    UPDATE => 'PUT',            # REST
+    DELETE => 'DELETE',         # REST/HTTP
+    POST => 'POST',             # HTTP
+    GET => 'GET',               # HTTP
+    PUT => 'PUT',               # HTTP
     );
 
 # the table of paths and their handlers/arguments; IMPORTANT: DO NOT
@@ -240,16 +241,16 @@ my @action_list = ();
 # run the query - eventually make this into fast_cgi?
 if (1) {
     # log it using the environment variables for safety
-    &log(sprintf "env %s %s %s", 
-	 $ENV{REMOTE_ADDR}, 
-	 $ENV{REQUEST_METHOD}, 
+    &log(sprintf "env %s %s %s",
+	 $ENV{REMOTE_ADDR},
+	 $ENV{REQUEST_METHOD},
 	 $ENV{REQUEST_URI});
 
     # rip the CGI query
     my $q = new CGI;
 
     # create a UI from it
-    my $ui = new MineUI($q, $cgi_mine);
+    my $ui = new MineUI($q, $main::MINE_HTTP_PATH);
 
     # if there was an error during decoding, fail noisily
     my $cgi_error = $q->cgi_error;
@@ -264,7 +265,7 @@ if (1) {
 	# execute the CGI input against the action list
 	eval { &match_and_execute($ui); } ; # nb: eval block needs ';'
 
-	if ($@) {		# did we barf?
+	if ($@) {               # did we barf?
 	    my $diag = "software exception: $@\n";
 	    print $ui->printError(500, $diag);
 	    warn $diag;
@@ -406,7 +407,7 @@ sub match_and_execute {
 	my $q = $ui->cgi;
 
 	if (defined($p = $q->param('_method'))) {
-	    if ($p eq 'POST' or	# POST->POST is redundant but not a risk
+	    if ($p eq 'POST' or # POST->POST is redundant but not a risk
 		$p eq 'PUT' or
 		$p eq 'DELETE') {
 		$cgi_method = $p;
@@ -416,7 +417,7 @@ sub match_and_execute {
 	    }
 	}
     }
-    elsif ($cgi_method eq 'PUT') {	# TODO: rewrite this
+    elsif ($cgi_method eq 'PUT') {      # TODO: rewrite this
 	# $cgi_data = $q->param('POSTDATA');
 	# $cgi_datafh = *STDIN;
     }
@@ -550,9 +551,15 @@ sub do_document {
 sub test_code {
     my ($ui, $info, $phr) = @_;
 
-    my $foo = Relation->new(5);
-    my $bar = $foo->getInterestsBlob;
-    $ui->printResult($bar);
+    my $rid = Relation->new(5);
+    my $ib = $rid->getInterestsBlob;
+
+    foreach my $oid (23..34) {
+	my $o = Object->new($oid);
+	my $boolean = $o->matchInterestsBlob($ib);
+    }
+
+    $ui->printResult($ib);
 }
 
 ##################################################################

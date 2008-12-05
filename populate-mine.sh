@@ -35,7 +35,7 @@ $MINECTL fast-tags \
 
 
 ###
-# set up tags with parents for implicit tagging; 
+# set up tags with parents for implicit tagging;
 # NB: you must pre-declare a tag before you use it as a parent
 
 $MINECTL fast-tags \
@@ -98,6 +98,69 @@ EOF
 
 $MINECTL fast-relation perry 1 "Perry de Havilland" red-wine food require:hippos except:white-wine
 
+
+###
+# special cases for testing
+
+$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
+    objectStatus=public \
+    objectTags="for:perry"
+
+$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
+    objectStatus=public \
+    objectTags="not:perry"
+
+$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
+    objectStatus=public \
+    objectTags="food"
+
+$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
+    objectStatus=public \
+    objectTags="food for:perry"
+
+$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
+    objectStatus=public \
+    objectTags="food hippos"
+
+$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
+    objectStatus=public \
+    objectTags="food hippos chardonnay"
+
+$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
+    objectStatus=public \
+    objectTags="food hippos not:perry"
+
+$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
+    objectStatus=public \
+    objectTags="food hippos for:perry not:perry"
+
+$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
+    objectStatus=public \
+    objectTags="food hippos not:perry"
+
+$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
+    objectStatus=public \
+    objectTags="hippos"
+
+$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
+    objectStatus=public \
+    objectTags="red-wine hippos"
+
+$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
+    objectStatus=public \
+    objectTags="wine hippos"
 
 ###
 # done
