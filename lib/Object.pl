@@ -379,4 +379,23 @@ sub matchInterestsBlob {
     return 0;
 }
 
+##################################################################
+
+sub toAtom {
+    my $self = shift;
+    my @atom;
+
+    # <entry> 
+    # <title>Atom-Powered Robots Run Amok</title> 
+    # <link href="http://example.org/2003/12/13/atom03"/> 
+    # <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id> 
+    # <updated>2003-12-13T18:30:02Z</updated> 
+    # <summary>Some text.</summary> 
+    # </entry> 
+
+
+
+    return \@atom;
+}
+
 1;
