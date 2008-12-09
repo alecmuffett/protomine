@@ -27,7 +27,7 @@
 
 ## methods named "catFoo" send Foo to the browser in raw form
 ## methods named "printFoo" send Foo to the browser with decoration
-## decoration => use $self->{TYPE} for HTTP type, add header, footer
+## decoration => use $self->{DEFAULT_TYPE} for HTTP type, add header, footer
 
 ## a bullet-list is a listref (obvious)
 ## a table is a listref of listrefs; NxM
@@ -112,8 +112,7 @@ sub boot {
     $self->{URL_FOOTER} = $root . "/ui/bits/footer.html";
     $self->{URL_HEADER} = $root . "/ui/bits/header.html";
 
-
-    $self->{TYPE} = "text/html";
+    $self->{DEFAULT_TYPE} = "text/html";
 
     return $self;
 }
@@ -255,8 +254,8 @@ sub printFH {
 
 sub printPage {
     my $self = shift;
+    my $type = $self->{DEFAULT_TYPE};
     my $q = $self->cgi;
-    my $type = $self->{TYPE};
     my $started = 0;
 
     print $q->header(-type => $type);
@@ -287,7 +286,7 @@ sub printPage {
 sub printTree {
     my $self = shift;
     my $q = $self->cgi;
-    my $type = $self->{TYPE};
+    my $type = $self->{DEFAULT_TYPE};
     my $xbase = $self->{URL_XBASE};
     my $title = sprintf "%s %s", $self->{METHOD}, $self->{URL_FULL};
     my $started = 0;
@@ -309,6 +308,7 @@ sub printTree {
 
     print $q->end_html if ($started);
 }
+
 
 ## printResult (...) -- print tree results, with custom mime type, no decoration
 

@@ -42,13 +42,19 @@ rel=submitcomment or something.
 comments on objects get written as key=value files in
 database/objects/OID.comments/CID
 
-	CREATE /ui/object/OID/comment.html <- UI skin aware?
+	NB COMMENTS NEED A SUBMISSION CGI FORM THAT IS ACCESSIBLE TO
+	THE PUBLIC.  HOW DOES THIS FIT INTO THE PRIVACY OF THE MINE?
 
-	CREATE /api/object/OID/comment.xml
-	READ /api/object/OID/comment.xml
-	READ /api/object/OID/comment/CID.xml
-	UPDATE /api/object/OID/comment/CID.xml
-	DELETE /api/object/OID/comment/CID.xml
+
+	GET     /ui/object/OID/submit.html  <- PUBLIC 
+	POST    /ui/object/OID/submit.html  <- PUBLIC 
+	CREATE  /api/object/OID/submit.xml  <- PUBLIC
+
+	CREATE  /api/object/OID/comment.xml <- NOT PUBLIC BUT SAME AS submit.xml
+	READ    /api/object/OID/comment.xml
+	READ    /api/object/OID/comment/CID.xml
+	UPDATE  /api/object/OID/comment/CID.xml
+	DELETE  /api/object/OID/comment/CID.xml
 
 API for comment-lists-ing
 
