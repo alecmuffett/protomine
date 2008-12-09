@@ -140,7 +140,7 @@ sub method {                    # return my CGI object
     return $self->{METHOD};
 }
 
-sub setBase {                   # set the xbase header for dynamic documents
+sub setXBase {                   # set the xbase header for dynamic documents
     my $self = shift;
     my $path = shift;
     $self->{URL_XBASE} =
@@ -250,73 +250,110 @@ sub printFH {
     $self->catFH($fh);
 }
 
-## printPage (...) -- print page argument, with decoration
+## printPageUsing (...) -- print page argument, with decoration
 
-sub printPage {
+sub printPageUsing {
     my $self = shift;
-    my $type = $self->{DEFAULT_TYPE};
+    my $type = shift;
+
     my $q = $self->cgi;
-    my $started = 0;
 
     print $q->header(-type => $type);
 
     if ($type eq 'text/html') {
-	my $xbase = $self->{URL_XBASE};
-	my $title = sprintf "%s %s", $self->{METHOD}, $self->{URL_FULL};
 	my @meta;
 
+	my $title = sprintf "%s %s", $self->{METHOD}, $self->{URL_FULL};
 	push(@meta, -title => $title);
+
+	my $xbase = $self->{URL_XBASE};
 	push(@meta, -xbase => $xbase) if (defined($xbase));
 
 	push(@meta, -style => { -src => $self->{URL_CSS} });
 
 	print $q->start_html(@meta);
-	$started = 1;
+
+	$self->catPageHeader;
     }
 
-    $self->catPageHeader;
     $self->catPage(@_);
-    $self->catPageFooter;
 
-    print $q->end_html if ($started);
+    if ($type eq 'text/html') {
+	$self->catPageFooter;
+	print $q->end_html;
+    }
 }
 
-## printTree (...) -- print tree arguments, with decoration
+## printTreeUsing (...) -- print tree arguments, with decoration
 
-sub printTree {
+sub printTreeUsing {
     my $self = shift;
-    my $q = $self->cgi;
-    my $type = $self->{DEFAULT_TYPE};
-    my $xbase = $self->{URL_XBASE};
-    my $title = sprintf "%s %s", $self->{METHOD}, $self->{URL_FULL};
-    my $started = 0;
+    my $type = shift;
 
+    my $q = $self->cgi;
     print $q->header(-type => $type);
 
-    if (defined($xbase)) {
-	print $q->start_html(-title => $title, -xbase => $xbase);
-	$started = 1;
-    }
-    elsif ($type eq 'text/html') {
-	print $q->start_html($title);
-	$started = 1;
+    if ($type eq 'text/html') {
+	my $title = sprintf "%s %s", $self->{METHOD}, $self->{URL_FULL};
+
+	my $xbase = $self->{URL_XBASE};
+
+	if (defined($xbase)) {
+	    print $q->start_html(-title => $title, -xbase => $xbase);
+	}
+	else {
+	    print $q->start_html($title);
+	}
+
+	$self->catPageHeader;
     }
 
-    $self->catPageHeader;
-    $self->catTree(@_);         # yes it is almost all cut and paste
-    $self->catPageFooter;
+    $self->catTree(@_);
 
-    print $q->end_html if ($started);
+    if ($type eq 'text/html') {
+	$self->catPageFooter;
+	print $q->end_html;
+    }
 }
 
-
-## printResult (...) -- print tree results, with custom mime type, no decoration
-
-sub printResult {
+sub printPageXML {
     my $self = shift;
-    my $q = $self->cgi;
-    print $q->header(-type => "text/html");
-    $self->catTree(@_);
+    return $self->printPageUsing("application/xml", @_);
+}
+
+sub printTreeXML {
+    my $self = shift;
+    return $self->printTreeUsing("application/xml", @_);
+}
+
+sub printPageATOM {
+    my $self = shift;
+    return $self->printPageUsing("application/atom+xml", @_);
+}
+
+sub printTreeATOM {
+    my $self = shift;
+    return $self->printTreeUsing("application/atom+xml", @_);
+}
+
+sub printPageHTML {
+    my $self = shift;
+    return $self->printPageUsing("text/html", @_);
+}
+
+sub printTreeHTML {
+    my $self = shift;
+    return $self->printTreeUsing("text/html", @_);
+}
+
+sub printPageText {
+    my $self = shift;
+    return $self->printPageUsing("text/plain", @_);
+}
+
+sub printTreeText {
+    my $self = shift;
+    return $self->printTreeUsing("text/plain", @_);
 }
 
 ##################################################################

@@ -30,32 +30,32 @@ sub ui_clone_object {		# OID
 
 sub ui_create_object {
     my ($ui, $info, $phr) = @_;
-    $ui->setBase("ui/");
+    $ui->setXBase("ui/");
     my $result = &api_create_object(@_);
     my $oid = $result->{objectId};
     my @output;
     push(@output, "created object $oid");
-    $ui->printPage(\@output);
+    $ui->printPageHTML(\@output);
 }
 
 sub ui_create_relation {
     my ($ui, $info, $phr) = @_;
-    $ui->setBase("ui/");
+    $ui->setXBase("ui/");
     my $result = &api_create_relation(@_);
     my $rid = $result->{relationId};
     my @output;
     push(@output, "created relation $rid");
-    $ui->printPage(\@output);
+    $ui->printPageHTML(\@output);
 }
 
 sub ui_create_tag {
     my ($ui, $info, $phr) = @_;
-    $ui->setBase("ui/");
+    $ui->setXBase("ui/");
     my $result = &api_create_tag(@_);
     my $tid = $result->{tagId};
     my @output;
     push(@output, "created tag $tid");
-    $ui->printPage(\@output);
+    $ui->printPageHTML(\@output);
 }
 
 sub ui_delete_object {		# OID
@@ -92,7 +92,7 @@ sub ui_show_config {
 
 sub ui_show_objects {
     my ($ui, $info, $phr) = @_;
-    $ui->setBase("ui/");	# everything will be relative to this
+    $ui->setXBase("ui/");	# everything will be relative to this
     my $oids = Object->list;
     my @output;
     push(@output, "<dl>" );
@@ -116,12 +116,12 @@ sub ui_show_objects {
 	push(@output, "<p/>\n" );
     }
     push(@output, "</dl>\n" );
-    $ui->printPage(\@output);
+    $ui->printPageHTML(\@output);
 }
 
 sub ui_show_relations {
     my ($ui, $info, $phr) = @_;
-    $ui->setBase("ui/");	# everything will be relative to this
+    $ui->setXBase("ui/");	# everything will be relative to this
     my $rids = Relation->list;
     my @output;
     push(@output, "<dl>" );
@@ -143,12 +143,12 @@ sub ui_show_relations {
 	push(@output, "<p/>\n" );
     }
     push(@output, "</dl>\n" );
-    $ui->printPage(\@output);
+    $ui->printPageHTML(\@output);
 }
 
 sub ui_show_tags {
     my ($ui, $info, $phr) = @_;
-    $ui->setBase("ui/");	# everything will be relative to this
+    $ui->setXBase("ui/");	# everything will be relative to this
     my $tids = Tag->list;
     my @output;
     push(@output, "<dl>" );
@@ -170,7 +170,7 @@ sub ui_show_tags {
 	push(@output, "<p/>\n" );
     }
     push(@output, "</dl>\n" );
-    $ui->printPage(\@output);
+    $ui->printPageHTML(\@output);
 }
 
 sub ui_update_config {
