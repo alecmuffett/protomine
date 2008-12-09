@@ -20,6 +20,7 @@
 # undefined function calls
 
 $pkg = "";
+
 while (<>) {
     if (/^\s*package\s+(\w+)/o) {
 	$pkg = " package $1";
@@ -51,7 +52,6 @@ foreach $input (@lines) {
 }
 
 print "-- checking definition\n";
-
 foreach $call (sort keys %calls) {
     $ndefns = ($#{$defns{$call}} + 1);
     @xdefns = @{$defns{$call}};
@@ -74,7 +74,6 @@ foreach $call (sort keys %calls) {
 print "\n";
 
 print "-- checking usage\n";
-
 foreach $defn (sort keys %defns) {
     $ncalls = ($#{$calls{$defn}} + 1);
     @xcalls = @{$calls{$defn}};
@@ -87,7 +86,7 @@ foreach $defn (sort keys %defns) {
 	print join("\n\t", @xdefns);
 	print "\n\n";
     }
-    elsif (0 && ($ncalls > 1)) {
+    elsif (1 || ($ncalls > 1)) {
 	print "$defn called $ncalls times:\n\t";
 	print join("\n\t", @xcalls);
 	print "\n\n";
@@ -96,3 +95,4 @@ foreach $defn (sort keys %defns) {
 }
 print "\n";
 
+exit 0;
