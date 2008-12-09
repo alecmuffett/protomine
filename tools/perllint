@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -s
 
 ##
 ## Copyright 2008 Adriana Lukas & Alec Muffett
@@ -18,6 +18,8 @@
 
 # performs a sweep of perl scripts given as arguments, looking for
 # undefined function calls
+
+# usage: perllint [-v] file ...
 
 $pkg = "";
 
@@ -86,7 +88,7 @@ foreach $defn (sort keys %defns) {
 	print join("\n\t", @xdefns);
 	print "\n\n";
     }
-    elsif (1 || ($ncalls > 1)) {
+    elsif ($v and ($ncalls > 1)) {
 	print "$defn called $ncalls times:\n\t";
 	print join("\n\t", @xcalls);
 	print "\n\n";
