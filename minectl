@@ -27,12 +27,31 @@ $root = $MINE_HTTP_FULLPATH;
 # load the MIME lookup library
 require "pm-mime.pl";
 
-# debugging switches of varying verbosity
-my $debug = 0;                    # print curl cmdline before execution
-push(@curlopts, '--fail') if (0); # curl dies silently on failure
-push(@curlopts, '--digest') if (0);  # curl http digest authentication
-push(@curlopts, '--user', 'alecm:sesame') if (0); # user and pw for authentication
-push(@curlopts, '--verbose') if (0); # curl acts verbosely
+if (0) {                        # to silence perl -wc
+    print $d;
+    print $j;
+    print $a;
+}
+
+my $json = 0;
+my $debug = 0;
+my $auth = 0;
+
+$json = 1 if ($j);
+$debug = 1 if ($d);
+$auth = 1 if ($a);
+
+if ($debug) {
+    push(@curlopts, '--verbose'); # make curl act verbosely
+}
+else {
+    push(@curlopts, '--fail'); # make curl die silently on failure
+}
+
+if ($auth) {
+    push(@curlopts, '--user', 'alecm:sesame'); # curl user and pw for authentication
+    push(@curlopts, '--digest'); # curl http digest authentication
+}
 
 # that which calls curl
 sub Mine {
@@ -41,32 +60,32 @@ sub Mine {
     my @curlargs;
 
     if ($method eq 'create') {
-        $query = "";
+	$query = "";
     }
     elsif ($method eq 'read') {
-        $query = "";
+	$query = "";
     }
     elsif ($method eq 'update') {
-        $query = "?_method=UPDATE";
+	$query = "?_method=UPDATE";
     }
     elsif ($method eq 'delete') {
-        $query = "?_method=DELETE";
+	$query = "?_method=DELETE";
     }
     else {
-        die "$0: unrecognised method $method\n";
+	die "$0: unrecognised method $method\n";
     }
 
     foreach $arg (@args) {
-        push(@curlargs, '-F', $arg);
+	push(@curlargs, '-F', $arg);
     }
 
-    if ($j) {                   # to JSON if "-j"
-        $api =~ s!\.xml$!.json!o;
+    if ($json) {
+	$api =~ s!\.xml$!.json!o; # only swap to .json if was .xml beforehand
     }
 
     @cmd = ("curl", @curlopts, "$root$api$query", @curlargs);
 
-    warn "> exec: @cmd\n" if ($debug);
+    warn "+ exec: @cmd\n" if ($debug);
     system(@cmd);
 }
 
@@ -97,15 +116,15 @@ while (<DATA>) {
     # PASSARGS: apply all foo=bar parameters to single API call
 
     if ($call_how eq 'PASSARGS') {
-        &Mine($method, $api, @ARGV);
+	&Mine($method, $api, @ARGV);
     }
 
     # ITERARGS: apply each foo=bar parameter to individual API calls
 
     elsif ($call_how eq 'ITERARGS') {
-        foreach $arg (@ARGV) {
-            &Mine($method, $api, $arg);
-        }
+	foreach $arg (@ARGV) {
+	    &Mine($method, $api, $arg);
+	}
     }
 
     # SUB1PASS: strip the first arg and interpolate into API URL; pass
@@ -113,81 +132,81 @@ while (<DATA>) {
     # SAFEST CASE FOR SINGLE-ARGUMENT COMMANDLINES.
 
     elsif ($call_how eq 'SUB1PASS') {
-        my $arg = shift;
-        $api =~ s![ROT]ID!$arg!g;
-        &Mine($method, $api, @ARGV);
+	my $arg = shift;
+	$api =~ s![ROT]ID!$arg!g;
+	&Mine($method, $api, @ARGV);
     }
 
     # SUB1ITER: strip the first arg and interpolate into API URL;
     # apply each subsequent foo=bar parameter to it individually
 
     elsif ($call_how eq 'SUB1ITER') {
-        my $arg = shift;
-        $api =~ s![ROT]ID!$arg!g;
-        foreach $arg (@ARGV) {
-            &Mine($method, $api, $arg);
-        }
+	my $arg = shift;
+	$api =~ s![ROT]ID!$arg!g;
+	foreach $arg (@ARGV) {
+	    &Mine($method, $api, $arg);
+	}
     }
 
     # SUBEVERY: strip each arg and interpolate it into an API URL, and
     # call that without parameters
 
     elsif ($call_how eq 'SUBEVERY') {
-        foreach $arg (@ARGV) {
-            my $api2 = $api;
-            $api2 =~ s![RIT]ID!$arg!g;
-            &Mine($method, $api2);
-        }
+	foreach $arg (@ARGV) {
+	    my $api2 = $api;
+	    $api2 =~ s![RIT]ID!$arg!g;
+	    &Mine($method, $api2);
+	}
     }
 
     # FRELATION: magic special case for uploading files
     elsif ($call_how eq 'FRELATION') {
 
-        my $relationname = shift(@ARGV);
-        my $relationversion = shift(@ARGV);
-        my $relationdescription = shift(@ARGV);
+	my $relationname = shift(@ARGV);
+	my $relationversion = shift(@ARGV);
+	my $relationdescription = shift(@ARGV);
 
-        &Mine($method,
-              $api,
-              "relationName=$relationname",
-              "relationVersion=$relationversion",
-              "relationDescription=$relationdescription",
-              "relationInterests=@ARGV",
-            );
+	&Mine($method,
+	      $api,
+	      "relationName=$relationname",
+	      "relationVersion=$relationversion",
+	      "relationDescription=$relationdescription",
+	      "relationInterests=@ARGV",
+	    );
     }
 
     # FUPLOAD: magic special case for uploading files
     elsif ($call_how eq 'FUPLOAD') {
 
-        foreach my $filename (@ARGV) {
-            my $filetype = &mime_type($filename);
+	foreach my $filename (@ARGV) {
+	    my $filetype = &mime_type($filename);
 
-            &Mine($method,
-                  $api,
-                  "data=\@$filename",
-                  "objectName=$filename",
-                  "objectType=$filetype",
-                  "objectStatus=draft",
-                  "objectDescription=bulk-uploaded file, sourced from $filename");
-        }
+	    &Mine($method,
+		  $api,
+		  "data=\@$filename",
+		  "objectName=$filename",
+		  "objectType=$filetype",
+		  "objectStatus=draft",
+		  "objectDescription=bulk-uploaded file, sourced from $filename");
+	}
     }
 
     # FTAGS: magic special case for creating tags
     elsif ($call_how eq 'FTAGS') {
 
-        foreach my $foo (@ARGV) {
-            my ($tagname, @tagparents) = split(m!/!o, $foo);
-            my @tagargs = ();
+	foreach my $foo (@ARGV) {
+	    my ($tagname, @tagparents) = split(m!/!o, $foo);
+	    my @tagargs = ();
 
-            push(@tagargs, "tagName=$tagname");
-            push(@tagargs, "tagParents=@tagparents") if ($#tagparents >= 0);
-            &Mine($method, $api, @tagargs);
-        }
+	    push(@tagargs, "tagName=$tagname");
+	    push(@tagargs, "tagParents=@tagparents") if ($#tagparents >= 0);
+	    &Mine($method, $api, @tagargs);
+	}
     }
 
     # THIS CAN'T HAPPEN
     else {
-        die "LOL WHUT?\n";
+	die "LOL WHUT?\n";
     }
 }
 

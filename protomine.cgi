@@ -121,7 +121,7 @@ my @raw_action_list = (
     # the /get URL is a special case HTTP
     ###
 
-    [ '/get', 'GET', \&do_remote_request, 'GET', ],
+    [ '/get', 'GET', \&do_remote_get, 'GET', ],
 
     ###
     # unfinished crap
@@ -488,7 +488,7 @@ sub match_and_execute {
 
 sub noop {
     my ($ui, $info, $phr, @args) = @_;
-    $ui->printPage("noop @args");
+    $ui->printPageText("noop @args");
 }
 
 ##################################################################
@@ -502,25 +502,25 @@ sub do_redirect {
 
 ##################################################################
 
-# stub to print whatever a API returns, as a *page*
+# stub to print whatever a API returns
 
 sub do_apidump {
     my ($ui, $info, $phr, $fn, @rest) = @_;
-    $ui->printPage(&{$fn}($ui, $info, $phr, @rest));
+    $ui->printPageText(&{$fn}($ui, $info, $phr, @rest));
 }
 
 ##################################################################
 
-# stub to print whatever a API returns, as a *result*
+# stub to print whatever a API returns
 
 sub do_xml {
     my ($ui, $info, $phr, $fn, @rest) = @_;
-    $ui->printResult(&{$fn}($ui, $info, $phr, @rest));
+    $ui->printTreeXML(&{$fn}($ui, $info, $phr, @rest));
 }
 
 ##################################################################
 
-sub do_remote_request {
+sub do_remote_get {
     die "method not yet implemented";
 }
 
@@ -538,7 +538,7 @@ sub do_document {
 
 	my @page;
 	push(@page, $ui->formatDirectory($document));
-	$ui->printPage(@page);
+	$ui->printPageText(@page);
     }
     elsif (-f $document) {
 	$ui->printFile($document);
@@ -566,7 +566,7 @@ sub test_code {
 	push(@ofeed, $oid) if ($o->matchInterestsBlob($ib));
     }
 
-    $ui->printResult( { objectIds => \@ofeed });
+    $ui->printTreeXML( { objectIds => \@ofeed });
 }
 
 ##################################################################
