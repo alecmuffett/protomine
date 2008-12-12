@@ -590,7 +590,7 @@ sub do_remote_get {
 	    push(@ofeed, $oid) if ($o->matchInterestsBlob($ib));
 	}
 
-	return $ui->printTreeATOM( { objectIds => \@ofeed });
+	return $ui->printTreeAtom( { objectIds => \@ofeed });
     }
 
     # fall off the end?

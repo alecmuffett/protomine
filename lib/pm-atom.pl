@@ -18,7 +18,7 @@
 
 ##################################################################
 
-# atomFormat: converts a Unix timestamp into ATOM format based on
+# atomFormat: converts a Unix timestamp into Atom format based on
 # Zulu/GMT timezone
 
 sub atomFormat {
