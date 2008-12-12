@@ -434,7 +434,7 @@ sub save {
 
 sub clone {
     my $self = shift;
-    my $other = new $self->new;
+    my $other = $self->new;
     $other->setFrom($self->{DATA});
     return $other->save;
 }
