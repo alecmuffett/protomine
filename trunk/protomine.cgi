@@ -542,54 +542,59 @@ sub do_remote_get {
         &log("security $diag");
 	die "do_remote_get: $diag\n";
     }
-
     my $rid = $1;
     my $rvsn = $2;
     my $oid = $3;
 
     # load the relation
     # TBD: trap this better so you log a security exception
-    my $relation = Relation->new($rid); # will abort if not exist
+    my $r = Relation->new($rid); # will abort if not exist
 
     # check the relationship validity 
     # (rvsn, date, time-of-day, ipaddress, ...)
     # TBD: replace this with a Relation method call
-    my $rvsn2 = $relation->get('relationVersion');
+    my $rvsn2 = $r->get('relationVersion');
     unless ($rvsn eq $rvsn2) {		    
 	my $diag = "bad rvsn $key; supplied=$rvsn real=$rvsn2";
 	&log("security $diag");
 	die "do_remote_get: $diag\n";
     }
 
-    # if it's an object, fetch the object
-    # if it's a feed, generate the feed
-    # else die
+    # analyse the request
+    if ($oid > 0) {		    # it's an object-get 
+	# get his interests blob
+	my $ib = $r->getInterestsBlob; 
 
-    die "method not yet implemented";
-}
+	# pull in the object metadata
+	my $o = Object->new($oid) ; # will abort if not exist
 
-sub do_remote_get_object {
-    my ($ui, $info, $phr, $fn, @rest) = @_;
-    die "method not yet implemented";
-}
+	# check if the object wants to be seen by him
+	unless ($o->matchInterestsBlob($ib)) {
+	    my $diag = "bad object-get oid=$oid rid=$rid failed matchInterestsBlob";
+	    &log("security $diag");
+	    die "do_remote_get: $diag\n";
+	}
 
-sub do_remote_get_feed {
-    my ($ui, $info, $phr, $fn, @rest) = @_;
+	# punt to api_read_oid_aux
+	return &api_read_oid_aux($ui, $info, $phr, $oid);
+    }
+    elsif ($oid == 0) {		# it's a feed-get
+	my @ofeed;
 
-    die "method not yet implemented";
+	my $rid = 5;
+	my $r = Relation->new($rid);
+	my $ib = $r->getInterestsBlob;
 
-    my @ofeed;
+	foreach my $oid (@{Object->list}) {
+	    my $o = Object->new($oid);
+	    push(@ofeed, $oid) if ($o->matchInterestsBlob($ib));
+	}
 
-    my $rid = 5;
-    my $relation = Relation->new($rid);
-    my $ib = $relation->getInterestsBlob;
-
-    foreach my $oid (@{Object->list}) {
-	my $o = Object->new($oid);
-	push(@ofeed, $oid) if ($o->matchInterestsBlob($ib));
+	return $ui->printTreeATOM( { objectIds => \@ofeed });
     }
 
-    $ui->printTreeATOM( { objectIds => \@ofeed });
+    # fall off the end?
+    die "do_remote_get: this can't happen";
 }
 
 ##################################################################
