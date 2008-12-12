@@ -1,0 +1,15 @@
+The Thing database system numbers all things as sequences of positive
+integers from 1 upwards.
+
+This means that Thing number zero/0 is illegal, a bit like a NULL
+pointer or a NUL byte at the end of a C-string.
+
+The protomine implementation uses this concept:
+
+1) A minekey encodes the following information:
+
+	magic,RID,RVSN,OID
+
+   if OID is zero, the feed for relation RID is returned, so long as
+   the relation version RVSN matches the RID's current version number
+
