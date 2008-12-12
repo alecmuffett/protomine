@@ -553,7 +553,7 @@ sub do_remote_get {
     # check the relationship validity 
     # (rvsn, date, time-of-day, ipaddress, ...)
     # TBD: replace this with a Relation method call
-    my $rvsn2 = $r->get('relationVersion');
+    my $rvsn2 = $r->relationVersion;
     unless ($rvsn eq $rvsn2) {		    
 	my $diag = "bad rvsn $key; supplied=$rvsn real=$rvsn2";
 	&log("security $diag");

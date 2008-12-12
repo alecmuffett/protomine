@@ -199,4 +199,11 @@ sub getInterestsBlob {
 
 ##################################################################
 
+sub relationVersion {
+    my $self = shift;
+    return $self->get('relationVersion');
+}
+
+##################################################################
+
 1;
