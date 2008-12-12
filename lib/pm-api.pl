@@ -61,7 +61,7 @@ sub api_create_object {		# -- DONE --
     if (defined($q->param('data'))) { # install that which is uploaded
 	my $fh = $q->upload('data');
 	unless (defined($fh)) {
-	    die "bad fh passed back from cgi";
+	    die "api_create_object: bad fh passed back from cgi";
 	}
 	$object->auxPutFH($fh);
     }
