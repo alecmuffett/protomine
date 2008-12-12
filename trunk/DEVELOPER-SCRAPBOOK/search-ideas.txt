@@ -1,0 +1,10 @@
+general search context criteria:
+
+	rid (matched against intra-object for:rid and not:rid)
+	except_tid
+	require_tid
+	interests
+	created_before
+	created_after
+	modified_before
+	modified_after

@@ -42,7 +42,7 @@ test:
 ###
 
 webpages: $(UI)/index.html
-	for i in LICENSE NOTICE TECHNOTES TODO ; do cp $$i $(DOC)/$$i.txt ; done
+	for i in LICENSE NOTICE ; do cp $$i $(DOC)/$$i.txt ; done
 
 ###
 # syntax the CGI script
