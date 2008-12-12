@@ -1,0 +1,15 @@
+comments on objects get written as key=value files in
+database/objects/OID.comments/CID
+
+	NB COMMENTS NEED A SUBMISSION CGI FORM THAT IS ACCESSIBLE TO
+	THE PUBLIC.  HOW DOES THIS FIT INTO THE PRIVACY OF THE MINE?
+
+
+	GET     /ui/submit/OID.html  <- PUBLIC <- get form to insert comment
+	CREATE  /api/submit/OID.xml  <- PUBLIC <- insert comment
+
+	CREATE  /api/object/OID/comment.xml <- NOT PUBLIC BUT SAME AS submit/OID.xml
+	READ    /api/object/OID/comment.xml
+	READ    /api/object/OID/comment/CID.xml
+	UPDATE  /api/object/OID/comment/CID.xml
+	DELETE  /api/object/OID/comment/CID.xml

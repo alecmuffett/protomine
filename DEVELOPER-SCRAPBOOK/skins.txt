@@ -1,0 +1,4 @@
+brilliant flashes of inspiration
+	in config define SKINNAME, maps to /ui/SKINNAME/...
+	default SKINNAME is "basic"
+	config picks up homepage url

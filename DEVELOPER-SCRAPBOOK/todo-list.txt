@@ -1,86 +1,16 @@
-Things and relationships.
-
-	ui->
-
-	Relation->
-
-
-	Object->match(context)
-		reject if private
-		reject if not:rid
-		
-
-
-
-general search context criteria:
-
-	rid (matched against intra-object for:rid and not:rid)
-	except_tid
-	require_tid
-	interests
-	created_before
-	created_after
-	modified_before
-	modified_after
-
-
-
-
 ADD INCLUDE AND EXCLUDE AS SYNONYMS FOR REQUIRE AND EXCEPT
-
-
-
-implement a /public hierarchy for hosting public javascript, etc
-
-put /feeds to /private
-
-
 
 ping kevin about marking-up in-feed-document URLs with
 rel=submitcomment or something.
 
-comments on objects get written as key=value files in
-database/objects/OID.comments/CID
-
-	NB COMMENTS NEED A SUBMISSION CGI FORM THAT IS ACCESSIBLE TO
-	THE PUBLIC.  HOW DOES THIS FIT INTO THE PRIVACY OF THE MINE?
-
-
-	GET     /ui/object/OID/submit.html  <- PUBLIC 
-	POST    /ui/object/OID/submit.html  <- PUBLIC 
-	CREATE  /api/object/OID/submit.xml  <- PUBLIC
-
-	CREATE  /api/object/OID/comment.xml <- NOT PUBLIC BUT SAME AS submit.xml
-	READ    /api/object/OID/comment.xml
-	READ    /api/object/OID/comment/CID.xml
-	UPDATE  /api/object/OID/comment/CID.xml
-	DELETE  /api/object/OID/comment/CID.xml
-
-API for comment-lists-ing
-
-first plugin: HTML sticky-note
-
-
-
-
-
-
-brilliant flashes of inspiration
-	in config define SKINNAME, maps to /ui/SKINNAME/...
-	default SKINNAME is "basic"
-	config picks up homepage url
-
 	
-	define FEEDDEPTH
-		sort order of Object->list promotes MRM to top of list
-		keep filling feed for RELATION until FEEDDEPTH met
-		generate feed
+- define FEEDDEPTH
+	sort order of Object->list promotes MRM to top of list keep
+	filling feed for RELATION until FEEDDEPTH met generate feed
 
-
-
-- the Thing->toAtomHTML method is really easy; if the type is
-  text/html then return that, otherwise put a link stub as HTML and
-  return that
+- the Thing->toAtomHTML method is really easy; if the type is text/html
+	then return that, otherwise put a link stub as HTML and return
+	that...
 
 - if Object is DRAFT 
 	it will be seen only by You.
@@ -92,13 +22,13 @@ brilliant flashes of inspiration
 - if Object is PUBLIC 
 	it is subject to tagging rules
 
-- add relationSourceIPAddress doing substring match against "192.168.1." for subnet ACL accesss 
+- add relationSourceIPAddress doing substring match against
+  "192.168.1." for subnet ACL accesss
 
 - relationNames need to be single word tokens, no spaces
 
-- all thingNames must begine with an alphanumeric and not contain spaces
-
-- add bulk tag-creation method
+- all relation/tagNames must begine with an alphanumeric and not
+  contain spaces
 
 - add read() supermethod to Object, to add stuff like objectSize to metadata
 
