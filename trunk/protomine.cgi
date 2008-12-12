@@ -262,6 +262,7 @@ if (1) {
     if ($cgi_error) {
 	my $diag = "cgi decoding error: $cgi_error";
 	print $ui->printError(500, $diag);
+	&log("die $diag");
 	die $diag;
     }
 
@@ -271,6 +272,7 @@ if (1) {
 
 	if ($@) {               # did we barf?
 	    my $diag = "software exception: $@\n";
+	    &log("die $diag");
 	    print $ui->printError(500, $diag);
 	    warn $diag;
 	}
@@ -433,12 +435,14 @@ sub match_and_execute {
     foreach my $action (@action_list) {
 	my ($method, $pattern, $paramlistref, $handler, @args) = @{$action};
 
-	next unless ($cgi_method eq $method); # skip if wrong method
-	next unless ($cgi_url =~ /$pattern/); # skip if not matching pattern
+	# skip if wrong method
+	next unless ($cgi_method eq $method); 
 
-	# this is where we store key/value pairs from the regular
-	# expression substring matcher
+	# skip if not matching pattern
+	next unless ($cgi_url =~ /$pattern/);
 
+	# this is where we store key/value pairs from the 
+	# regular expression substring matcher
 	my %paramhash = ();
 
 	# do we need to do argument processing?
@@ -474,10 +478,12 @@ sub match_and_execute {
 	# many side-effects and "drop back 10 yards and punt"
 	# scenarios that frankly i can't be arsed;
 
+	&log("run $cgi_method $cgi_url ", %paramhash);
 	return &{$handler}($ui, [$cgi_method, $cgi_url, $pattern], \%paramhash, @args);
     }
 
     # if we get here, we fell of the list of regular expressions
+    &log("wtf $cgi_method $cgi_url");
     $ui->printError(404, "no handler for $cgi_method $cgi_url");
 }
 
@@ -521,6 +527,7 @@ sub do_xml {
 ##################################################################
 
 sub do_remote_get {
+    my ($ui, $info, $phr, $fn, @rest) = @_;
     die "method not yet implemented";
 }
 
@@ -538,9 +545,11 @@ sub do_document {
 
 	my @page;
 	push(@page, $ui->formatDirectory($document));
-	$ui->printPageText(@page);
+	&log("dir $document");
+	$ui->printPageHTML(@page);
     }
     elsif (-f $document) {
+	&log("file $document");
 	$ui->printFile($document);
     }
     else {
