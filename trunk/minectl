@@ -31,6 +31,7 @@ if (0) {                        # to silence perl -wc
     print $d;
     print $j;
     print $a;
+    print $MINE_HTTP_FULLPATH;
 }
 
 my $json = 0;
@@ -133,7 +134,7 @@ while (<DATA>) {
 
     elsif ($call_how eq 'SUB1PASS') {
 	my $arg = shift;
-	$api =~ s![ROT]ID!$arg!g;
+	$api =~ s!\b([RITC]ID|KEY)\b!$arg!g;
 	&Mine($method, $api, @ARGV);
     }
 
@@ -237,10 +238,10 @@ fast-relation  FRELATION  create  /api/relation.xml  name  vers     desc        
 ###
 
 # developer testing
-test  PASSARGS  read  /test  a=b  ...
+test  PASSARGS  read  /test  a=b    ...
 
 # calling the feed and object retreival
-get      SUB1PASS  read  /get  minekey
+get   SUB1PASS  read  /get?key=KEY  minekey
 
 # the version command, effectively a no-op / test routine
 version  PASSARGS  read  /api/version.xml
