@@ -204,7 +204,11 @@ sub get {
 		die "Object: get: bad format for elements of $key: '$src'\n";
 	    }
 
-	    if ($1 eq 'r+') {
+	    if (!defined($1)) {
+		my $tag = Tag->new($2);
+		$foo = $tag->name;
+	    }
+	    elsif ($1 eq 'r+') {
 		my $relation = Relation->new($2);
 		$foo = 'for:' . $relation->name;
 	    }
@@ -213,8 +217,7 @@ sub get {
 		$foo = 'not:' . $relation->name;
 	    }
 	    else {
-		my $tag = Tag->new($2);
-		$foo = $tag->name;
+		die "this can't happen";
 	    }
 
 	    push(@dsts, $foo);
@@ -231,7 +234,7 @@ sub get {
 sub matchInterestsBlob {
     my $self = shift;
     my $iblob = shift;
-    my $mdebug = 0;
+    my $mdebug = 1;		# verbose debugging switch in this code
 
     # upon whose we are checking
     my $rid = $iblob->{rid};

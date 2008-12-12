@@ -74,7 +74,7 @@ sub boot {
     $self->{WRITABLE_KEYS} = {}; # keys which may be present to write
     $self->{REQUIRED_KEYS} = {}; # keys which must be present to write
 
-    die "Thing::boot called, this should not happen\n";
+    die "Thing::boot called, this can't happen";
 
     return $self;
 }

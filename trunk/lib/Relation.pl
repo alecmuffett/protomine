@@ -115,7 +115,7 @@ sub set {
 		$foo = "t-$id";
 	    }
 	    else {
-		die "this can't happen\n";
+		die "this can't happen";
 	    }
 
 	    push(@dsts, $foo);
@@ -188,7 +188,7 @@ sub getInterestsBlob {
 	    push(@{$iblob->{except}}, $2); # except
 	}
 	else {
-	    die "this can't happen\n";
+	    die "this can't happen";
 	}
 
     }

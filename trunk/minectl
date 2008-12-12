@@ -134,7 +134,7 @@ while (<DATA>) {
 
     elsif ($call_how eq 'SUB1PASS') {
 	my $arg = shift;
-	$api =~ s!\b([RITC]ID|KEY)\b!$arg!g;
+	$api =~ s!\b([ORTC]ID|KEY)\b!$arg!g; # {object,relation,tag,comment}id,key
 	&Mine($method, $api, @ARGV);
     }
 

@@ -86,7 +86,7 @@ do
 	"relationInterests=$relationInterests" || exit 1
 
 done <<EOF
-alec     1  Alec_Muffett   wine      cats      motorbikes  mine
+alec     1  Alec_Muffett   wine      cats      motorbikes  mine  food
 adriana  1  Adriana_Lukas  wine      cookery   motorbikes  vrm   mine
 carrie   1  Carrie_Bishop  sneakers  trainers  mine        vrm
 ben      1  Ben_Laurie     wine      food      motorbikes
@@ -102,62 +102,62 @@ $MINECTL fast-relation perry 1 "Perry de Havilland" red-wine food require:hippos
 ###
 # special cases for testing
 
-$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
     objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
     objectStatus=public \
     objectTags="for:perry"
 
-$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
     objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
     objectStatus=public \
     objectTags="not:perry"
 
-$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
     objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
     objectStatus=public \
     objectTags="food"
 
-$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
     objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
     objectStatus=public \
     objectTags="food for:perry"
 
-$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
     objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
     objectStatus=public \
     objectTags="food hippos"
 
-$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
     objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
     objectStatus=public \
     objectTags="food hippos chardonnay"
 
-$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
     objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
     objectStatus=public \
     objectTags="food hippos not:perry"
 
-$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
     objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
     objectStatus=public \
     objectTags="food hippos for:perry not:perry"
 
-$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
     objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
     objectStatus=public \
     objectTags="food hippos not:perry"
 
-$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
     objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
     objectStatus=public \
     objectTags="hippos"
 
-$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
     objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
     objectStatus=public \
     objectTags="red-wine hippos"
 
-$MINECTL create-object @data=$DIR/pimpernel.jpg objectType=image/jpeg \
+$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
     objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
     objectStatus=public \
     objectTags="wine hippos"
