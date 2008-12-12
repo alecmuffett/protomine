@@ -251,10 +251,10 @@ if (1) {
 	 $ENV{REQUEST_URI});
 
     # rip the CGI query
-    my $q = new CGI;
+    my $q = CGI->new;
 
     # create a UI from it
-    my $ui = new MineUI($q, $main::MINE_HTTP_PATH);
+    my $ui = MineUI->new($q, $main::MINE_HTTP_PATH);
 
     # if there was an error during decoding, fail noisily
     my $cgi_error = $q->cgi_error;
@@ -528,7 +528,68 @@ sub do_xml {
 
 sub do_remote_get {
     my ($ui, $info, $phr, $fn, @rest) = @_;
+
+    # extract the key
+    my $q = $ui->cgi;
+    my $key = $q->param('key');
+
+    # decrypt the key
+    # tbd
+
+    # parse the key
+    unless ($key =~ m!^mine1,(\d+),(\d+),(\d+)$!o) {
+	my $diag = "bad key $key";
+        &log("security $diag");
+	die "do_remote_get: $diag\n";
+    }
+
+    my $rid = $1;
+    my $rvsn = $2;
+    my $oid = $3;
+
+    # load the relation
+    # TBD: trap this better so you log a security exception
+    my $relation = Relation->new($rid); # will abort if not exist
+
+    # check the relationship validity 
+    # (rvsn, date, time-of-day, ipaddress, ...)
+    # TBD: replace this with a Relation method call
+    my $rvsn2 = $relation->get('relationVersion');
+    unless ($rvsn eq $rvsn2) {		    
+	my $diag = "bad rvsn $key; supplied=$rvsn real=$rvsn2";
+	&log("security $diag");
+	die "do_remote_get: $diag\n";
+    }
+
+    # if it's an object, fetch the object
+    # if it's a feed, generate the feed
+    # else die
+
     die "method not yet implemented";
+}
+
+sub do_remote_get_object {
+    my ($ui, $info, $phr, $fn, @rest) = @_;
+    die "method not yet implemented";
+}
+
+sub do_remote_get_feed {
+    my ($ui, $info, $phr, $fn, @rest) = @_;
+
+    die "method not yet implemented";
+
+    my @ofeed;
+
+    my $rid = 5;
+    my $relation = Relation->new($rid);
+    my $ib = $relation->getInterestsBlob;
+
+    foreach my $oid (@{Object->list}) {
+	my $o = Object->new($oid);
+	push(@ofeed, $oid) if ($o->matchInterestsBlob($ib));
+    }
+
+    $ui->printTreeATOM( { objectIds => \@ofeed });
 }
 
 ##################################################################
@@ -562,20 +623,8 @@ sub do_document {
 # stub for faffing about
 
 sub test_code {
-    my ($ui, $info, $phr) = @_;
-
-    my @ofeed;
-
-    my $rid = 5;
-    my $relation = Relation->new($rid);
-    my $ib = $relation->getInterestsBlob;
-
-    foreach my $oid (@{Object->list}) {
-	my $o = Object->new($oid);
-	push(@ofeed, $oid) if ($o->matchInterestsBlob($ib));
-    }
-
-    $ui->printTreeXML( { objectIds => \@ofeed });
+    my ($ui, $info, $phr, $fn, @rest) = @_;
+    die "method not yet implemented";
 }
 
 ##################################################################
