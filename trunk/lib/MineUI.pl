@@ -326,12 +326,12 @@ sub printTreeXML {
     return $self->printTreeUsing("application/xml", @_);
 }
 
-sub printPageATOM {
+sub printPageAtom {
     my $self = shift;
     return $self->printPageUsing("application/atom+xml", @_);
 }
 
-sub printTreeATOM {
+sub printTreeAtom {
     my $self = shift;
     return $self->printTreeUsing("application/atom+xml", @_);
 }
