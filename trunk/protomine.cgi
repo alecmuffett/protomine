@@ -593,6 +593,14 @@ sub do_remote_get {
 	# consider each object in the mine
 	# TBD: this should be the latest 50 in most-recently-modified order
 
+	push(@ofeed, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+	push(@ofeed, "<feed xmlns=\"http://www.w3.org/2005/Atom\">\n");
+	push(@ofeed, "<title>Example Feed</title>\n");
+	push(@ofeed, "<link href=\"http://example.org/\"/>\n");
+	push(@ofeed, "<updated>2003-12-13T18:30:02Z</updated>\n");
+	push(@ofeed, "<author><name>John Doe</name></author>\n");
+	push(@ofeed, "<id>urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6</id>\n");
+
 	foreach $oid (@{Object->list}) {
 	    my $o = Object->new($oid);
 
@@ -602,6 +610,8 @@ sub do_remote_get {
 
 	    push(@ofeed, $o->toAtom($permalink));
 	}
+
+	push(@ofeed, "</feed>\n");
 
 	return $ui->printTreeAtom(  \@ofeed );
     }
