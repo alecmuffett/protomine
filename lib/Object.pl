@@ -160,7 +160,7 @@ sub set {
 		die "Object: get: bad format for elements of $key: '$src'\n";
 	    }
 
-	    if (!defined($1)) {	# no "for:" or "not:" prefix
+	    if (!defined($1)) { # no "for:" or "not:" prefix
 		my $id = Tag->existsName($2);
 		$foo = $id;
 	    }
@@ -234,23 +234,21 @@ sub get {
 sub matchInterestsBlob {
     my $self = shift;
     my $iblob = shift;
-    my $mdebug = 1;		# verbose debugging switch in this code
+
+    # verbose debugging switch in this code
+    # bitmask: 0x01 = debug FAILs, 0x02 = debug PASSes
+    my $mdebug = 0x02;
 
     # upon whose we are checking
     my $rid = $iblob->{rid};
-
-    # debug
-    if ($mdebug) {
-	my $oid = $self->id;
-	warn "considering object $oid on behalf of relation $rid\n";
-    }
+    my $oid = $self->id;
 
     # load the raw tags describing this object
     my $rawtags = $self->SUPER::get('objectTags');
 
     # no tags -> fast fail
     unless (defined($rawtags)) {
-	warn "FAIL: object has no tags\n" if ($mdebug);
+	warn "FAIL: oid=$oid/rid=$rid object has no tags\n" if ($mdebug & 0x01);
 	return 0;
     }
 
@@ -261,7 +259,7 @@ sub matchInterestsBlob {
     # first sweep: fail fast if "not:RELATION"
     foreach $tag (@tags) {
 	if ($tag eq "r-$rid") { # is marked not:RELATION
-	    warn "FAIL: is marked not:$rid\n" if ($mdebug);
+	    warn "FAIL: oid=$oid/rid=$rid object is marked not:$rid\n" if ($mdebug & 0x01);
 	    return 0;
 	}
     }
@@ -270,8 +268,7 @@ sub matchInterestsBlob {
 
     foreach $tag (@tags) {
 	if ($tag eq "r+$rid") { # is marked for:RELATION
-	    warn "PASS: is marked for:$rid\n"
-		if ($mdebug);
+	    warn "PASS: oid=$oid/rid=$rid object is marked for:$rid\n" if ($mdebug & 0x02);
 	    return 1;
 	}
     }
@@ -332,8 +329,7 @@ sub matchInterestsBlob {
 
     foreach $tag (@expanded_tags) {
 	if ($user_excepts{$tag}) {
-	    warn "FAIL: relation $rid marked as except:$tag (in @expanded_tags)\n"
-		if ($mdebug);
+	    warn "FAIL: oid=$oid/rid=$rid relation marked as except:$tag (in: @expanded_tags)\n" if ($mdebug & 0x01);
 	    return 0;
 	}
     }
@@ -346,8 +342,7 @@ sub matchInterestsBlob {
 
     foreach my $user_requirement (@{$iblob->{require}}) {
 	unless (grep { $_ == $user_requirement } @expanded_tags) {
-	    warn "FAIL: relation $rid has require:$user_requirement (not in @expanded_tags)\n"
-		if ($mdebug);
+	    warn "FAIL: oid=$oid/rid=$rid object fails require:$user_requirement (in: @expanded_tags)\n" if ($mdebug & 0x01);
 	    return 0;
 	}
 
@@ -358,8 +353,7 @@ sub matchInterestsBlob {
     # there are more than zero) have been met
 
     if ($reqctr) {
-	warn "PASS: relation satisfies all require: tags (in @expanded_tags)\n"
-	    if ($mdebug);
+	warn "PASS: oid=$oid/rid=$rid object satisfies all require: tags (in: @expanded_tags)\n" if ($mdebug & 0x02);
 	return 2;
     }
 
@@ -369,15 +363,13 @@ sub matchInterestsBlob {
     foreach my $interest (@{$iblob->{interests}}) {
 
 	if (grep { $_ == $interest } @expanded_tags) {
-	    warn "PASS: object overlaps relation's interest $interest (in @expanded_tags)\n"
-		if ($mdebug);
+	    warn "PASS: oid=$oid/rid=$rid object $oid overlaps relation's interests (in: @expanded_tags)\n" if ($mdebug & 0x02);
 	    return 3;
 	}
     }
 
     # we didnae find reason to share this one
-    warn "FAIL: relation not interested in object\n"
-	if ($mdebug);
+    warn "FAIL: oid=$oid/rid=$rid relation not interested in object\n" if ($mdebug & 0x01);
 
     return 0;
 }
@@ -386,14 +378,15 @@ sub matchInterestsBlob {
 
 sub toAtom {
     my $self = shift;
+    my $permalink = shift; # how the recipient of this feed will refer to this object
 
-    # <entry> 
-    # <title>Atom-Powered Robots Run Amok</title> 
-    # <link href="http://example.org/2003/12/13/atom03"/> 
-    # <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id> 
-    # <updated>2003-12-13T18:30:02Z</updated> 
-    # <summary>Some text.</summary> 
-    # </entry> 
+    # <entry>
+    # <title>Atom-Powered Robots Run Amok</title>
+    # <link href="http://example.org/2003/12/13/atom03"/>
+    # <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
+    # <updated>2003-12-13T18:30:02Z</updated>
+    # <summary>Some text.</summary>
+    # </entry>
 
     # TODO: the ID field needs to be a GUID of some sort, or a URL;
     # but the private permalink should not be exposed, and the
@@ -402,16 +395,15 @@ sub toAtom {
     # the same as the mine's cryptokey.  For the moment, though, we'll
     # fake something up.
 
-    my $rid = shift;		# on behalf of whom this is being prepared
-    my $oid = $self->id;	# the object number
-    my @atom;			# where the results are stored
+    my $rid = shift;            # on behalf of whom this is being prepared
+    my $oid = $self->id;        # the object number
+    my @atom;                   # where the results are stored
 
     my $title = $self->get('objectName') || "(title undefined)";
-    my $permalink = "/api/read-data/$oid";
-    my $id = "";		# this needs to be generated/permanent
-    my $updated = "";
+    my $id = $permalink;        # this needs to be generated/permanent
+    my $updated = "[updated]";
     my $summary = $self->get('objectDescription') || "(summary undefined)";
-    my $content = "";
+    my $content = "[synthesised text]";
 
     push(@atom, "<entry xml:base='$main::MINE_HTTP_FULLPATH'>\n");
     push(@atom, "<title>$title</title>\n");

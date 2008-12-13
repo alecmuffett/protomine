@@ -42,6 +42,7 @@ my $trap_exceptions_to_http = 1;
 if (0) {
     print $main::MINE_DIRECTORY;
     print $main::MINE_HTTP_PATH;
+    print $main::MINE_HTTP_FULLPATH;
 }
 
 # go to the mine home directory
@@ -530,6 +531,7 @@ sub do_remote_get {
     my ($ui, $info, $phr, $fn, @rest) = @_;
 
     # extract the key
+
     my $q = $ui->cgi;
     my $key = $q->param('key');
 
@@ -537,6 +539,7 @@ sub do_remote_get {
     # tbd
 
     # parse the key
+
     unless ($key =~ m!^mine1,(\d+),(\d+),(\d+)$!o) {
 	my $diag = "bad key $key";
         &log("security $diag");
@@ -548,23 +551,28 @@ sub do_remote_get {
 
     # load the relation
     # TBD: trap this better so you log a security exception
+
     my $r = Relation->new($rid); # will abort if not exist
 
     # check the relationship validity 
     # (rvsn, date, time-of-day, ipaddress, ...)
     # TBD: replace this with a Relation method call
+
     my $rvsn2 = $r->relationVersion;
+
     unless ($rvsn eq $rvsn2) {		    
 	my $diag = "bad rvsn $key; supplied=$rvsn real=$rvsn2";
 	&log("security $diag");
 	die "do_remote_get: $diag\n";
     }
 
-    # analyse the request
-    if ($oid > 0) {		    # it's an object-get 
-	# get his interests blob
-	my $ib = $r->getInterestsBlob; 
+    # get his interests blob
+    
+    my $ib = $r->getInterestsBlob;
 
+    # analyse the request
+
+    if ($oid > 0) {		    # it's an object-get 
 	# pull in the object metadata
 	my $o = Object->new($oid) ; # will abort if not exist
 
@@ -579,18 +587,22 @@ sub do_remote_get {
 	return &api_read_oid_aux($ui, $info, $phr, $oid);
     }
     elsif ($oid == 0) {		# it's a feed-get
-	my @ofeed;
+	my @ofeed;		# the atom feed document
 
-	my $rid = 5;
-	my $r = Relation->new($rid);
-	my $ib = $r->getInterestsBlob;
+	# consider each object in the mine
+	# TBD: this should be the latest 50 in most-recently-modified order
 
-	foreach my $oid (@{Object->list}) {
+	foreach $oid (@{Object->list}) {
 	    my $o = Object->new($oid);
-	    push(@ofeed, $oid) if ($o->matchInterestsBlob($ib));
+
+	    next unless ($o->matchInterestsBlob($ib));
+
+	    my $permalink = $main::MINE_HTTP_FULLPATH . "/get?key=mine1,$rid,$rvsn,$oid";
+
+	    push(@ofeed, $o->toAtom($permalink));
 	}
 
-	return $ui->printTreeAtom( { objectIds => \@ofeed });
+	return $ui->printTreeAtom(  \@ofeed );
     }
 
     # fall off the end?
