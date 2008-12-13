@@ -60,6 +60,7 @@ clobber: clean
 	rm -f database/relations/*
 	rm -f database/tags/* # leave logs alone
 	rm -f protomine-config.pl
+	rm -f minecode.ps
 
 ###
 # delete scratch files
@@ -81,10 +82,19 @@ permissions:
 
 
 ###
-# quickie
+# quickies
 ###
 
 config: protomine-config.pl
+
+# http://www.codento.com/people/mtr/genscript/ - GNU enscript
+print:
+	enscript --file-align=2 \
+		--pretty-print=perl \
+		--media=A4 \
+		--output=minecode.ps \
+		--mark-wrapped-lines=arrow \
+		protomine.cgi lib/* minectl
 
 lint:
 	tools/perllint protomine.cgi lib/*.pl
