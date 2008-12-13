@@ -21,7 +21,7 @@
 # atomFormat: converts a Unix timestamp into Atom format based on
 # Zulu/GMT timezone
 
-sub atomFormat {
+sub atom_format {
     my $t = shift;
 
     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) = gmtime($t);

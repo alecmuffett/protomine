@@ -687,7 +687,7 @@ sub lastModified {
     my $id = $self->id;
     my $file = $self->filepath($id);
     my $date = (stat($file))[9];
-    die "atomFileLastModified: stat: $file: $!\n" unless (defined($date));
+    die "lastModified: stat: $file: $!\n" unless (defined($date));
     return $date;
 }
 
@@ -698,7 +698,7 @@ sub lastAccessed {
     my $id = $self->id;
     my $file = $self->filepath($id);
     my $date = (stat($file))[8];
-    die "atomFileLastAccessed: stat: $file: $!\n" unless (defined($date));
+    die "lastAccessed: stat: $file: $!\n" unless (defined($date));
     return $date;
 }
 

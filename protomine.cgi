@@ -52,6 +52,7 @@ chdir($main::MINE_DIRECTORY) or die "chdir: $main::MINE_DIRECTORY: $!";
 # get the extra stuff we need
 
 require 'pm-api.pl';
+require 'pm-atom.pl';
 require 'pm-ui.pl';
 require 'pm-time.pl';
 require 'pm-mime.pl';
