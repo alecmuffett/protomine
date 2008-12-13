@@ -396,14 +396,32 @@ sub toAtom {
     # fake something up.
 
     my $rid = shift;            # on behalf of whom this is being prepared
+
     my $oid = $self->id;        # the object number
+
     my @atom;                   # where the results are stored
 
     my $title = $self->get('objectName') || "(title undefined)";
-    my $id = $permalink;        # this needs to be generated/permanent
-    my $updated = "[updated]";
+
+    my $id = $permalink;        # this needs to be generated/permanent?
+
+    my $updated = &main::atom_format($self->lastModified);
+
     my $summary = $self->get('objectDescription') || "(summary undefined)";
-    my $content = "[synthesised text]";
+
+    my $objectType = $self->get('objectType');
+
+    my $content;
+
+    if ($objectType eq 'text/html') { # include verbatim
+	$content = "[html content of object $oid]";
+    }
+    elsif ($objectType eq 'text/plain') { # do HTML escaping
+	$content = "[html-escaped plain text content of object $oid]";
+    }
+    else {			# generate a stub
+	$content = "[synthetic stub for object of type $objectType]";
+    }
 
     push(@atom, "<entry xml:base='$main::MINE_HTTP_FULLPATH'>\n");
     push(@atom, "<title>$title</title>\n");
