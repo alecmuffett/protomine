@@ -67,7 +67,7 @@ clobber: clean
 ###
 
 clean: permissions
-	-rm `find . -name '*~'` 
+	-rm `find . -name '*~'`
 	-rm *.tmp
 
 ###
@@ -90,11 +90,11 @@ config: protomine-config.pl
 # http://www.codento.com/people/mtr/genscript/ - GNU enscript
 print:
 	enscript --file-align=2 \
-		--pretty-print=perl \
+		--mark-wrapped-lines=arrow \
 		--media=A4 \
 		--output=minecode.ps \
-		--mark-wrapped-lines=arrow \
-		protomine.cgi lib/* minectl
+		--pretty-print=perl \
+		protomine.cgi lib/* minectl generate-homepage.pl
 
 lint:
 	tools/perllint protomine.cgi lib/*.pl
