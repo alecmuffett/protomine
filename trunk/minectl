@@ -205,6 +205,15 @@ while (<DATA>) {
 	}
     }
 
+    # MIMETYPE: useful kludge
+    elsif ($call_how eq 'MIMETYPE') {
+
+	foreach my $filename (@ARGV) {
+	    my $filetype = &mime_type($filename);
+	    print "$filetype\n";
+	}
+    }
+
     # THIS CAN'T HAPPEN
     else {
 	die "LOL WHUT?\n";
@@ -227,6 +236,9 @@ exit 0;
 
 ##################################################################
 __END__;
+
+# useful hack
+mime-type  MIMETYPE  -  -  filename.ext ...
 
 # builtins which speed things up
 fast-upload    FUPLOAD    create  /api/object.xml    file  ...
