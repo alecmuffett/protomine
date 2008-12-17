@@ -593,22 +593,30 @@ sub do_remote_get {
 	# consider each object in the mine
 	# TBD: this should be the latest 50 in most-recently-modified order
 
+	my $feed_owner = "Alec Muffett";
+
+	my $feed_title = sprintf "%s's feed for %s", $feed_owner, $r->name;
+	my $feed_link = &get_permalink($r);
+	my $feed_updated = &atom_format(time);
+	my $feed_author_name = $feed_owner;
+	my $feed_id = $feed_link;
+
 	push(@ofeed, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 	push(@ofeed, "<feed xmlns=\"http://www.w3.org/2005/Atom\">\n");
-	push(@ofeed, "<title>Example Feed</title>\n");
-	push(@ofeed, "<link href=\"http://example.org/\"/>\n");
-	push(@ofeed, "<updated>2003-12-13T18:30:02Z</updated>\n");
-	push(@ofeed, "<author><name>John Doe</name></author>\n");
-	push(@ofeed, "<id>urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6</id>\n");
+	push(@ofeed, "<title>$feed_title</title>\n");
+	push(@ofeed, "<link href=\"$feed_link\"/>\n");
+	push(@ofeed, "<updated>$feed_updated</updated>\n");
+	push(@ofeed, "<author><name>$feed_author_name</name></author>\n");
+	push(@ofeed, "<id>$feed_id</id>\n");
 
 	foreach $oid (@{Object->list}) {
 	    my $o = Object->new($oid);
 
 	    next unless ($o->matchInterestsBlob($ib));
 
-	    my $permalink = $main::MINE_HTTP_FULLPATH . "/get?key=mine1,$rid,$rvsn,$oid";
+	    my $obj_link = &get_permalink($r, $o);
 
-	    push(@ofeed, $o->toAtom($permalink));
+	    push(@ofeed, $o->toAtom($obj_link));
 	}
 
 	push(@ofeed, "</feed>\n");

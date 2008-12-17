@@ -33,4 +33,24 @@ sub atom_format {
 
 ##################################################################
 
+sub get_permalink {
+    my $r = shift;
+    my $o = shift;
+
+    my $rid = 0;
+    my $rvsn = 0;
+    my $oid = 0;
+
+    if (defined($r)) {
+	$rid = $r->id;
+	$rvsn = $r->get('relationVersion');
+
+	if (defined($o)) {
+	    $oid = $o->id;
+	}
+    }
+
+    return $main::MINE_HTTP_FULLPATH . "/get?key=mine1,$rid,$rvsn,$oid";
+}
+
 1;
