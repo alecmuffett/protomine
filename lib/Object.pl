@@ -341,7 +341,7 @@ sub matchInterestsBlob {
     my $reqctr = 0;
 
     foreach my $user_requirement (@{$iblob->{require}}) {
-	unless (grep { $_ == $user_requirement } @expanded_tags) {
+	unless (grep { $_ eq $user_requirement } @expanded_tags) {
 	    warn "FAIL: oid=$oid/rid=$rid object fails require:$user_requirement (in: @expanded_tags)\n" if ($mdebug & 0x01);
 	    return 0;
 	}
@@ -362,7 +362,7 @@ sub matchInterestsBlob {
 
     foreach my $interest (@{$iblob->{interests}}) {
 
-	if (grep { $_ == $interest } @expanded_tags) {
+	if (grep { $_ eq $interest } @expanded_tags) {
 	    warn "PASS: oid=$oid/rid=$rid object $oid overlaps relation's interests (in: @expanded_tags)\n" if ($mdebug & 0x02);
 	    return 3;
 	}
