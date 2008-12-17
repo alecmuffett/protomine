@@ -29,7 +29,7 @@ MINECTL=./minectl
 ###
 # set up some basic tags
 
-$MINECTL fast-tags \
+$MINECTL new-tags \
      animals documents drink food mine motorbikes people plants shoes \
      things transport vrm weather french italian spanish
 
@@ -38,7 +38,7 @@ $MINECTL fast-tags \
 # set up tags with parents for implicit tagging;
 # NB: you must pre-declare a tag before you use it as a parent
 
-$MINECTL fast-tags \
+$MINECTL new-tags \
      cats/animals \
      hippos/animals \
      cookery/food \
@@ -52,7 +52,7 @@ $MINECTL fast-tags \
 ###
 # the wine hierarchy, just to drive the point home
 
-$MINECTL fast-tags \
+$MINECTL new-tags \
      wine/drink \
      white-wine/wine \
      red-wine/wine \
@@ -64,11 +64,11 @@ $MINECTL fast-tags \
 ###
 # upload some objects without individual tagging
 
-$MINECTL fast-upload $DIR/* # my, isn't this easy?
+$MINECTL upload $DIR/* # my, isn't this easy?
 
 
 ###
-# verbosely set up some relations; there is actually a "fast-relation"
+# verbosely set up some relations; there is actually a "new-relation"
 # that does exactly this, however the example is worthwhile to show
 # what you may want to do if you want to drive it at the lowest level.
 
@@ -94,9 +94,9 @@ EOF
 
 
 ###
-# quick hack to demo fast-relation
+# quick hack to demo new-relation
 
-$MINECTL fast-relation perry 1 "Perry de Havilland" red-wine food require:hippos except:white-wine
+$MINECTL new-relation perry 1 "Perry de Havilland" red-wine food require:hippos except:white-wine
 
 ###
 # special cases for tag testing

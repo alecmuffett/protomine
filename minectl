@@ -160,7 +160,7 @@ while (<DATA>) {
 	}
     }
 
-    # FRELATION: magic special case for uploading files
+    # FRELATION: magic special case for adding relations
     elsif ($call_how eq 'FRELATION') {
 
 	my $relationname = shift(@ARGV);
@@ -178,17 +178,29 @@ while (<DATA>) {
 
     # FUPLOAD: magic special case for uploading files
     elsif ($call_how eq 'FUPLOAD') {
+	my $tags = undef;
+
+	if ($ARGV[0] eq '-t') {
+	    shift(@ARGV);	# dump -t
+	    $tags = shift(@ARGV); # stash and dump the tags
+	}
 
 	foreach my $filename (@ARGV) {
 	    my $filetype = &mime_type($filename);
+	    my @cmdargs = ( 
+		"data=\@$filename",
+		"objectName=$filename",
+		"objectType=$filetype",
+		"objectStatus=draft",
+		"objectDescription=bulk-uploaded file, sourced from $filename"
+		);
 
-	    &Mine($method,
-		  $api,
-		  "data=\@$filename",
-		  "objectName=$filename",
-		  "objectType=$filetype",
-		  "objectStatus=draft",
-		  "objectDescription=bulk-uploaded file, sourced from $filename");
+	    if (defined($tags)) {
+		push(@cmdargs, "objectTags=$tags");
+	    }
+
+	    &Mine($method, $api, @cmdargs);
+
 	}
     }
 
@@ -237,13 +249,17 @@ exit 0;
 ##################################################################
 __END__;
 
-# useful hack
-mime-type  MIMETYPE  -  -  filename.ext ...
+# useful hacks
+mime-type MIMETYPE - - filename.ext ...
 
-# builtins which speed things up
-fast-upload    FUPLOAD    create  /api/object.xml    file  ...
-fast-tags      FTAGS      create  /api/tag.xml       tag1  tag2/p1  tag3/p1/p2  ...
-fast-relation  FRELATION  create  /api/relation.xml  name  vers     desc        tag  ...
+# accelerated upload
+upload FUPLOAD create /api/object.xml [ -t "tag ..." ] file ...
+
+# accelerated tagging
+new-tags FTAGS create /api/tag.xml tag1 tag2/p1 tag3/p1/p2 ...
+
+# accelerated relation
+new-relation FRELATION create /api/relation.xml name vers desc tag ...
 
 ###
 # raw API calls
