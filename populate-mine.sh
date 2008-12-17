@@ -98,69 +98,37 @@ EOF
 
 $MINECTL fast-relation perry 1 "Perry de Havilland" red-wine food require:hippos except:white-wine
 
-
 ###
-# special cases for testing
-
-$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
-    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
-    objectStatus=public \
-    objectTags="for:perry"
-
-$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
-    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
-    objectStatus=public \
-    objectTags="not:perry"
-
-$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
-    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
-    objectStatus=public \
-    objectTags="food"
-
-$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
-    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
-    objectStatus=public \
-    objectTags="food for:perry"
-
-$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
-    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
-    objectStatus=public \
-    objectTags="food hippos"
-
-$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
-    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
-    objectStatus=public \
-    objectTags="food hippos chardonnay"
-
-$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
-    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
-    objectStatus=public \
-    objectTags="food hippos not:perry"
-
-$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
-    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
-    objectStatus=public \
-    objectTags="food hippos for:perry not:perry"
-
-$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
-    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
-    objectStatus=public \
-    objectTags="food hippos not:perry"
-
-$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
-    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
-    objectStatus=public \
-    objectTags="hippos"
-
-$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
-    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
-    objectStatus=public \
-    objectTags="red-wine hippos"
-
-$MINECTL create-object data=@$DIR/pimpernel.jpg objectType=image/jpeg \
-    objectName="Pimpernel" objectDescription="Scarlet Pimpernel" \
-    objectStatus=public \
-    objectTags="wine hippos"
+# special cases for tag testing
+while read file tags
+do
+    $MINECTL create-object data=@$DIR/$file objectType=`$MINECTL mime-type $file` \
+	objectName="name($file)" objectDescription="description($file $tags)" \
+	objectStatus=public objectTags="$tags"
+done <<EOF
+dam.jpg              for:perry
+fashion1.jpg         food       for:perry
+adriana.jpg          food       hippos     chardonnay
+rome.jpg             food       hippos     for:perry   not:perry
+feeds-based-vrm.pdf  food       hippos     not:perry
+monument.jpg         food       hippos
+rose.jpg             food
+mountains.jpg        hippos
+stonehenge.jpg       not:perry
+suzi.jpg             red-wine   hippos
+moon.jpg             wine       hippos
+mine-diagram.jpg
+italy.jpg
+mine-paper-v2.pdf    for:alec
+bridge.jpg
+alecm.png   
+woodland.jpg
+austen.txt
+milan.jpg
+cloud.jpg
+pimpernel.jpg
+buster.jpg
+EOF
 
 ###
 # done
