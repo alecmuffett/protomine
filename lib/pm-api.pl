@@ -151,8 +151,11 @@ sub api_list_clones {
 ## api_list_objects --
 sub api_list_objects {		# -- DONE --
     my ($ui, $info, $phr) = @_;
-    my $list = Object->list;
-    return { objectIds => $list };
+    my @structure;
+    foreach my $oid (Object->list) {
+	push(@structure, { objectId => $oid });
+    }    
+    return { objectIds => \@structure };
 }
 
 ##################################################################
@@ -160,8 +163,11 @@ sub api_list_objects {		# -- DONE --
 ## api_list_relations --
 sub api_list_relations {	# -- DONE --
     my ($ui, $info, $phr) = @_;
-    my $list = Relation->list;
-    return { relationIds => $list };
+    my @structure;
+    foreach my $rid (Relation->list) {
+	push(@structure, { relationId => $rid });
+    }    
+    return { relationIds => \@structure };
 }
 
 ##################################################################
@@ -169,8 +175,11 @@ sub api_list_relations {	# -- DONE --
 ## api_list_tags --
 sub api_list_tags {		# -- DONE --
     my ($ui, $info, $phr) = @_;
-    my $list = Tag->list;
-    return { tagIds => $list };
+    my @structure;
+    foreach my $tid (Tag->list) {
+	push(@structure, { tagId => $tid });
+    }    
+    return { tagIds => \@structure };
 }
 
 ##################################################################

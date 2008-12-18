@@ -87,7 +87,7 @@ sub boot {
 ##################################################################
 ##################################################################
 
-## list -- returns listref of integers, id's of valid things
+## list -- returns list of integers, id's of valid things
 
 sub list {
     my $self = shift;
@@ -103,7 +103,7 @@ sub list {
     my @numberlist = sort {$b <=> $a} grep(/^\d+$/o, readdir(DIR));
     closedir(DIR);
 
-    return \@numberlist;
+    return @numberlist;
 }
 
 ## existsId -- returns boolean, whether the desired id exists
@@ -122,7 +122,7 @@ sub existsId {
     return (-f $file);
 }
 
-## selectByName (string) -- returns listref of integers
+## selectByName (string) -- returns list of integers
 
 sub selectByName {
     my $self = shift;
@@ -135,16 +135,16 @@ sub selectByName {
     my $name = shift;
     my @hits;
 
-    foreach my $id (@{$self->list}) {
+    foreach my $id ($self->list) {
 	my $thing = $self->new($id);
 
 	if ($thing->name eq $name) {
 	    push(@hits, $id);
-	    last if $self->enforce_unique_names; # provide a fast return if names guaranteed unique
+	    last if $self->enforce_unique_names; # fast return if names guaranteed unique
 	}
     }
 
-    return \@hits;
+    return @hits;
 }
 
 ## existsName (name) -- return $id||-1 if name exists
@@ -158,32 +158,22 @@ sub existsName {
     }
 
     my $name = shift;
-    my $namelist = $self->selectByName($name); # name list
+    my @namelist = $self->selectByName($name); # name list
 
-    if ($#{$namelist} > 0) {	# 1+ entries
+    if ($#namelist > 0) {	# 1+ entries
 	if ($self->enforce_unique_names) {
 	    die "corrupted database, non-unique name $name\n";
 	}
 	return -1;
     }
-    elsif ($#{$namelist} == 0) { # 1 entry
+    elsif ($#namelist == 0) { # 1 entry
 	if ($self->enforce_unique_names) {
-	    return ${$namelist}[0];
+	    return $namelist[0];
 	}
 	return -1;
     }
 
     return 0;                   # no entries
-}
-
-## selectByTags (listref, listref, listref) -- returns listref of integers
-
-sub selectByTags {
-}
-
-## selectByDate (createAfter, createdBefore) -- returns listref of integers
-
-sub selectByDate {
 }
 
 ##################################################################
@@ -216,28 +206,20 @@ sub filepath {
     return $self->directory . "/" . $file;
 }
 
-## keysRequired -- returns listref, list of keys required to be output
+## keysRequired -- returns list, list of keys required to be output
 
 sub keysRequired {
     my $self = shift ;
     my @klist = keys %{$self->{REQUIRED_KEYS}};
-    return \@klist;
+    return @klist;
 }
 
-## keyRequired (key) -- returns boolean, whether argument is a required key
-
-sub keyRequired {
-    my $self = shift ;
-    my $key = shift;
-    return $self->{REQUIRED_KEYS}->{$key};
-}
-
-## keysValid -- returns listref, list of keys that are valid
+## keysValid -- returns list, list of keys that are valid
 
 sub keysValid {
     my $self = shift ;
     my @klist = keys %{$self->{VALID_KEYS}};
-    return \@klist;
+    return @klist;
 }
 
 ## validKey (key) -- returns scalar, whether argument is a valid key;
@@ -250,12 +232,12 @@ sub validKey {
     return $self->{VALID_KEYS}->{$key};
 }
 
-## keysWritable -- returns listref, list of keys writable to output
+## keysWritable -- returns list, list of keys writable to output
 
 sub keysWritable {
     my $self = shift ;
     my @klist = keys %{$self->{WRITABLE_KEYS}};
-    return \@klist;
+    return @klist;
 }
 
 ## writableKey (key) -- returns scalar, whether argument is a writable
@@ -275,12 +257,12 @@ sub writableKey {
 ##################################################################
 ##################################################################
 
-## listDataKeys -- returns listref, sorted list of data keys
+## listDataKeys -- returns list, sorted list of data keys
 
 sub listDataKeys {
     my $self = shift ;
     my @klist = sort keys %{$self->{DATA}};
-    return \@klist;
+    return @klist;
 }
 
 ## get (key) -- returns scalar
@@ -482,7 +464,7 @@ sub toTree {
     my $self = shift;
     my %tree;
 
-    foreach my $key (@{$self->listDataKeys}) {
+    foreach my $key ($self->listDataKeys) {
 	my $value = $self->get($key);
 	$tree{$key} = $value;
     }
@@ -499,7 +481,7 @@ sub toPage {
     my @page;
 
     push(@page, "<UL>\n");
-    foreach my $key (@{$self->listDataKeys}) {
+    foreach my $key ($self->listDataKeys) {
 	my $value = $self->get($key);
 	$value =~ s!\n+! !go; # purge newlines
 	push(@page, "<LI><EM>$key:</EM> $value</LI>\n");
@@ -533,14 +515,14 @@ sub toSavedForm {
     my @page;
 
     # safety check: have we got all the required keys?
-    foreach my $key (@{$self->keysRequired}) {
+    foreach my $key ($self->keysRequired) {
 	unless (defined($self->{DATA}->{$key})) {
 	    die "toSavedForm: require undefined key $key\n";
 	}
     }
 
     # print them all...
-    foreach my $key (@{$self->listDataKeys}) {
+    foreach my $key ($self->listDataKeys) {
 	# ...so long as they are writable
 	unless ($self->writableKey($key)) {
 	    push(@page, "# $key: is unwritable\n"); # non-fatal condition
@@ -652,10 +634,10 @@ sub max {
 	return $lastused;
     }
 
-    my $listref = $self->list;
+    my @thinglist = $self->list;
 
-    if (defined($listref->[0])) {
-	$calculated = ${$listref}[0];
+    if (defined($thinglist[0])) {
+	$calculated = $thinglist[0];
     }
 
     # we could cache $calculated here but frankly that's a bit

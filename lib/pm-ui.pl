@@ -93,10 +93,10 @@ sub ui_show_config {
 sub ui_show_objects {
     my ($ui, $info, $phr) = @_;
     $ui->setXBase("ui/");	# everything will be relative to this
-    my $oids = Object->list;
+    my @oids = Object->list;
     my @output;
     push(@output, "<dl>" );
-    foreach my $oid (@{$oids}) {
+    foreach my $oid (@oids) {
 	my $thing = Object->new($oid);
 	my $name = $thing->name;
 
@@ -122,10 +122,10 @@ sub ui_show_objects {
 sub ui_show_relations {
     my ($ui, $info, $phr) = @_;
     $ui->setXBase("ui/");	# everything will be relative to this
-    my $rids = Relation->list;
+    my @rids = Relation->list;
     my @output;
     push(@output, "<dl>" );
-    foreach my $rid (@{$rids}) {
+    foreach my $rid (@rids) {
 	my $thing = Relation->new($rid);
 	my $name = $thing->name;
 
@@ -149,10 +149,10 @@ sub ui_show_relations {
 sub ui_show_tags {
     my ($ui, $info, $phr) = @_;
     $ui->setXBase("ui/");	# everything will be relative to this
-    my $tids = Tag->list;
+    my @tids = Tag->list;
     my @output;
     push(@output, "<dl>" );
-    foreach my $tid (@{$tids}) {
+    foreach my $tid (@tids) {
 	my $thing = Tag->new($tid);
 	my $name = $thing->name;
 

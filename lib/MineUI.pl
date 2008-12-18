@@ -482,12 +482,12 @@ sub catTree {
 
 		if (ref($value) eq 'ARRAY') { # special case listrefs to provide multi-values
 		    print "<$key>\n";
-		    my $countdown = $#{$value};
+		    # my $countdown = $#{$value};
 		    foreach my $element (@{$value}) {
 			$self->catTree($element);
-			print "\n" if ($countdown-- > 0);
+			# print "\n" if ($countdown-- > 0);
 		    }
-		    print "\n</$key>\n";
+		    print "</$key>\n";
 		}
 		else {          # single value key
 		    print "<$key>";

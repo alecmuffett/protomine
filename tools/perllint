@@ -48,8 +48,8 @@ foreach $input (@lines) {
 	push(@{$calls{$1}}, $debug);
     }
 
-    while ($line =~ s!->(\w+)!!o) {
-	push(@{$calls{$1}}, $debug);
+    while ($line =~ s!(->|::)(\w+)!!o) {
+	push(@{$calls{$2}}, $debug);
     }
 }
 
