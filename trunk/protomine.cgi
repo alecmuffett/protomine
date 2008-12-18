@@ -593,9 +593,9 @@ sub do_remote_get {
 	# consider each object in the mine
 	# TBD: this should be the latest 50 in most-recently-modified order
 
-	my $feed_owner = "Alec Muffett";
+	my $feed_owner = "alec";
 
-	my $feed_title = sprintf "%s's feed for %s", $feed_owner, $r->name;
+	my $feed_title = sprintf "%s for %s (%s)", $feed_owner, $r->name, $r->get('relationInterests');
 	my $feed_link = &get_permalink($r);
 	my $feed_updated = &atom_format(time);
 	my $feed_author_name = $feed_owner;

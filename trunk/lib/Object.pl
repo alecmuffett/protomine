@@ -273,7 +273,7 @@ sub matchInterestsBlob {
 	}
     }
 
-    # expand the tagParents to permit implicit matching
+    # expand the tagImplies to permit implicit matching
 
     my %tobedone;
     my @tbd;
@@ -301,7 +301,7 @@ sub matchInterestsBlob {
     while (@tbd = grep { $tobedone{$_} == 1 } keys %tobedone) {
 	foreach $tag (@tbd) {
 	    my $x = Tag->new($tag);
-	    my $xrawtags = $x->SUPER::get('tagParents');
+	    my $xrawtags = $x->SUPER::get('tagImplies');
 
 	    if (defined($xrawtags)) {
 		my @xtags = grep(/^\d+$/, split(" ", $xrawtags));

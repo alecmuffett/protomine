@@ -35,8 +35,8 @@ $MINECTL new-tags \
 
 
 ###
-# set up tags with parents for implicit tagging;
-# NB: you must pre-declare a tag before you use it as a parent
+# set up tags for implicit tagging;
+# NB: you must pre-declare a tag before you use it as an implied tag
 
 $MINECTL new-tags \
      cats/animals \

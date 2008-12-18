@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+ <title>Mine Javascript Test</title>
+ <script type="text/javascript" src="../pub/prototype.js"></script>
+</head>
+<body>
+ <h1>Ajax Call</h1>
+ 
+ <input type="textfield" id="input_field"/>
+ 
+ <a href="#" id="submit_link">GO</a>
+ 
+ <h1>Return</h1>
+   
+ <div id="result">Result here</div>
+ 
+ <script>
+   document.observe('dom:loaded', function(e) {
+     $('submit_link').observe('click', function(e) {
+       url = $('input_field').value;
+       alert("GET: "+url);
+       var opt = {
+           method: 'get',
+           onSuccess: function(t) {
+             alert("SUCCESS");
+           },
+           onComplete: function(t) {
+             alert("COMPLETE");
+           }
+       }
+ 	    new Ajax.Updater('result', url, opt);
+     })
+   });
+ </script>
+</body>
