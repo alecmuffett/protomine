@@ -609,7 +609,7 @@ sub do_remote_get {
 	push(@ofeed, "<author><name>$feed_author_name</name></author>\n");
 	push(@ofeed, "<id>$feed_id</id>\n");
 
-	foreach $oid (@{Object->list}) {
+	foreach $oid (Object->list) {
 	    my $o = Object->new($oid);
 
 	    next unless ($o->matchInterestsBlob($ib));
