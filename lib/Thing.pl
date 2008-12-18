@@ -549,8 +549,14 @@ sub toSavedForm {
 
 	# this one is
 	my $value = $self->{DATA}->{$key};
-	$value =~ s!\n+! !go; # purge newlines
-	push(@page, "$key: $value\n");
+
+	# sanitise in the same way as set()
+	$value =~ s!\s+! !go;	# kill newlines/extra whitespace
+	$value =~ s!^\s!!o;	# kill leading whitespace
+	$value =~ s! $!!o;	# kill trailing whitespace
+
+	# skip if blank
+	push(@page, "$key: $value\n") unless ($key eq '');
     }
 
     return join('', @page);

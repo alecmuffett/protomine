@@ -44,12 +44,12 @@ sub boot {
     $self->{VALID_KEYS} = {
 	tagId => 1,
 	tagName => 1,
-	tagParents => 1,
+	tagImplies => 1,
     };
 
     $self->{WRITABLE_KEYS} = {
 	tagName => 1,
-	tagParents => 1,
+	tagImplies => 1,
     };
 
     return $self;
@@ -70,7 +70,7 @@ sub set {
 	    die "Tag: cannot set $key=$value as '$value' has illegal format\n";
 	}
     }
-    elsif ($key eq 'tagParents') { 
+    elsif ($key eq 'tagImplies') { 
 	my @srcs = split(" ", $value);
 	my @dsts;
 
@@ -95,7 +95,7 @@ sub get {
     my ($self, $key) = @_;
     my $value = $self->SUPER::get($key);
 
-    if ($key eq 'tagParents') { 
+    if ($key eq 'tagImplies') { 
 	my @srcs = split(" ", $value);
 	my @dsts;
 
