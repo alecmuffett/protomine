@@ -594,7 +594,7 @@ sub do_remote_get {
 	push(@ofeed, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 	push(@ofeed, "<feed xmlns=\"http://www.w3.org/2005/Atom\">\n");
 	push(@ofeed, "<title>$feed_title</title>\n");
-	push(@ofeed, "<link href=\"$feed_link\"/>\n");
+	push(@ofeed, "<link href=\"$feed_link\" rel=\"self\"/>\n");
 	push(@ofeed, "<updated>$feed_updated</updated>\n");
 	push(@ofeed, "<author><name>$feed_author_name</name></author>\n");
 	push(@ofeed, "<id>$feed_id</id>\n");
