@@ -411,7 +411,7 @@ sub toAtom {
 
     my $content;
 
-    $content = $objectDescription . "<p/>\n";
+    $content = $objectDescription . "\n";
 
     if ($objectType eq 'text/html') { # include verbatim
 	$content .= "[html content of object $oid]";

@@ -45,6 +45,7 @@ use warnings;
 
 use CGI::Carp;
 use CGI::Pretty;
+use File::Temp qw(tempfile);
 
 my $BUFSIZ = 1024 * 64;         # for the C-programmer in you
 
@@ -247,16 +248,22 @@ sub printFile {
     $self->catFile($arg);
 }
 
-## printPageUsing (...) -- print page argument, with decoration
+## printUsing (...) -- print page argument, with decoration
 
-sub printPageUsing {
+sub printUsing {
     my $self = shift;
+    my $mode = shift;
     my $type = shift;
 
     my $q = $self->cgi;
 
-    print $q->header(-type => $type);
+    # create a tempfile
+    my ($fh_tmp, $filename_tmp) = tempfile('pmine.XXXXXXX', DIR => '/tmp');
 
+    # select it for print
+    my $fh_stdout = select($fh_tmp);
+
+    # spew HTML header if appropriate
     if ($type eq 'text/html') {
 	my @meta;
 
@@ -273,84 +280,89 @@ sub printPageUsing {
 	$self->catPageHeader;
     }
 
-    $self->catPage(@_);
+    # spew body
+    if ($mode eq 'page') {
+	$self->catPage(@_);
+    }
+    elsif ($mode eq 'tree') {
+	$self->catTree(@_);
+    }
+    else {
+	die "this can't happen";
+    }
 
+    # spew HTML footer if approprate
     if ($type eq 'text/html') {
 	$self->catPageFooter;
 	print $q->end_html;
     }
-}
 
-## printTreeUsing (...) -- print tree arguments, with decoration
+    # deselect it for print
+    select($fh_stdout);
 
-sub printTreeUsing {
-    my $self = shift;
-    my $type = shift;
+    # flush tempfile
+    $fh_tmp->flush;
 
-    my $q = $self->cgi;
-    print $q->header(-type => $type);
+    # rewind tempfile
+    $fh_tmp->seek(0, 0);
 
-    if ($type eq 'text/html') {
-	my $title = sprintf "%s %s", $self->{METHOD}, $self->{URL_FULL};
+    # stat tempfile to determine size
+    my $content_length = (-s $filename_tmp);
 
-	my $xbase = $self->{URL_XBASE};
+    # print appropriate HTTP header
+    print $q->header(-type => $type,
+		     -Content_length => $content_length);
 
-	if (defined($xbase)) {
-	    print $q->start_html(-title => $title, -xbase => $xbase);
-	}
-	else {
-	    print $q->start_html($title);
-	}
-
-	$self->catPageHeader;
+    # print tempfile content
+    my $buffer;
+    while (read($fh_tmp, $buffer, $BUFSIZ) > 0) {
+	print $buffer;
     }
 
-    $self->catTree(@_);
+    # close tmpfile
+    $fh_tmp->close;
 
-    if ($type eq 'text/html') {
-	$self->catPageFooter;
-	print $q->end_html;
-    }
+    # done
 }
 
 sub printPageXML {
     my $self = shift;
-    return $self->printPageUsing("application/xml", @_);
+    return $self->printUsing('page', 'application/xml', @_);
 }
 
 sub printTreeXML {
     my $self = shift;
-    return $self->printTreeUsing("application/xml", @_);
+    return $self->printUsing('tree', 'application/xml', @_);
 }
 
 sub printPageAtom {
     my $self = shift;
-    return $self->printPageUsing("application/atom+xml", @_);
+    return $self->printUsing('page', 'application/atom+xml', @_);
 }
 
 sub printTreeAtom {
     my $self = shift;
-    return $self->printTreeUsing("application/atom+xml", @_);
+    return $self->printUsing('tree', 'application/atom+xml', @_);
 }
 
 sub printPageHTML {
     my $self = shift;
-    return $self->printPageUsing("text/html", @_);
+    return $self->printUsing('page', 'text/html', @_);
 }
 
 sub printTreeHTML {
     my $self = shift;
-    return $self->printTreeUsing("text/html", @_);
+    return $self->printUsing('tree', 'text/html', @_);
 }
 
 sub printPageText {
     my $self = shift;
-    return $self->printPageUsing("text/plain", @_);
+    return $self->printUsing('page', 'text/plain', @_);
 }
 
 sub printTreeText {
     my $self = shift;
-    return $self->printTreeUsing("text/plain", @_);
+    return $self->printUsing('tree', 'text/plain', @_);
 }
 
 ##################################################################

@@ -22,7 +22,7 @@ cd $thisdir
 
 thisdir=`pwd`
 
-http_server="http://localhost"
+http_server="http://127.0.0.1"
 
 http_path="/~$USER/mine" # no trailing slash
 
