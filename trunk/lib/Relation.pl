@@ -142,14 +142,17 @@ sub get {
 
 	    my $tag = Tag->new($2);
 
-	    if ($1 eq 't+') {
+	    if (!defined($1)) {
+		$foo = $tag->name;
+	    }
+	    elsif ($1 eq 't+') {
 		$foo = 'require:' . $tag->name;
 	    }
 	    elsif ($1 eq 't-') {
 		$foo = 'except:' . $tag->name;
 	    }
 	    else {
-		$foo = $tag->name;
+		die "this can't happen";
 	    }
 
 	    push(@dsts, $foo);
