@@ -537,18 +537,9 @@ sub do_remote_get {
     my $key = $q->param('key');
 
     # decrypt the key
-    # tbd
+    # TBD: better security audit trail here
 
-    # parse the key
-
-    unless ($key =~ m!^mine1,(\d+),(\d+),(\d+)$!o) {
-	my $diag = "bad key $key";
-        &log("security $diag");
-	die "do_remote_get: $diag\n";
-    }
-    my $rid = $1;
-    my $rvsn = $2;
-    my $oid = $3;
+    my ($rid, $rvsn, $oid) = &decode_key($key);
 
     # load the relation
     # TBD: trap this better so you log a security exception

@@ -213,7 +213,8 @@ while (<DATA>) {
     elsif ($call_how eq 'FTAGS') {
 
 	foreach my $foo (@ARGV) {
-	    my ($tagname, @tagimplies) = split(m!/!o, $foo);
+	    my ($tagname, $tagparents) = split(m!:!o, $foo);
+	    my (@tagimplies) = split(m!,!o, $tagparents);
 	    my @tagargs = ();
 
 	    push(@tagargs, "tagName=$tagname");
@@ -286,7 +287,10 @@ sub Mine {
     }
 
     if ($json) {
-	$api =~ s!\.xml$!.json!o; # only swap to .json if was .xml beforehand
+	# only swap to .json if was .xml beforehand
+	unless ($api =~ s!\.xml$!.json!o) { 
+	    die "$0: API $api cannot be coersced to JSON format output\n";
+	}
     }
 
     @cmd = ("curl", @curlopts, "$root$api$query", @curlargs);
@@ -307,7 +311,7 @@ mime-type MIMETYPE - - filename.ext ...
 upload FUPLOAD create /api/object.xml [ -t "tag ..." ] file ...
 
 # accelerated tagging
-new-tags FTAGS create /api/tag.xml tag1 tag2/implied1 tag3/implied1/implied2 ...
+new-tags FTAGS create /api/tag.xml tag1 tag2 tag3:implies1 tag4:implies1,implies2[,more...] ...
 
 # accelerated relation
 new-relation FRELATION create /api/relation.xml name vers desc tag ...

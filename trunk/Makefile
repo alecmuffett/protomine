@@ -27,7 +27,7 @@ DOC=database/doc
 # top dependency: is there a protomine-config file
 ###
 
-all: permissions protomine-config.pl syntax webpages test
+setup: permissions protomine-config.pl syntax webpages test
 	echo done.
 
 ###
