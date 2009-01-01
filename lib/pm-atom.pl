@@ -50,7 +50,74 @@ sub get_permalink {
 	}
     }
 
-    return $main::MINE_HTTP_FULLPATH . "/get?key=mine1,$rid,$rvsn,$oid";
+    my $key = &encode_key($rid, $rvsn, $oid);
+
+    return $main::MINE_HTTP_FULLPATH . "/get?key=$key";
 }
+
+##################################################################
+
+sub decode_key {
+    my ($encoded) = @_;
+    my $magic_number = "mine1";	# break out into global setting
+    my $packfmt = "h*";		# break out?
+
+    warn "decode_key: encoded=$encoded\n";
+
+    my $key = pack($packfmt, $encoded);
+    warn "decode_key: key=$key\n";
+
+    unless (my ($magic, $rid, $rvsn, $oid, $crc) =
+	    ($key =~ m!^(\w+),(\d+),(\d+),(\d+),(\d+)$!o)) {
+	die "decode_key: bad decode result\n";
+    }
+
+    die "decode_key: bad magic\n" unless ($magic eq $magic_number);
+    die "decode_key: bad rid\n" unless ($rid > 0);
+    die "decode_key: bad rvsn\n" unless ($rvsn > 0);
+    die "decode_key: bad oid\n" unless ($oid > 0);
+
+    my $prefix2 = "$magic,$rid,$rvsn,$oid";
+    warn "decode_key: prefix2=$prefix2\n";
+
+    my $crc2 = unpack("%C*", $prefix2);
+    warn "decode_key: crc2=$crc2\n";
+
+    die "decode_key: bad crc check\n" unless ($crc2 eq $crc);
+    warn "decode_key: crc check ok\n";
+
+    return ($rid, $rvsn, $oid);
+}
+
+##################################################################
+
+sub encode_key {
+    my ($rid, $rvsn, $oid) = @_;
+    my $magic_number = "mine1";	# break out into global setting
+    my $packfmt = "h*";		# break out?
+
+    my $magic = $magic_number;
+
+    die "encode_key: bad magic\n" unless ($magic ne '');
+    die "encode_key: bad rid\n" unless ($rid > 0);
+    die "encode_key: bad rvsn\n" unless ($rvsn > 0);
+    die "encode_key: bad oid\n" unless ($oid > 0);
+
+    my $prefix = "$magic,$rid,$rvsn,$oid";
+    warn "encode_key: prefix=$prefix\n";
+
+    my $crc = unpack("%C*", $prefix);
+    warn "encode_key: crc=$crc\n";
+
+    my $key = "$prefix,$crc";
+    warn "encode_key: key=$key\n";
+
+    my $encoded = unpack($packfmt, $key);
+    warn "encode_key: encoded=$encoded\n";
+
+    return $encoded;
+}
+
+##################################################################
 
 1;

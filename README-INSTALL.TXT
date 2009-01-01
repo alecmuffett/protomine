@@ -13,17 +13,22 @@ Commands:
 ---------
 
   cd
-
   svn checkout http://protomine.googlecode.com/svn/trunk/ protomine
-
   cd protomine
-
   ./osx-setup.sh
-
   make
-
   ./populate-mine.sh
-
   ./open-browser.pl
 
 ------------------------------------------------------------------
+
+Ubuntu pre-requisites:
+
+	Subversion
+	GNU Make
+	curl
+	perl
+	apache2
+
+	apt-get install subversion make curl perl apache2
+

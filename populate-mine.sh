@@ -22,112 +22,99 @@ exec 2>&1
 ###
 # can't be arsed to poke filenames in everywhere
 
-DIR=database/doc/sample-data
-MINECTL=./minectl
+SAMPLES=database/doc/sample-data
 
-
-###
-# set up some basic tags
-
-$MINECTL new-tags \
-     animals documents drink food mine motorbikes people plants shoes \
-     things transport vrm weather french italian spanish
-
+minectl=./minectl
 
 ###
-# set up tags for implicit tagging;
-# NB: you must pre-declare a tag before you use it as an implied tag
+# set up some very general tags
 
-$MINECTL new-tags \
-     cats/animals \
-     hippos/animals \
-     cookery/food \
-     flowers/plants \
-     pumps/shoes \
-     sneakers/shoes \
-     stiletto/shoes \
-     trainers/shoes
+# concepts
 
+$minectl new-tags animals clothes countryside drink space \
+         fashion food friends plants transport travel
 
-###
-# the wine hierarchy, just to drive the point home
+# countries
 
-$MINECTL new-tags \
-     wine/drink \
-     white-wine/wine \
-     red-wine/wine \
-     chardonnay/white-wine \
-     tannins \
-     rioja/red-wine/tannins
+$minectl new-tags france spain italy usa
 
+# geekery
+
+$minectl new-tags themineproject
 
 ###
-# upload some objects without individual tagging
+# set up some implied tags; cats imply animals, motorbikes imply transport, ...
 
-$MINECTL upload $DIR/* # my, isn't this easy?
+$minectl new-tags cats:animals dogs:animals birds:animals hippos:animals
 
+$minectl new-tags flowers:plants vegetables:plants trees:plants
 
-###
-# verbosely set up some relations; there is actually a "new-relation"
-# that does exactly this, however the example is worthwhile to show
-# what you may want to do if you want to drive it at the lowest level.
-
-while read relationName relationVersion relationDescription relationInterests
-do
-    test "$relationName" = "" && continue
-
-    # this shell script can't preserve space easily, hence this hack
-    relationDescription=`echo $relationDescription | sed -e 's/_/ /'`
-
-    $MINECTL create-relation \
-	"relationName=$relationName" \
-	"relationVersion=$relationVersion" \
-	"relationDescription=$relationDescription" \
-	"relationInterests=$relationInterests" || exit 1
-
-done <<EOF
-alec     1  Alec_Muffett   wine      cats      motorbikes  mine  food
-adriana  1  Adriana_Lukas  wine      cookery   motorbikes  vrm   mine
-carrie   1  Carrie_Bishop  sneakers  trainers  mine        vrm
-ben      1  Ben_Laurie     wine      food      motorbikes
-EOF
-
+$minectl new-tags bicycles:transport motorbikes:transport cars:transport
 
 ###
-# quick hack to demo new-relation
+# set up tags and implied tags in one go; read from left to right
 
-$MINECTL new-relation perry 1 "Perry de Havilland" red-wine food require:hippos except:white-wine
+$minectl new-tags wine:drink beer:drink 
+
+$minectl new-tags white-wine:wine red-wine:wine chardonnay:white-wine rioja:red-wine
 
 ###
-# special cases for tag testing
+# for shoe-fetishists "shoes" implies BOTH clothes AND fashion
+
+$minectl new-tags shoes:clothes,fashion
+
+# shoe types
+
+$minectl new-tags \
+    mules:shoes \
+    pumps:shoes \
+    slingbacks:shoes \
+    sneakers:shoes \
+    stilettos:shoes \
+    trainers:shoes
+
+###
+# upload a batch of objects without individual tagging
+
+$minectl upload $SAMPLES/* # wasn't that easy?
+
+###
+# set up some relations
+
+$minectl new-relation alec 1 "Alec Muffett" cats motorbikes drink food themineproject
+$minectl new-relation adriana 1 "Adriana Lukas" wine motorbikes themineproject
+$minectl new-relation carrie 1 "Carrie Bishop" sneakers trainers themineproject
+$minectl new-relation ben 1 "Ben Laurie" wine food motorbikes
+$minectl new-relation perry 1 "Perry de Havilland" food drink except:white-wine
+
+###
+# highly verbose special cases for tag testing
 while read file tags
 do
-    $MINECTL create-object data=@$DIR/$file objectType=`$MINECTL mime-type $file` \
-	objectName="name($file)" objectDescription="description($file $tags)" \
-	objectStatus=public objectTags="$tags"
+    $minectl upload -t "$tags" $SAMPLES/$file
 done <<EOF
-dam.jpg              for:perry
-fashion1.jpg         food       for:perry
-adriana.jpg          food       hippos     chardonnay
-rome.jpg             food       hippos     for:perry   not:perry
-feeds-based-vrm.pdf  food       hippos     not:perry
-monument.jpg         food       hippos
-rose.jpg             food
-mountains.jpg        hippos
-stonehenge.jpg       not:perry
-suzi.jpg             red-wine   hippos
-moon.jpg             wine       hippos
-mine-diagram.jpg
-italy.jpg
-mine-paper-v2.pdf    for:alec
-bridge.jpg
-alecm.png   
-woodland.jpg
+adriana.jpg themineproject
+alecm.png themineproject
 austen.txt
-milan.jpg
+bridge.jpg countryside
+buster.jpg cats
 cloud.jpg
-pimpernel.jpg
-buster.jpg
+dam.jpg countryside 
+fashion1.jpg fashion
+feeds-based-vrm.pdf themineproject
+italy.jpg italy
+milan.jpg italy
+mine-diagram.jpg themineproject
+mine-paper-v2.pdf themineproject
+monument.jpg france motorbikes countryside
+moon.jpg space
+mountains.jpg  italy motorbikes countryside
+pimpernel.jpg flowers
+rome.jpg italy
+rose.jpg flowers
+stonehenge.jpg countryside
+suzi.jpg cats
+woodland.jpg trees countryside
 EOF
 
 ###
