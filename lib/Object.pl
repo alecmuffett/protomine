@@ -90,7 +90,7 @@ sub auxPutFH {
     $self->fileRename("$file~new", $file);
 }
 
-sub auxPut {
+sub auxPutBlob {
     my $self = shift;
     my $data = shift;
 
@@ -107,28 +107,25 @@ sub auxPut {
     $self->fileRename("$file~new", $file);
 }
 
-sub auxGetFH {
+sub auxGetFile {
     my $self = shift;
     my $retval;
 
     my $id = $self->id;
-    die "auxGet: cannot get aux data without an id for filename\n" unless ($id > 0);
-    my $file = $self->filepath("$id.data");
 
-    my $fh = FileHandle->new;
-    unless ($fh->open($file)) {
-	die "auxGetFH: open: $file: $!\n";
-    }
+    die "auxGetFile: cannot get aux data without an id for filename\n" unless ($id > 0);
 
-    return $fh;
+    return $self->filepath("$id.data");
 }
 
-sub auxGet {
+sub auxGetBlob {
     my $self = shift;
     my $retval;
 
     my $id = $self->id;
+
     die "auxGet: cannot get aux data without an id for filename\n" unless ($id > 0);
+
     my $file = $self->filepath("$id.data");
     my $filesize = (-s $file);
 
