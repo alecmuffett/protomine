@@ -519,6 +519,10 @@ sub toSavedForm {
 	unless (defined($self->{DATA}->{$key})) {
 	    die "toSavedForm: require undefined key $key\n";
 	}
+
+	unless ($self->{DATA}->{$key} ne '') {
+	    die "toSavedForm: require non-empty key $key\n";
+	}
     }
 
     # print them all...
@@ -538,7 +542,7 @@ sub toSavedForm {
 	$value =~ s! $!!o;	# kill trailing whitespace
 
 	# skip if blank
-	push(@page, "$key: $value\n") unless ($key eq '');
+	push(@page, "$key: $value\n") unless ($value eq '');
     }
 
     return join('', @page);

@@ -42,7 +42,6 @@ my $trap_exceptions_to_http = 1;
 if (0) {
     print $main::MINE_DIRECTORY;
     print $main::MINE_HTTP_PATH;
-    print $main::MINE_HTTP_FULLPATH;
 }
 
 # go to the mine home directory
