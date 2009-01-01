@@ -197,9 +197,8 @@ sub assertTrailingSlash {
 	    $self->{URL_QUERY}; # ?foo=bar
 
 	my $q = $self->cgi;
-	print $q->redirect(-uri => $reconstruct, -status => 301);
 
-	exit 0;
+	print $q->redirect(-uri => $reconstruct, -status => 301);
     }
 }
 
@@ -214,7 +213,9 @@ sub printRedirect {
     my $arg = shift;
     my $reconstruct = $self->{URL_DECLARED} . $arg;
     my $q = $self->cgi;
-    print $q->redirect(-uri => $reconstruct, -status => 301);
+
+    print $q->redirect(-uri => $reconstruct, 
+		       -status => 301);
 }
 
 ## printError (code, args...) -- generate a error page, text/plain for simplicity
@@ -223,31 +224,27 @@ sub printError {
     my $self = shift;
     my ($code, @message) = @_;
     my $q = $self->cgi;
-    print $q->header(-status => $code, -type => "text/plain");
-    print "http error $code:\n";
-    print "@message\n";
-    exit 1;
+
+    my $body = "http error $code:\n@message\n";
+
+    print $q->header(-status => $code, 
+		     -type => "text/plain",
+		     -Content_length => length($body));
+    print $body;
 }
 
-## printFile (file) -- print a file (jpeg, mp3, whatever) to browser, setting mime type
+## printFile (file [, type]) -- print a file to browser, setting mime type
 
 sub printFile {
     my $self = shift;
     my $arg = shift;
-    my $type = &main::mime_type($arg);
+    my $type = shift || &main::mime_type($arg);
     my $q = $self->cgi;
-    print $q->header(-type => $type);
+
+    print $q->header(-type => $type,
+		     -Content_length => (-s $arg));
+
     $self->catFile($arg);
-}
-
-## printFH (fh, type) -- print a FH (jpeg, mp3, whatever) to browser with mime type
-
-sub printFH {
-    my $self = shift;
-    my ($fh, $type) = @_;
-    my $q = $self->cgi;
-    print $q->header(-type => $type);
-    $self->catFH($fh);
 }
 
 ## printPageUsing (...) -- print page argument, with decoration
@@ -396,19 +393,6 @@ sub catFile {
 	print $buffer;
     }
     close(CATFILE) or die "catFile: close: $arg: $!\n";
-}
-
-# print filehandle without decoration
-
-sub catFH {
-    my $self = shift;
-    my $arg = shift;
-    my $buffer;
-
-    while (read($arg, $buffer, $BUFSIZ) > 0) {
-	print $buffer;
-    }
-    close($arg) or die "catFH: close: $!\n";
 }
 
 # recursively descend a nested list of scalars and listrefs and other

@@ -198,7 +198,7 @@ sub api_read_oid_aux {		# -- DONE -- *** AUX DATA, NOT RETURN STRUCTURE ***
 
     my $q = $ui->cgi;
     my $object = Object->new($id);
-    $ui->printFH($object->auxGetFH, $object->get('objectType'));
+    $ui->printFile($object->auxGetFile, $object->get('objectType'));
 }
 
 ##################################################################

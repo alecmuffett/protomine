@@ -105,7 +105,7 @@ sub ui_show_objects {
 	push(@output, 
 	     $ui->formatCloud({
 		 "delete-object/$oid.html", "[delete]",
-		 "read-data/$oid", "[view]",
+		 "../api/object/$oid", "[view]",
 		 "read-object/$oid.html", "[info]",
 		 "update-data/$oid.html", "[update]",
 		 "update-object/$oid.html", "[update info]",
