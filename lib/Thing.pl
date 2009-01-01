@@ -291,10 +291,20 @@ sub set {
 		die "set($key, $value) however value is not amongst '@{$val_enum}'\n";
 	    }
 	}
+
 	$value =~ s!\s+! !go;	# kill newlines/extra whitespace
 	$value =~ s!^\s!!o;	# kill leading whitespace
 	$value =~ s! $!!o;	# kill trailing whitespace
-	return $self->{DATA}->{$key} = $value;
+
+	# this is how we delete params, set them to empty string
+	if ($value eq '') {
+	    delete($self->{DATA}->{$key});
+	}
+	else {
+	    $self->{DATA}->{$key} = $value;
+	}
+
+	return $value;
     }
 
     die "set($key, $value) however that key is not setable\n";
@@ -366,7 +376,8 @@ sub load {
 	chomp;
 
 	# parse or die
-	unless (/(\w+)(\s*=\s*|:\s*|\s+)(.*)/o) {
+	# we are using .+ for $3 to ensure non-emptiness
+	unless (/(\w+)(\s*=\s*|:\s*|\s+)(.+)/o) {
 	    die "load: bad record in '$file' line $.: $_\n";
 	}
 
@@ -520,7 +531,7 @@ sub toSavedForm {
 	    die "toSavedForm: require undefined key $key\n";
 	}
 
-	unless ($self->{DATA}->{$key} ne '') {
+	unless ($self->{DATA}->{$key} !~ m!^\s*$!o) {
 	    die "toSavedForm: require non-empty key $key\n";
 	}
     }
