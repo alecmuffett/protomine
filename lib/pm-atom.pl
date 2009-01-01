@@ -59,23 +59,24 @@ sub get_permalink {
 
 sub decode_key {
     my ($encoded) = @_;
-    my $magic_number = "mine1";	# break out into global setting
-    my $packfmt = "h*";		# break out?
+    my $magic_number = "mine";	# break out into global setting
+    my $packfmt = "H*";		# break out?
 
     warn "decode_key: encoded=$encoded\n";
 
     my $key = pack($packfmt, $encoded);
     warn "decode_key: key=$key\n";
 
-    unless (my ($magic, $rid, $rvsn, $oid, $crc) =
+    my ($magic, $rid, $rvsn, $oid, $crc);
+    unless (($magic, $rid, $rvsn, $oid, $crc) =
 	    ($key =~ m!^(\w+),(\d+),(\d+),(\d+),(\d+)$!o)) {
 	die "decode_key: bad decode result\n";
     }
 
-    die "decode_key: bad magic\n" unless ($magic eq $magic_number);
-    die "decode_key: bad rid\n" unless ($rid > 0);
-    die "decode_key: bad rvsn\n" unless ($rvsn > 0);
-    die "decode_key: bad oid\n" unless ($oid > 0);
+    die "decode_key: bad magic $magic vs \n" unless ($magic eq $magic_number);
+    die "decode_key: bad rid $rid\n" unless ($rid > 0);
+    die "decode_key: bad rvsn $rvsn\n" unless ($rvsn > 0);
+    die "decode_key: bad oid $oid\n" unless ($oid >= 0); # probably redundant
 
     my $prefix2 = "$magic,$rid,$rvsn,$oid";
     warn "decode_key: prefix2=$prefix2\n";
@@ -84,7 +85,7 @@ sub decode_key {
     warn "decode_key: crc2=$crc2\n";
 
     die "decode_key: bad crc check\n" unless ($crc2 eq $crc);
-    warn "decode_key: crc check ok\n";
+    warn "decode_key: decoded $rid $rvsn $oid\n";
 
     return ($rid, $rvsn, $oid);
 }
@@ -93,15 +94,15 @@ sub decode_key {
 
 sub encode_key {
     my ($rid, $rvsn, $oid) = @_;
-    my $magic_number = "mine1";	# break out into global setting
-    my $packfmt = "h*";		# break out?
+    my $magic_number = "mine";	# break out into global setting
+    my $packfmt = "H*";		# break out?
 
     my $magic = $magic_number;
 
-    die "encode_key: bad magic\n" unless ($magic ne '');
-    die "encode_key: bad rid\n" unless ($rid > 0);
-    die "encode_key: bad rvsn\n" unless ($rvsn > 0);
-    die "encode_key: bad oid\n" unless ($oid > 0);
+    die "encode_key: bad magic $magic\n" unless ($magic ne '');
+    die "encode_key: bad rid $rid\n" unless ($rid > 0);
+    die "encode_key: bad rvsn $rvsn\n" unless ($rvsn > 0);
+    die "encode_key: bad oid $oid\n" unless ($oid >= 0); # probably redundant
 
     my $prefix = "$magic,$rid,$rvsn,$oid";
     warn "encode_key: prefix=$prefix\n";

@@ -133,6 +133,7 @@ sub ui_show_relations {
 	push(@output, "<dd>");
 	push(@output, 
 	     $ui->formatCloud({
+		 &get_permalink($thing), "[feed]",
 		 "delete-relation/$rid.html", "[delete]",
 		 "read-relation/$rid.html", "[info]",
 		 "update-relation/$rid.html", "[update info]",
