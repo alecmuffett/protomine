@@ -45,7 +45,6 @@ use warnings;
 
 use CGI::Carp;
 use CGI::Pretty;
-use File::Temp qw(tempfile);
 
 my $BUFSIZ = 1024 * 64;         # for the C-programmer in you
 
@@ -257,11 +256,8 @@ sub printUsing {
 
     my $q = $self->cgi;
 
-    # create a tempfile
-    my ($fh_tmp, $filename_tmp) = tempfile('pmine.XXXXXXX', DIR => '/tmp');
-
-    # select it for print
-    my $fh_stdout = select($fh_tmp);
+    # print appropriate HTTP header
+    print $q->header(-type => $type);
 
     # spew HTML header if appropriate
     if ($type eq 'text/html') {
@@ -277,7 +273,9 @@ sub printUsing {
 
 	print $q->start_html(@meta);
 
-	$self->catPageHeader;
+	if ($self->{FILE_HEADER} ne '') {
+	    $self->catFile($self->{FILE_HEADER});
+	}
     }
 
     # spew body
@@ -293,34 +291,11 @@ sub printUsing {
 
     # spew HTML footer if approprate
     if ($type eq 'text/html') {
-	$self->catPageFooter;
+	if ($self->{FILE_FOOTER} ne '') {
+	    $self->catFile($self->{FILE_FOOTER});
+	}
 	print $q->end_html;
     }
-
-    # deselect it for print
-    select($fh_stdout);
-
-    # flush tempfile
-    $fh_tmp->flush;
-
-    # rewind tempfile
-    $fh_tmp->seek(0, 0);
-
-    # stat tempfile to determine size
-    my $content_length = (-s $filename_tmp);
-
-    # print appropriate HTTP header
-    print $q->header(-type => $type,
-		     -Content_length => $content_length);
-
-    # print tempfile content
-    my $buffer;
-    while (read($fh_tmp, $buffer, $BUFSIZ) > 0) {
-	print $buffer;
-    }
-
-    # close tmpfile
-    $fh_tmp->close;
 
     # done
 }
@@ -370,28 +345,6 @@ sub printTreeText {
 ##################################################################
 
 # METHODS WHICH ACTUALLY PRINT STUFF
-
-# print decoration header
-
-sub catPageHeader {
-    my $self = shift;
-    my $arg = shift;
-
-    if ($self->{FILE_HEADER} ne '') {
-	$self->catFile($self->{FILE_HEADER});
-    }
-}
-
-# print decoration footer
-
-sub catPageFooter {
-    my $self = shift;
-    my $arg = shift;
-
-    if ($self->{FILE_FOOTER} ne '') {
-	$self->catFile($self->{FILE_FOOTER});
-    }
-}
 
 # print file without decoration
 
