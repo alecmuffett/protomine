@@ -43,17 +43,17 @@ chdir($main::MINE_DIRECTORY) or die "chdir: $main::MINE_DIRECTORY: $!";
 
 # get the extra stuff we need
 
-require 'pm-api.pl';
-require 'pm-atom.pl';
-require 'pm-ui.pl';
-require 'pm-mime.pl';
-
-require 'Log.pl';
 require 'Context.pl';
-require 'Thing.pl';
+require 'Log.pl';
 require 'Object.pl';
+require 'Page.pl';
 require 'Relation.pl';
 require 'Tag.pl';
+require 'Thing.pl';
+require 'pm-api.pl';
+require 'pm-atom.pl';
+require 'pm-mime.pl';
+require 'pm-ui.pl';
 
 # impose a 10Mb ceiling on POST data
 
@@ -480,7 +480,7 @@ sub do_noop {
 
 sub do_redirect {
     my ($ctx, $info, $phr, $target) = @_;
-    return Page->newRedirect($target);
+    return $ctx->forceRedirect($target);
 }
 
 ##################################################################
@@ -499,6 +499,29 @@ sub do_apidump {
 sub do_xml {
     my ($ctx, $info, $phr, $fn, @rest) = @_;
     return Page->newXML(&{$fn}($ctx, $info, $phr, @rest));
+}
+
+##################################################################
+
+# handle an actual proper document request
+
+sub do_document {
+    my ($ctx, $info, $phr, $root, $cited) = @_;
+
+    my $document = "$root/$cited";
+
+    if (-d $document) {
+	$ctx->assertTrailingSlash;
+	Log->msg("dir $document");
+	return Page->newDirectory($document);
+    }
+    elsif (-f $document) {
+	Log->msg("file $document");
+	return Page->newFile($document);
+    }
+    else {
+	return Page->newError(404, "cannot do_document $document");
+    }
 }
 
 ##################################################################
@@ -592,35 +615,6 @@ sub do_remote_get {
 
     # fall off the end?
     die "do_remote_get: this can't happen";
-}
-
-##################################################################
-
-# handle an actual proper document request
-
-sub do_document {
-    my ($ctx, $info, $phr, $root, $cited) = @_;
-
-    my $document = "$root/$cited";
-
-    if (-d $document) {
-	$ctx->assertTrailingSlash;
-
-	my @page;
-
-	push(@page, $ctx->formatDirectory($document));
-
-	Log->msg("dir $document");
-
-	return Page->newHTML(@page);
-    }
-    elsif (-f $document) {
-	Log->msg("file $document");
-	return Page->newFile($document);
-    }
-    else {
-	return Page->newError(404, "cannot do_document $document");
-    }
 }
 
 ##################################################################
