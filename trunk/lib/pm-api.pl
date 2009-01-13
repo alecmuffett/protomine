@@ -18,7 +18,6 @@
 
 use strict;
 use warnings;
-#use diagnostics;
 
 ##################################################################
 
@@ -198,7 +197,7 @@ sub api_read_oid_aux {		# -- DONE -- *** AUX DATA, NOT RETURN STRUCTURE ***
 
     my $q = $ctx->cgi;
     my $object = Object->new($id);
-    $ctx->printFile($object->auxGetFile, $object->get('objectType'));
+    return Page->newFile($object->auxGetFile, $object->get('objectType'));
 }
 
 ##################################################################

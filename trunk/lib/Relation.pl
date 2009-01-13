@@ -20,7 +20,6 @@ package Relation;
 
 use strict;
 use warnings;
-#use diagnostics;
 
 use vars qw(@ISA);
 #require 'mine/Thing.pl';
