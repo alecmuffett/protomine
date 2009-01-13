@@ -15,21 +15,7 @@
 ## permissions and limitations under the License.
 ##
 
-$emphasis = 'b';
-
-# header
-$header = <<"EOF;";
-<hr>
-<p>
-<h1>welcome to protomine!</h1>
-<p>
-EOF;
-
-$footer = <<"EOF;";
-<p>
-<hr>
-EOF;
-
+$emphasis = 'em';
 
 ##################################################################
 print $header;
@@ -67,14 +53,19 @@ while (<DATA>) {
 	push(@rest, $url) if ($#rest < 0);
 	print "<LI><A HREF=\"$url\">@rest</A></LI>\n";
     }
+    elsif ($cmd eq '\'') {	# verbatim quote
+	print "@rest\n";
+    }
 }
-
-print $footer;
 
 exit 0;
 ##################################################################
 __END__;
-: this mine!
+
+' <hr/>
+' <p/>
+
+: welcome to protomine!
 { documentation 
 + ../doc/ local
 }
@@ -101,6 +92,10 @@ __END__;
 }
 -
 
+' <p/>
+' <hr/>
+' <p/>
+
 : the mine! project
 . http://themineproject.org/index.php/about/ about
 . http://themineproject.org/ home page and blog
@@ -109,8 +104,11 @@ __END__;
 -
 
 : protomine! software
-. http://themineproject.org/index.php/feed/ rss feed (announcements)
-. http://themineproject.org/index.php/download/ downloads
+. http://code.google.com/p/protomine/ google code home page
+. http://code.google.com/p/protomine/w/list documentation wiki
+. http://code.google.com/p/protomine/updates/list updates and history
+. http://code.google.com/p/protomine/issues/list bugs and bug reporting
+. http://code.google.com/p/protomine/source/checkout subversion code download
 -
 
 : protomine! authors
@@ -118,76 +116,11 @@ __END__;
 . http://www.crypticide.com/dropsafe/ alec muffett, programmer / geek
 -
 
-: hacking, test
-. ../test
--
+' <p/>
+' <hr/>
+' <p/>
 
-: hacking, feeds
-. ../feed/COOKIE
--
+' &copy; 2008-2009 Adriana Lukas &amp; Alec Muffett; 
+' protomine is open source software distributed under the Apache 2.0 license,
+' please see the <A HREF="http://code.google.com/p/protomine/w/list">project home page</A> for details
 
-: hacking, api
-. ../api/config.xml
-. ../api/config.xml?_method=PUT
-. ../api/object.xml
-. ../api/object.xml?_method=POST
-. ../api/object/3
-. ../api/object/3.xml
-. ../api/object/3.xml?_method=DELETE
-. ../api/object/3.xml?_method=PUT
-. ../api/object/3/clone.xml
-. ../api/object/3/clone.xml?_method=POST
-. ../api/object/3?_method=PUT
-. ../api/relation.xml
-. ../api/relation.xml?_method=POST
-. ../api/relation/2.xml
-. ../api/relation/2.xml?_method=DELETE
-. ../api/relation/2.xml?_method=PUT
-. ../api/select/object.xml
-. ../api/select/relation.xml
-. ../api/select/tag.xml
-. ../api/share/raw/2/1/3.xml
-. ../api/share/redirect/2.xml
-. ../api/share/redirect/2/3.xml
-. ../api/share/url/2.xml
-. ../api/share/url/2/3.xml
-. ../api/tag.xml
-. ../api/tag.xml?_method=POST
-. ../api/tag/4.xml
-. ../api/tag/4.xml?_method=DELETE
-. ../api/tag/4.xml?_method=PUT
-. ../api/version.xml
--
-
-: hacking, ui
-. ../ui/clone-object/3.html
-. ../ui/create-object.html?_method=POST
-. ../ui/create-relation.html?_method=POST
-. ../ui/create-tag.html?_method=POST
-. ../ui/delete-object/3.html
-. ../ui/delete-relation/2.html
-. ../ui/delete-tag/4.html
-. ../ui/read-data/3
-. ../ui/read-object/3.html
-. ../ui/read-relation/2.html
-. ../ui/read-tag/4.html
-. ../ui/select/object.html
-. ../ui/select/relation.html
-. ../ui/select/tag.html
-. ../ui/share/raw/2/1/3
-. ../ui/share/redirect/2
-. ../ui/share/redirect/2/3
-. ../ui/share/url/2.html
-. ../ui/share/url/2/3.html
-. ../ui/show-clones/3.html
-. ../ui/show-config.html
-. ../ui/show-objects.html
-. ../ui/show-relations.html
-. ../ui/show-tags.html
-. ../ui/update-config.html?_method=POST
-. ../ui/update-data/3.html?_method=POST
-. ../ui/update-object/3.html?_method=POST
-. ../ui/update-relation/2.html?_method=POST
-. ../ui/update-tag/4.html?_method=POST
-. ../ui/version.html
--

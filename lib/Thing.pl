@@ -469,25 +469,25 @@ sub delete {
 
 ##################################################################
 
-## toTree -- returns hashref
+## toDataStructure -- returns hashref
 
-sub toTree {
+sub toDataStructure {
     my $self = shift;
-    my %tree;
+    my %ds;
 
     foreach my $key ($self->listDataKeys) {
 	my $value = $self->get($key);
-	$tree{$key} = $value;
+	$ds{$key} = $value;
     }
 
-    return \%tree;
+    return \%ds;
 }
 
 ##################################################################
 
-## toPage -- returns listref
+## toHTML -- returns listref
 
-sub toPage {
+sub toHTML {
     my $self = shift;
     my @page;
 
@@ -505,16 +505,30 @@ sub toPage {
 ##################################################################
 
 ## toString -- returns string
+# is like toSavedForm with the safety checks turned off
 
 sub toString {
     my $self = shift;
-    return join('', @{$self->toPage});
-}
+    my @page;
 
+    foreach my $key ($self->listDataKeys) {
+	my $value = $self->{DATA}->{$key};
+
+	unless ($self->writableKey($key)) {
+	    push(@page, "# $key: $value # is unwritable\n");
+	    next;
+	}
+
+	# skip if blank
+	push(@page, "$key: $value\n");
+    }
+
+    return join('', @page);
+}
 
 ##################################################################
 
-## toSavedForm -- returns string; more sanity checking than toPage
+## toSavedForm -- returns string; more sanity checking than toString
 
 ## NOTE: WE CANNOT USE THE RESULT OF get() FOR toSavedForm SINCE THAT
 ## WILL DO BIDIRECTIONAL TAG TRANSLATION THEREBY DEFEATING THE WHOLE
@@ -538,14 +552,14 @@ sub toSavedForm {
 
     # print them all...
     foreach my $key ($self->listDataKeys) {
-	# ...so long as they are writable
-	unless ($self->writableKey($key)) {
-	    push(@page, "# $key: is unwritable\n"); # non-fatal condition
-	    next;
-	}
-
 	# this one is
 	my $value = $self->{DATA}->{$key};
+
+	# ...so long as they are writable
+	unless ($self->writableKey($key)) {
+	    push(@page, "# $key: $value # is unwritable\n");
+	    next;
+	}
 
 	# sanitise in the same way as set()
 	$value =~ s!\s+! !go;	# kill newlines/extra whitespace

@@ -29,33 +29,33 @@ sub ui_clone_object {		# OID
 }
 
 sub ui_create_object {
-    my ($ui, $info, $phr) = @_;
-    $ui->setXBase("ui/");
+    my ($ctx, $info, $phr) = @_;
+    $ctx->setXBase("ui/");
     my $result = &api_create_object(@_);
     my $oid = $result->{objectId};
     my @output;
     push(@output, "created object $oid");
-    $ui->printPageHTML(\@output);
+    $ctx->printHTML(\@output);
 }
 
 sub ui_create_relation {
-    my ($ui, $info, $phr) = @_;
-    $ui->setXBase("ui/");
+    my ($ctx, $info, $phr) = @_;
+    $ctx->setXBase("ui/");
     my $result = &api_create_relation(@_);
     my $rid = $result->{relationId};
     my @output;
     push(@output, "created relation $rid");
-    $ui->printPageHTML(\@output);
+    $ctx->printHTML(\@output);
 }
 
 sub ui_create_tag {
-    my ($ui, $info, $phr) = @_;
-    $ui->setXBase("ui/");
+    my ($ctx, $info, $phr) = @_;
+    $ctx->setXBase("ui/");
     my $result = &api_create_tag(@_);
     my $tid = $result->{tagId};
     my @output;
     push(@output, "created tag $tid");
-    $ui->printPageHTML(\@output);
+    $ctx->printHTML(\@output);
 }
 
 sub ui_delete_object {		# OID
@@ -91,19 +91,19 @@ sub ui_show_config {
 }
 
 sub ui_show_objects {
-    my ($ui, $info, $phr) = @_;
-    $ui->setXBase("ui/");	# everything will be relative to this
+    my ($ctx, $info, $phr) = @_;
+    $ctx->setXBase("ui/");	# everything will be relative to this
     my @oids = Object->list;
     my @output;
     push(@output, "<dl>" );
     foreach my $oid (@oids) {
-	my $thing = Object->new($oid);
-	my $name = $thing->name;
+	my $object = Object->new($oid);
+	my $name = $object->name;
 
 	push(@output, "<dt>object $oid: $name</dt>\n");
 	push(@output, "<dd>");
 	push(@output, 
-	     $ui->formatCloud({
+	     $ctx->formatCloud({
 		 "delete-object/$oid.html", "[delete]",
 		 "../api/object/$oid", "[view]",
 		 "read-object/$oid.html", "[info]",
@@ -111,67 +111,67 @@ sub ui_show_objects {
 		 "update-object/$oid.html", "[update info]",
 				       }));
 	push(@output, "<br/>\n" );
-	push(@output, $thing->toString);
+	push(@output, $object->toString);
 	push(@output, "</dd>\n" );
 	push(@output, "<p/>\n" );
     }
     push(@output, "</dl>\n" );
-    $ui->printPageHTML(\@output);
+    $ctx->printHTML(\@output);
 }
 
 sub ui_show_relations {
-    my ($ui, $info, $phr) = @_;
-    $ui->setXBase("ui/");	# everything will be relative to this
+    my ($ctx, $info, $phr) = @_;
+    $ctx->setXBase("ui/");	# everything will be relative to this
     my @rids = Relation->list;
     my @output;
     push(@output, "<dl>" );
     foreach my $rid (@rids) {
-	my $thing = Relation->new($rid);
-	my $name = $thing->name;
+	my $relation = Relation->new($rid);
+	my $name = $relation->name;
 
 	push(@output, "<dt>relation $rid: $name</dt>\n");
 	push(@output, "<dd>");
 	push(@output, 
-	     $ui->formatCloud({
-		 &get_permalink($thing), "[feed]",
+	     $ctx->formatCloud({
+		 &get_permalink($relation), "[feed]",
 		 "delete-relation/$rid.html", "[delete]",
 		 "read-relation/$rid.html", "[info]",
 		 "update-relation/$rid.html", "[update info]",
 				       }));
 	push(@output, "<br/>\n" );
-	push(@output, $thing->toString);
+	push(@output, $relation->toString);
 	push(@output, "</dd>\n" );
 	push(@output, "<p/>\n" );
     }
     push(@output, "</dl>\n" );
-    $ui->printPageHTML(\@output);
+    $ctx->printHTML(\@output);
 }
 
 sub ui_show_tags {
-    my ($ui, $info, $phr) = @_;
-    $ui->setXBase("ui/");	# everything will be relative to this
+    my ($ctx, $info, $phr) = @_;
+    $ctx->setXBase("ui/");	# everything will be relative to this
     my @tids = Tag->list;
     my @output;
     push(@output, "<dl>" );
     foreach my $tid (@tids) {
-	my $thing = Tag->new($tid);
-	my $name = $thing->name;
+	my $tag = Tag->new($tid);
+	my $name = $tag->name;
 
 	push(@output, "<dt>tag $tid: $name</dt>\n");
 	push(@output, "<dd>");
 	push(@output, 
-	     $ui->formatCloud({
+	     $ctx->formatCloud({
 		 "delete-tag/$tid.html", "[delete]",
 		 "read-tag/$tid.html", "[info]",
 		 "update-tag/$tid.html", "[update info]",
 				       }));
 	push(@output, "<br/>\n" );
-	push(@output, $thing->toString);
+	push(@output, $tag->toString);
 	push(@output, "</dd>\n" );
 	push(@output, "<p/>\n" );
     }
     push(@output, "</dl>\n" );
-    $ui->printPageHTML(\@output);
+    $ctx->printHTML(\@output);
 }
 
 sub ui_update_config {

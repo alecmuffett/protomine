@@ -53,47 +53,55 @@ foreach $input (@lines) {
     }
 }
 
-print "-- checking definition\n";
-foreach $call (sort keys %calls) {
-    $ndefns = ($#{$defns{$call}} + 1);
-    @xdefns = @{$defns{$call}};
 
-    $ncalls = ($#{$calls{$call}} + 1);
-    @xcalls = @{$calls{$call}};
+foreach $loop (0..1) {
+    print "**** UNDEFINED ROUTINES\n\n" if ($loop == 0);
+    print "**** MULTIPLY-DEFINED ROUTINES\n\n" if ($loop == 1);
 
-    if ($ndefns == 0) {
-	print "$call undefined, called at:\n\t";
-	print join("\n\t", @xcalls);
-	print "\n\n";
+    foreach $call (sort keys %calls) {
+	$ndefns = ($#{$defns{$call}} + 1);
+	@xdefns = @{$defns{$call}};
+	$ncalls = ($#{$calls{$call}} + 1);
+	@xcalls = @{$calls{$call}};
+
+	if (($loop == 0) and ($ndefns == 0)) {
+	    print "$call undefined, called at:\n\t";
+	    print join("\n\t", @xcalls);
+	    print "\n\n";
+	}
+	elsif (($loop == 1) and ($ndefns > 1)) {
+	    print "$call defined $ndefns times:\n\t";
+	    print join("\n\t", @xdefns);
+	    print "\n\n";
+	}
+
     }
-    elsif ($ndefns > 1) {
-	print "$call defined $ndefns times:\n\t";
-	print join("\n\t", @xdefns);
-	print "\n\n";
-    }
-
 }
 print "\n";
 
-print "-- checking usage\n";
-foreach $defn (sort keys %defns) {
-    $ncalls = ($#{$calls{$defn}} + 1);
-    @xcalls = @{$calls{$defn}};
+foreach $loop (0..1) {
+    print "**** UNDEFINED ROUTINES\n\n" if ($loop == 0);
+    print "**** MULTIPLY-DEFINED ROUTINES\n\n" if ($v and $loop == 1);
 
-    $ndefns = ($#{$defns{$defn}} + 1);
-    @xdefns = @{$defns{$defn}};
+    foreach $defn (sort keys %defns) {
+	$ncalls = ($#{$calls{$defn}} + 1);
+	@xcalls = @{$calls{$defn}};
 
-    if ($ncalls == 0) {
-	print "$defn uncalled, defined at:\n\t";
-	print join("\n\t", @xdefns);
-	print "\n\n";
+	$ndefns = ($#{$defns{$defn}} + 1);
+	@xdefns = @{$defns{$defn}};
+
+	if (($loop == 0) and ($ncalls == 0)) {
+	    print "$defn uncalled, defined at:\n\t";
+	    print join("\n\t", @xdefns);
+	    print "\n\n";
+	}
+	elsif ($v and ($loop == 1) and ($ncalls > 1)) {
+	    print "$defn called $ncalls times:\n\t";
+	    print join("\n\t", @xcalls);
+	    print "\n\n";
+	}
+
     }
-    elsif ($v and ($ncalls > 1)) {
-	print "$defn called $ncalls times:\n\t";
-	print join("\n\t", @xcalls);
-	print "\n\n";
-    }
-
 }
 print "\n";
 
