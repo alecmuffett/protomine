@@ -22,7 +22,6 @@ my $BUFSIZ = 1024 * 64;         # buffer size for file copying
 
 use strict;
 use warnings;
-#use diagnostics;
 
 use Fcntl qw(:DEFAULT :flock);
 

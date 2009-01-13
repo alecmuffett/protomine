@@ -27,11 +27,10 @@ my $DIRMAGIC = '[directory]';
 
 # enumeration for speed, later
 my $STATIC_FILE = -1;
-my $DYNAMIC_ATOM = 1;
-my $DYNAMIC_JSON = 2;
-my $DYNAMIC_XML = 3;
-my $DYNAMIC_HTML = 4;
-my $DYNAMIC_PLAIN = 5;
+my $DYNAMIC_PLAIN = 1;
+my $DYNAMIC_XML = 2;
+my $DYNAMIC_HTML = 3;
+my $DYNAMIC_JSON = 4;
 
 ##################################################################
 
@@ -66,12 +65,6 @@ sub setStatus {			# set the HTTP return code
     $self->{STATUS} = $arg;
 }
 
-sub setXBase {                   # set the xbase header for dynamic documents
-    my $self = shift;
-    my $arg = shift;
-    $self->{XBASE} = $arg;
-}
-
 ##################################################################
 
 sub newError {                  # handler for error pages
@@ -95,8 +88,8 @@ sub newError {                  # handler for error pages
 sub newFile {                   # handler for actual on-disk files
     my $class = shift;
     my $filename = shift;
+    my $mimetype = shift || &main::mime_type($filename);
 
-    my $mimetype = &main::mime_type($filename);
     my $p = $class->__new($mimetype, $STATIC_FILE);
     $p->{PATH} = $filename;	# reading the file is deferred
     return $p;
@@ -114,27 +107,39 @@ sub newDirectory {              # handler for real dirs, or those with 'index.ht
 
 sub newHTML {                   # HTML page
     my $class = shift;
-    return $class->__new('text/html', $DYNAMIC_HTML); # subject to header/footer, css, etc
+    my $xbase = shift;
+
+    my $p = $class->__new('text/html', $DYNAMIC_HTML); # subject to header/footer, css, etc
+    $p->{XBASE} = $xbase;
+    return $p;
 }
 
 sub newText {                   # plain text page
     my $class = shift;
-    return $class->__new('text/plain', $DYNAMIC_PLAIN);
+    my $p = $class->__new('text/plain', $DYNAMIC_PLAIN);
+    $p->add(@_) if ($#_ >= 0);
+    return $p;
 }
 
 sub newXML {                    # XML page
     my $class = shift;
-    return $class->__new('application/xml', $DYNAMIC_XML);
+    my $p = $class->__new('application/xml', $DYNAMIC_XML);
+    $p->add(@_) if ($#_ >= 0);
+    return $p;
 }
 
 sub newJSON {                   # JSON page
     my $class = shift;
-    return $class->__new('application/json', $DYNAMIC_JSON);
+    my $p = $class->__new('application/json', $DYNAMIC_JSON);
+    $p->add(@_) if ($#_ >= 0);
+    return $p;
 }
 
 sub newAtom {                   # ATOM page
     my $class = shift;
-    return $class->__new('application/atom+xml', $DYNAMIC_ATOM);
+    my $p = $class->__new('application/atom+xml', $DYNAMIC_XML);
+    $p->add(@_) if ($#_ >= 0);
+    return $p;
 }
 
 ##################################################################

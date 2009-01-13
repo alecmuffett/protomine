@@ -18,7 +18,6 @@
 
 use strict;
 use warnings;
-#use diagnostics;
 
 ##################################################################
 ##################################################################
@@ -30,32 +29,35 @@ sub ui_clone_object {		# OID
 
 sub ui_create_object {
     my ($ctx, $info, $phr) = @_;
-    $ctx->setXBase("ui/");
+
     my $result = &api_create_object(@_);
     my $oid = $result->{objectId};
-    my @output;
-    push(@output, "created object $oid");
-    $ctx->printHTML(\@output);
+
+    my $p = Page->newHTML("ui/");
+    $p->add("created object $oid");
+    return $p;
 }
 
 sub ui_create_relation {
     my ($ctx, $info, $phr) = @_;
-    $ctx->setXBase("ui/");
+
     my $result = &api_create_relation(@_);
     my $rid = $result->{relationId};
-    my @output;
-    push(@output, "created relation $rid");
-    $ctx->printHTML(\@output);
+
+    my $p = Page->newHTML("ui/");
+    $p->add("created relation $rid");
+    return $p;
 }
 
 sub ui_create_tag {
     my ($ctx, $info, $phr) = @_;
-    $ctx->setXBase("ui/");
+
     my $result = &api_create_tag(@_);
     my $tid = $result->{tagId};
-    my @output;
-    push(@output, "created tag $tid");
-    $ctx->printHTML(\@output);
+
+    my $p = Page->newHTML("ui/");
+    $p->add("created tag $tid");
+    return $p;
 }
 
 sub ui_delete_object {		# OID
@@ -92,86 +94,86 @@ sub ui_show_config {
 
 sub ui_show_objects {
     my ($ctx, $info, $phr) = @_;
-    $ctx->setXBase("ui/");	# everything will be relative to this
+
     my @oids = Object->list;
-    my @output;
-    push(@output, "<dl>" );
+
+    my $p = Page->newHTML("ui/");
+    $p->add("<dl>");
     foreach my $oid (@oids) {
 	my $object = Object->new($oid);
 	my $name = $object->name;
 
-	push(@output, "<dt>object $oid: $name</dt>\n");
-	push(@output, "<dd>");
-	push(@output, 
-	     $ctx->formatCloud({
-		 "delete-object/$oid.html", "[delete]",
-		 "../api/object/$oid", "[view]",
-		 "read-object/$oid.html", "[info]",
-		 "update-data/$oid.html", "[update]",
-		 "update-object/$oid.html", "[update info]",
-				       }));
-	push(@output, "<br/>\n" );
-	push(@output, $object->toString);
-	push(@output, "</dd>\n" );
-	push(@output, "<p/>\n" );
+	$p->add("<dt>object $oid: $name</dt>\n");
+	$p->add("<dd>");
+	$p->addCloud({
+	    "delete-object/$oid.html", "[delete]",
+	    "../api/object/$oid", "[view]",
+	    "read-object/$oid.html", "[info]",
+	    "update-data/$oid.html", "[update]",
+	    "update-object/$oid.html", "[update info]",
+		     });
+	$p->add("<br/>\n");
+	$p->add($object->toString);
+	$p->add("</dd>\n");
+	$p->add("<p/>\n");
     }
-    push(@output, "</dl>\n" );
-    $ctx->printHTML(\@output);
+    $p->add("</dl>\n");
+    return $p;
 }
 
 sub ui_show_relations {
     my ($ctx, $info, $phr) = @_;
-    $ctx->setXBase("ui/");	# everything will be relative to this
+
     my @rids = Relation->list;
-    my @output;
-    push(@output, "<dl>" );
+
+    my $p = Page->newHTML("ui/");
+    $p->add("<dl>");
     foreach my $rid (@rids) {
 	my $relation = Relation->new($rid);
 	my $name = $relation->name;
 
-	push(@output, "<dt>relation $rid: $name</dt>\n");
-	push(@output, "<dd>");
-	push(@output, 
-	     $ctx->formatCloud({
+	$p->add("<dt>relation $rid: $name</dt>\n");
+	$p->add("<dd>");
+	$p->addCloud({
 		 &get_permalink($relation), "[feed]",
 		 "delete-relation/$rid.html", "[delete]",
 		 "read-relation/$rid.html", "[info]",
 		 "update-relation/$rid.html", "[update info]",
-				       }));
-	push(@output, "<br/>\n" );
-	push(@output, $relation->toString);
-	push(@output, "</dd>\n" );
-	push(@output, "<p/>\n" );
+		     });
+	$p->add("<br/>\n");
+	$p->add($relation->toString);
+	$p->add("</dd>\n");
+	$p->add("<p/>\n");
     }
-    push(@output, "</dl>\n" );
-    $ctx->printHTML(\@output);
+    $p->add("</dl>\n");
+    return $p;
 }
 
 sub ui_show_tags {
     my ($ctx, $info, $phr) = @_;
-    $ctx->setXBase("ui/");	# everything will be relative to this
+
     my @tids = Tag->list;
-    my @output;
-    push(@output, "<dl>" );
+
+    my $p = Page->newHTML("ui/");
+    $p->add("<dl>");
     foreach my $tid (@tids) {
 	my $tag = Tag->new($tid);
 	my $name = $tag->name;
 
-	push(@output, "<dt>tag $tid: $name</dt>\n");
-	push(@output, "<dd>");
-	push(@output, 
-	     $ctx->formatCloud({
-		 "delete-tag/$tid.html", "[delete]",
-		 "read-tag/$tid.html", "[info]",
-		 "update-tag/$tid.html", "[update info]",
-				       }));
-	push(@output, "<br/>\n" );
-	push(@output, $tag->toString);
-	push(@output, "</dd>\n" );
-	push(@output, "<p/>\n" );
+	$p->add("<dt>tag $tid: $name</dt>\n");
+	$p->add("<dd>");
+	$p->addCloud({
+	    "delete-tag/$tid.html", "[delete]",
+	    "read-tag/$tid.html", "[info]",
+	    "update-tag/$tid.html", "[update info]",
+		     });
+	$p->add("<br/>\n");
+	$p->add($tag->toString);
+	$p->add("</dd>\n");
+	$p->add("<p/>\n");
     }
-    push(@output, "</dl>\n" );
-    $ctx->printHTML(\@output);
+    $p->add("</dl>\n");
+    return $p;
 }
 
 sub ui_update_config {
@@ -198,8 +200,6 @@ sub ui_version {
     die "method not yet implemented\n";
 }
 
-##################################################################
-##################################################################
 ##################################################################
 
 1;

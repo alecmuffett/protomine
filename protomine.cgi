@@ -265,6 +265,11 @@ if (1) {
 	}
     }
 
+    # one final mugtrap
+    unless (defined($page)) {
+	$page = Page->newError(500, "match_and_execute returned undefined page");
+    }
+
     # print the resulting page here - $ctx supplies context and CGI
     # object references, other meta information...
     $page->printUsing($ctx);
