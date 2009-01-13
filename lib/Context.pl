@@ -103,7 +103,19 @@ sub path {			# return the intra-mine URL path, eg: /api/foo.xml
     return $body;
 }
 
-##################################################################
+#  this routine forces a redirect to its first argument, which must
+# lead with a '/' and be under mine root
+
+sub forceRedirect {
+    my $self = shift;
+    my $arg = shift;
+
+    my $q = $self->cgi;
+    my $reconstruct = $self->{URL_DECLARED} . $arg;
+
+    print $q->redirect(-uri => $reconstruct, -status => 301);
+    exit 0;
+}
 
 # this routine takes the accessed URL and canonicalises it, which
 # should get us past most of the common sorts of security bugs; if

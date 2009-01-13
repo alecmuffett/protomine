@@ -44,12 +44,12 @@ foreach $input (@lines) {
 	push(@{$defns{$1}}, $debug);
     }
 
-    while ($line =~ s!\&(\w+)!!o) {
-	push(@{$calls{$1}}, $debug);
+    while ($line =~ s!(\w+(->|::))(\w+)!!o) {
+	push(@{$calls{$3}}, $debug);
     }
 
-    while ($line =~ s!(->|::)(\w+)!!o) {
-	push(@{$calls{$2}}, $debug);
+    while ($line =~ s!\&(\w+)!!o) {
+	push(@{$calls{$1}}, $debug);
     }
 }
 

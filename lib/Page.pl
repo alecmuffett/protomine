@@ -23,26 +23,15 @@ use warnings;
 
 # for the C-programmer in me, and you
 my $BUFSIZ = 1024 * 64;
+my $DIRMAGIC = '[directory]';
 
 # enumeration for speed, later
-my $STATIC_DIRECTORY = -2;
 my $STATIC_FILE = -1;
 my $DYNAMIC_ATOM = 1;
 my $DYNAMIC_JSON = 2;
 my $DYNAMIC_XML = 3;
 my $DYNAMIC_HTML = 4;
 my $DYNAMIC_PLAIN = 5;
-
-
-# inverse lookup table
-my %typelookup =
-    (
-     'application/atom+xml' => $DYNAMIC_ATOM,
-     'application/json' => $DYNAMIC_JSON,
-     'application/xml' => $DYNAMIC_XML,
-     'text/html' => $DYNAMIC_HTML,
-     'text/plain' => $DYNAMIC_PLAIN,
-    );
 
 ##################################################################
 
@@ -55,14 +44,15 @@ sub __new {
     my $self = {};
 
     $self->{TYPE} = shift;      # eg: text/html
-    $self->{METHOD} = shift;    # eg: $DYNAMIC_HTML
-    $self->{STATUS} = 200;      # http return status
+    $self->{STYLE} = shift;    # eg: $DYNAMIC_HTML
 
     $self->{DATA} = [];         # where the text goes
+    $self->{STATUS} = 200;      # http return status
 
-    $self->{CTX} = undef;
-    $self->{CGI} = undef;
-    $self->{PATH} = undef;
+    $self->{CTX} = undef;	# ref to Context
+    $self->{CGI} = undef;	# ref to CGI
+    $self->{PATH} = undef;	# filename or dirname
+    $self->{XBASE} = undef;	# xbase path
 
     bless $self, $class;
     return $self;
@@ -72,15 +62,14 @@ sub __new {
 
 sub setStatus {			# set the HTTP return code
     my $self = shift;
-    my $status = shift;
-    $self->{STATUS} = $status;
+    my $arg = shift;
+    $self->{STATUS} = $arg;
 }
 
 sub setXBase {                   # set the xbase header for dynamic documents
     my $self = shift;
-    my $path = shift;
-    my $ctx = $self->{CTX};
-    $self->{URL_XBASE} = $ctx->{URL_BASE} . $ctx->{URL_DECLARED} . '/' .  $path;
+    my $arg = shift;
+    $self->{XBASE} = $arg;
 }
 
 ##################################################################
@@ -109,8 +98,7 @@ sub newFile {                   # handler for actual on-disk files
 
     my $mimetype = &main::mime_type($filename);
     my $p = $class->__new($mimetype, $STATIC_FILE);
-    $p->{PATH} = $filename;
-
+    $p->{PATH} = $filename;	# reading the file is deferred
     return $p;
 }
 
@@ -120,18 +108,18 @@ sub newDirectory {              # handler for real dirs, or those with 'index.ht
 
     my $p = $class->__new('text/html', $DYNAMIC_HTML); # synthesised on the fly
     $p->{PATH} = $dirname;
-
+    $p->addDirectory($dirname);	# reading the directory is immediate
     return $p;
+}
+
+sub newHTML {                   # HTML page
+    my $class = shift;
+    return $class->__new('text/html', $DYNAMIC_HTML); # subject to header/footer, css, etc
 }
 
 sub newText {                   # plain text page
     my $class = shift;
     return $class->__new('text/plain', $DYNAMIC_PLAIN);
-}
-
-sub newHTML {                   # HTML page
-    my $class = shift;
-    return $class->__new('text/html', $DYNAMIC_HTML);
 }
 
 sub newXML {                    # XML page
@@ -144,7 +132,7 @@ sub newJSON {                   # JSON page
     return $class->__new('application/json', $DYNAMIC_JSON);
 }
 
-sub newATOM {                   # ATOM page
+sub newAtom {                   # ATOM page
     my $class = shift;
     return $class->__new('application/atom+xml', $DYNAMIC_ATOM);
 }
@@ -267,8 +255,8 @@ sub addDirectoryHash {		# format a directory hash
     my @sortkeys = sort keys %{$arg};
     my @sortorder;
 
-    push(@sortorder, grep { $arg->{$_}->[1] eq 'directory' } @sortkeys);
-    push(@sortorder, grep { $arg->{$_}->[1] ne 'directory' } @sortkeys);
+    push(@sortorder, grep { $arg->{$_}->[1] eq $DIRMAGIC } @sortkeys);
+    push(@sortorder, grep { $arg->{$_}->[1] ne $DIRMAGIC } @sortkeys);
 
     push(@{$pageref}, "<UL>\n");
 
@@ -288,7 +276,7 @@ sub addDirectoryHash {		# format a directory hash
 	    $bytes = sprintf "%d bytes", $size;
 	}
 
-	if ($type eq 'directory') {
+	if ($type eq $DIRMAGIC) {
 	    $slash = '/';
 	    $blurb = "directory";
 	}
@@ -316,7 +304,7 @@ sub addDirectory {           # format a filesystem directory
 	my $indexfile = "$arg/$file";
 
 	if (-f $indexfile) {
-	    return $self->addFile($indexfile);
+	    return $self->addFileContent($indexfile);
 	}
     }
 
@@ -336,7 +324,7 @@ sub addDirectory {           # format a filesystem directory
 
 	my $this = "$arg/$file";
 	if (-d $this) {
-	    $type = "directory";
+	    $type = $DIRMAGIC; # has to be a non-mime-type
 	    $size = 0;
 	}
 	else {
@@ -360,11 +348,9 @@ sub printFile {
     my $buffer;
 
     open(PRINTFILE, $arg) or die "printFile: open: $arg: $!\n";
-
     while (read(PRINTFILE, $buffer, $BUFSIZ) > 0) {
 	print $buffer;
     }
-
     close(PRINTFILE) or die "printFile: close: $arg: $!\n";
 }
 
@@ -374,10 +360,6 @@ sub printUsing {
     my $self = shift;
     my $ctx = shift;             # takes Context as argument
 
-    unless ($self->{METHOD} = $typelookup{$self->{TYPE}}) {
-	die "printUsing: unknown page content-type '$self->{TYPE}', abort\n";
-    }
-
     # extract the CGI object
     my $q = $ctx->cgi;
 
@@ -385,18 +367,51 @@ sub printUsing {
     $self->{CTX} = $ctx;
     $self->{CGI} = $q;
 
+    unless ($self->{STYLE}) {
+	die "printUsing: unknown page style, abort\n";
+    }
+
+    # deal with static files, fast
+    if ($self->{STYLE} == $STATIC_FILE) {
+	my $file = $self->{PATH};
+	my $bytes = (-s $file);
+	print $q->header(-type => $self->{TYPE}, -Content_length => $bytes);
+	$self->printFile($file);
+	return;			# done fast-track of files
+    }
+
     # print the HTTP header
     print $q->header(-status => $self->{STATUS}, -type => $self->{TYPE});
 
     # print HTML header, if appropriate
-    if ($self->{METHOD} == $DYNAMIC_HTML) {
+    if ($self->{STYLE} == $DYNAMIC_HTML) {
+        my @meta;
+
+        my $title = sprintf "%s %s", $ctx->method, $ctx->path;
+
+        push(@meta, -title => $title);
+
+        push(@meta, -style => { -src => $ctx->{URL_CSS} });
+
+	if (defined($self->{XBASE})) {
+	    push(@meta, -xbase => $ctx->{URL_BASE} . $ctx->{URL_DECLARED} . '/' .  $self->{XBASE});
+	}
+
+        print $q->start_html(@meta);
+
+	my $header = $ctx->{FILE_HEADER};
+	$self->printFile($header) if ($header ne '');
     }
 
     # print the body
-    $self->printBody(@_);
+    $self->printBody($self->{DATA});
 
     # print HTML footer, if appropriate
-    if ($self->{METHOD} == $DYNAMIC_HTML) {
+    if ($self->{STYLE} == $DYNAMIC_HTML) {
+	my $footer = $ctx->{FILE_FOOTER};
+	$self->printFile($footer) if ($footer ne '');
+
+        print $q->end_html;
     }
 }
 
@@ -408,17 +423,14 @@ sub printBody {
     foreach my $arg (@_) {
 	my $argtype = ref($arg);
 
-	if ($argtype eq '') {
+	if ($argtype eq '') {	# if it's primitive, print it
 	    print $arg;
 	}
-	elsif ($argtype eq 'SCALAR') {
+	elsif ($argtype eq 'SCALAR') { # if ref of primitive, print THAT
 	    print ${$arg};
 	}
-	elsif ($argtype eq 'ARRAY') {
+	elsif ($argtype eq 'ARRAY') { # 
 	    $self->printBody(@{$arg});
-	}
-	elsif ($argtype eq 'CODE') {
-	    $self->printBody(&{$arg});
 	}
 	elsif ($argtype eq 'HASH') {
 	    foreach my $key (sort keys %{$arg}) {

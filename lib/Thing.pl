@@ -485,25 +485,6 @@ sub toDataStructure {
 
 ##################################################################
 
-## toHTML -- returns listref
-
-sub toHTML {
-    my $self = shift;
-    my @page;
-
-    push(@page, "<UL>\n");
-    foreach my $key ($self->listDataKeys) {
-	my $value = $self->get($key);
-	$value =~ s!\n+! !go; # purge newlines
-	push(@page, "<LI><EM>$key:</EM> $value</LI>\n");
-    }
-    push(@page, "</UL>\n");
-
-    return \@page;
-}
-
-##################################################################
-
 ## toString -- returns string
 # is like toSavedForm with the safety checks turned off
 
