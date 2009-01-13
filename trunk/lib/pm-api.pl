@@ -24,7 +24,7 @@ use warnings;
 
 ## api_version --
 sub api_version {
-    my ($ui, $info, $phr) = @_;
+    my ($ctx, $info, $phr) = @_;
 
     return { version => { api => '1.001', 
 			  mine => '1.001' } };
@@ -33,7 +33,7 @@ sub api_version {
 
 ## api_create_clone --
 sub api_create_clone {		# -- DONE --
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     my $object = Object->new($id);
     return { objectId => $object->clone };
 }
@@ -42,9 +42,9 @@ sub api_create_clone {		# -- DONE --
 
 ## api_create_object --
 sub api_create_object {		# -- DONE --
-    my ($ui, $info, $phr) = @_;
+    my ($ctx, $info, $phr) = @_;
 
-    my $q = $ui->cgi;
+    my $q = $ctx->cgi;
     my $object = Object->new;
     my @import_list = grep(/^object/o, $q->param);
 
@@ -73,9 +73,9 @@ sub api_create_object {		# -- DONE --
 
 ## api_create_relation --
 sub api_create_relation {	# -- DONE --
-    my ($ui, $info, $phr) = @_;
+    my ($ctx, $info, $phr) = @_;
 
-    my $q = $ui->cgi;
+    my $q = $ctx->cgi;
     my $relation = Relation->new;
     my @import_list = grep(/^relation/o, $q->param);
 
@@ -94,9 +94,9 @@ sub api_create_relation {	# -- DONE --
 
 ## api_create_tag --
 sub api_create_tag {		# -- DONE --
-    my ($ui, $info, $phr) = @_;
+    my ($ctx, $info, $phr) = @_;
 
-    my $q = $ui->cgi;
+    my $q = $ctx->cgi;
     my $tag = Tag->new;
     my @import_list = grep(/^tag/o, $q->param);
 
@@ -115,7 +115,7 @@ sub api_create_tag {		# -- DONE --
 
 ## api_delete_oid --
 sub api_delete_oid {		# -- DONE --
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     my $object = Object->new($id);
     return { status => $object->delete };
 }
@@ -124,7 +124,7 @@ sub api_delete_oid {		# -- DONE --
 
 ## api_delete_rid --
 sub api_delete_rid {		# -- DONE --
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     my $relation = Relation->new($id);
     return { status => $relation->delete };
 }
@@ -133,7 +133,7 @@ sub api_delete_rid {		# -- DONE --
 
 ## api_delete_tid --
 sub api_delete_tid {		# -- DONE --
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     my $tag = Tag->new($id);
     return { status => $tag->delete };
 }
@@ -142,7 +142,7 @@ sub api_delete_tid {		# -- DONE --
 
 ## api_list_clones --
 sub api_list_clones {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -150,7 +150,7 @@ sub api_list_clones {
 
 ## api_list_objects --
 sub api_list_objects {		# -- DONE --
-    my ($ui, $info, $phr) = @_;
+    my ($ctx, $info, $phr) = @_;
     my @structure;
     foreach my $oid (Object->list) {
 	push(@structure, { objectId => $oid });
@@ -162,7 +162,7 @@ sub api_list_objects {		# -- DONE --
 
 ## api_list_relations --
 sub api_list_relations {	# -- DONE --
-    my ($ui, $info, $phr) = @_;
+    my ($ctx, $info, $phr) = @_;
     my @structure;
     foreach my $rid (Relation->list) {
 	push(@structure, { relationId => $rid });
@@ -174,7 +174,7 @@ sub api_list_relations {	# -- DONE --
 
 ## api_list_tags --
 sub api_list_tags {		# -- DONE --
-    my ($ui, $info, $phr) = @_;
+    my ($ctx, $info, $phr) = @_;
     my @structure;
     foreach my $tid (Tag->list) {
 	push(@structure, { tagId => $tid });
@@ -186,7 +186,7 @@ sub api_list_tags {		# -- DONE --
 
 ## api_read_config --
 sub api_read_config {
-    my ($ui, $info, $phr) = @_;
+    my ($ctx, $info, $phr) = @_;
     die "method not yet implemented";
 }
 
@@ -194,45 +194,45 @@ sub api_read_config {
 
 ## api_read_oid_aux --
 sub api_read_oid_aux {		# -- DONE -- *** AUX DATA, NOT RETURN STRUCTURE ***
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
 
-    my $q = $ui->cgi;
+    my $q = $ctx->cgi;
     my $object = Object->new($id);
-    $ui->printFile($object->auxGetFile, $object->get('objectType'));
+    $ctx->printFile($object->auxGetFile, $object->get('objectType'));
 }
 
 ##################################################################
 
 ## api_read_oid --
 sub api_read_oid {		# -- DONE --
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     my $object = Object->new($id);
-    return { object => $object->toTree };
+    return { object => $object->toDataStructure };
 }
 
 ##################################################################
 
 ## api_read_rid --
 sub api_read_rid {		# -- DONE --
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     my $relation = Relation->new($id);
-    return { relation => $relation->toTree };
+    return { relation => $relation->toDataStructure };
 }
 
 ##################################################################
 
 ## api_read_tid --
 sub api_read_tid {		# -- DONE --
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     my $tag = Tag->new($id);
-    return { tag => $tag->toTree };
+    return { tag => $tag->toDataStructure };
 }
 
 ##################################################################
 
 ## api_update_config --
 sub api_update_config {
-    my ($ui, $info, $phr) = @_;
+    my ($ctx, $info, $phr) = @_;
     die "method not yet implemented";
 }
 
@@ -240,7 +240,7 @@ sub api_update_config {
 
 ## api_update_oid --
 sub api_update_oid {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -248,7 +248,7 @@ sub api_update_oid {
 
 ## api_update_oid_aux --
 sub api_update_oid_aux {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -256,7 +256,7 @@ sub api_update_oid_aux {
 
 ## api_update_rid --
 sub api_update_rid {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -264,7 +264,7 @@ sub api_update_rid {
 
 ## api_update_tid --
 sub api_update_tid {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -272,7 +272,7 @@ sub api_update_tid {
 
 ## api_object_create_param --
 sub api_object_create_param {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -280,7 +280,7 @@ sub api_object_create_param {
 
 ## api_object_delete_param --
 sub api_object_delete_param {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -288,7 +288,7 @@ sub api_object_delete_param {
 
 ## api_object_read_param --
 sub api_object_read_param {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -296,7 +296,7 @@ sub api_object_read_param {
 
 ## api_object_update_param --
 sub api_object_update_param {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -304,7 +304,7 @@ sub api_object_update_param {
 
 ## api_relation_create_param --
 sub api_relation_create_param {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -312,7 +312,7 @@ sub api_relation_create_param {
 
 ## api_relation_delete_param --
 sub api_relation_delete_param {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -320,7 +320,7 @@ sub api_relation_delete_param {
 
 ## api_relation_read_param --
 sub api_relation_read_param {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -328,7 +328,7 @@ sub api_relation_read_param {
 
 ## api_relation_update_param --
 sub api_relation_update_param {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -336,7 +336,7 @@ sub api_relation_update_param {
 
 ## api_tag_create_param --
 sub api_tag_create_param {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -344,7 +344,7 @@ sub api_tag_create_param {
 
 ## api_tag_delete_param --
 sub api_tag_delete_param {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -352,7 +352,7 @@ sub api_tag_delete_param {
 
 ## api_tag_read_param --
 sub api_tag_read_param {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 
@@ -360,7 +360,7 @@ sub api_tag_read_param {
 
 ## api_tag_update_param --
 sub api_tag_update_param {
-    my ($ui, $info, $phr, $id) = @_;
+    my ($ctx, $info, $phr, $id) = @_;
     die "method not yet implemented";
 }
 

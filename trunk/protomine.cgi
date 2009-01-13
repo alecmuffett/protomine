@@ -18,7 +18,6 @@
 
 use strict;
 use warnings;
-#use diagnostics;
 
 use CGI qw/:standard/;
 use CGI::Carp;
@@ -28,12 +27,6 @@ use CGI::Pretty;
 my $execdir = $0;
 $execdir =~ s![^/]+$!!g;
 require "$execdir/protomine-config.pl";
-
-# directory where we write log info; must be writable by http daemon
-my $log_dir = "database/logs";
-
-# set to 0 for debugging in apache errlog
-my $trap_exceptions_to_http = 1;
 
 ##################################################################
 
@@ -53,11 +46,10 @@ chdir($main::MINE_DIRECTORY) or die "chdir: $main::MINE_DIRECTORY: $!";
 require 'pm-api.pl';
 require 'pm-atom.pl';
 require 'pm-ui.pl';
-require 'pm-time.pl';
 require 'pm-mime.pl';
 
-require 'MineUI.pl';
-
+require 'Log.pl';
+require 'Context.pl';
 require 'Thing.pl';
 require 'Object.pl';
 require 'Relation.pl';
@@ -98,12 +90,6 @@ my %crud = (
 my @raw_action_list = (
 
     ###
-    # developer hook
-    ###
-
-    [ '/test', 'GET', \&test_code ],
-
-    ###
     # empty / root request
     ###
 
@@ -128,11 +114,11 @@ my @raw_action_list = (
     # unfinished crap
     ###
 
-    [ '/ui/share/url/RID/OID.html', 'GET', \&noop, 'RID', 'RVSN', 'OID' ],
-    [ '/ui/share/url/RID.html', 'GET', \&noop, 'RID', 'RVSN', 'OID' ],
-    [ '/ui/share/redirect/RID/OID', 'GET', \&noop, 'RID', 'RVSN', 'OID' ],
-    [ '/ui/share/redirect/RID', 'GET', \&noop, 'RID', 'RVSN', 'OID' ],
-    [ '/ui/share/raw/RID/RVSN/OID', 'GET', \&noop, 'RID', 'RVSN', 'OID' ],
+    [ '/ui/share/url/RID/OID.html', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+    [ '/ui/share/url/RID.html', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+    [ '/ui/share/redirect/RID/OID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+    [ '/ui/share/redirect/RID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+    [ '/ui/share/raw/RID/RVSN/OID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
 
     ###
     # the /ui/ hierarchy lives in HTTP space
@@ -153,9 +139,9 @@ my @raw_action_list = (
     [ '/ui/show-objects.html', 'GET', \&ui_show_objects ],
     [ '/ui/show-config.html', 'GET', \&ui_show_config ],
     [ '/ui/show-clones/OID.html', 'GET', \&ui_show_clones, 'OID' ],
-    [ '/ui/select/tag.html', 'GET', \&noop ],
-    [ '/ui/select/relation.html', 'GET', \&noop ],
-    [ '/ui/select/object.html', 'GET', \&noop ],
+    [ '/ui/select/tag.html', 'GET', \&do_noop ],
+    [ '/ui/select/relation.html', 'GET', \&do_noop ],
+    [ '/ui/select/object.html', 'GET', \&do_noop ],
     [ '/ui/read-tag/TID.html', 'GET', \&ui_read_tag, 'TID' ],
     [ '/ui/read-relation/RID.html', 'GET', \&ui_read_relation, 'RID' ],
     [ '/ui/read-object/OID.html', 'GET', \&ui_read_object, 'OID' ],
@@ -184,11 +170,11 @@ my @raw_action_list = (
     # unfinished crap
     ###
 
-    [ '/api/share/url/RID/OID.xml', 'READ', \&noop, 'OID', 'RID' ],
-    [ '/api/share/url/RID.xml', 'READ', \&noop, 'RID' ],
-    [ '/api/share/redirect/RID/OID.xml', 'READ', \&noop, 'OID', 'RID' ],
-    [ '/api/share/redirect/RID.xml', 'READ', \&noop, 'RID' ],
-    [ '/api/share/raw/RID/RVSN/OID.xml', 'READ', \&noop, 'OID', 'RID', 'RVSN' ],
+    [ '/api/share/url/RID/OID.xml', 'READ', \&do_noop, 'OID', 'RID' ],
+    [ '/api/share/url/RID.xml', 'READ', \&do_noop, 'RID' ],
+    [ '/api/share/redirect/RID/OID.xml', 'READ', \&do_noop, 'OID', 'RID' ],
+    [ '/api/share/redirect/RID.xml', 'READ', \&do_noop, 'RID' ],
+    [ '/api/share/raw/RID/RVSN/OID.xml', 'READ', \&do_noop, 'OID', 'RID', 'RVSN' ],
 
     ###
     # the /api/ hierarchy lives in REST space
@@ -204,9 +190,9 @@ my @raw_action_list = (
     [ '/api/tag/TID.xml', 'DELETE', \&do_xml, \&api_delete_tid, 'TID' ],
     [ '/api/tag.xml', 'READ', \&do_xml, \&api_list_tags ],
     [ '/api/tag.xml', 'CREATE', \&do_xml, \&api_create_tag ],
-    [ '/api/select/tag.xml', 'READ', \&noop ],
-    [ '/api/select/relation.xml', 'READ', \&noop ],
-    [ '/api/select/object.xml', 'READ', \&noop ],
+    [ '/api/select/tag.xml', 'READ', \&do_noop ],
+    [ '/api/select/relation.xml', 'READ', \&do_noop ],
+    [ '/api/select/object.xml', 'READ', \&do_noop ],
     [ '/api/relation/RID/param.xml', 'UPDATE', \&do_xml, \&api_relation_update_param, 'RID' ],
     [ '/api/relation/RID/param.xml', 'READ', \&do_xml, \&api_relation_read_param, 'RID' ],
     [ '/api/relation/RID/param.xml', 'DELETE', \&do_xml, \&api_relation_delete_param, 'RID' ],
@@ -239,14 +225,18 @@ my @raw_action_list = (
 my @action_list = ();
 
 ##################################################################
+##################################################################
+##################################################################
 
 # compile the action list
+
 &compile_action_list;
 
 # run the query - eventually make this into fast_cgi?
+
 if (1) {
     # log it using the environment variables for safety
-    &log(sprintf "env %s %s %s",
+    Log->msg(sprintf "env %s %s %s",
 	 $ENV{REMOTE_ADDR},
 	 $ENV{REQUEST_METHOD},
 	 $ENV{REQUEST_URI});
@@ -254,77 +244,138 @@ if (1) {
     # rip the CGI query
     my $q = CGI->new;
 
-    # create a UI from it
-    my $ui = MineUI->new($q, $main::MINE_HTTP_PATH);
+    # create a context from it
+    my $ctx = Context->new($q, $main::MINE_HTTP_PATH);
+
+    # define the page we will print
+    my $page;
 
     # if there was an error during decoding, fail noisily
-    my $cgi_error = $q->cgi_error;
-
-    if ($cgi_error) {
-	my $diag = "cgi decoding error: $cgi_error";
-	print $ui->printError(500, $diag);
-	&log("die $diag");
-	die $diag;
-    }
-
-    if ($trap_exceptions_to_http) {
-	# execute the CGI input against the action list
-	eval { &match_and_execute($ui); } ; # nb: eval block needs ';'
-
-	if ($@) {               # did we barf?
-	    my $diag = "software exception: $@\n";
-	    &log("die $diag");
-	    print $ui->printError(500, $diag);
-	    warn $diag;
-	}
+    if (my $barf = $q->cgi_error) {
+	$page = Page->newError(500, "cgi decoding error: $barf");
     }
     else {
-	&match_and_execute($ui);
+	# execute the CGI input against the action list
+	# nb: the "eval" block needs a trailing ';'
+	eval { $page = &match_and_execute($ctx); } ;
+
+	# did we barf?
+	if ($@) {     
+	    $page = Page->newError(500, "software exception: $@\n");
+	}
     }
+
+    # print the resulting page here - $ctx supplies context and CGI
+    # object references, other meta information...
+    $page->printUsing($ctx);
 }
 
 # done
 
 exit 0;
 
-##################################################################
-
-# error logging routines
-
-sub log {
-    my ($file, $tag) = &yyyyLogInfo;
-    my $path = "$log_dir/$file";
-
-    my $msg = "@_";
-    $msg =~ s/\s+/ /go;
-
-    open(LOG, ">>$path") || die "open: >>$path: $!";
-    print LOG "$tag $$ $msg\n";
-    close(LOG);
-}
-
 ###################################################################
-# this routine relates to the pseudo-urls in @raw_action_list; the
-# uppercase tokens in the pseudo-URL get ripped out and replaced by the
-# regular expressions below.
+###################################################################
+###################################################################
 
-sub smart_token {
-    my $token = shift;
+# this is the main routine which encodes parameters and calls handlers
+# as described in the notes for &compile_action_list
 
-    return '(xml|json)' if ($token eq 'FMT'); # xml, json, html, text, atom, ...
+sub match_and_execute {
+    my $ctx = shift;
 
-    return '\d+' if ($token eq 'OID');
-    return '\d+' if ($token eq 'RID');
-    return '\d+' if ($token eq 'TID');
-    return '\d+' if ($token eq 'RVSN');
-    return '\w+' if ($token eq 'COOKIE');
+    # sanity-check the supplied URL with any query info;
+    $ctx->assertCanonicalURL;
 
-    return '.*'  if ($token eq 'SUFFIX'); # magic names - greedy wildcard
-    return '.*?' if ($token eq 'TEXT\d*'); # magic names - conservative wildcard
-    return '\d+' if ($token =~ m!NUM\d+!o);    # magic names - NUM001
-    return '\w+' if ($token =~ m!WORD\d+!o);   # magic names - WORD001
+    # memorise the important stuff
+    my $cgi_method = $ctx->method;
 
-    return '[\-\.\w]+';
+    # sanity check the method, and provide the PUT/DELETE workaround
+    if ($cgi_method eq 'GET' or $cgi_method eq 'POST') {
+	my $p;
+	my $q = $ctx->cgi;
+
+	if (defined($p = $q->param('_method'))) {
+	    if ($p eq 'POST' or # POST->POST is redundant but not a risk
+		$p eq 'PUT' or
+		$p eq 'DELETE') {
+		$cgi_method = $p;
+	    }
+	    else {
+		die "illegal value for _method: $p";
+	    }
+	}
+    }
+    elsif ($cgi_method eq 'PUT') {      # TODO: rewrite this
+	# $cgi_data = $q->param('POSTDATA');
+	# $cgi_datafh = *STDIN;
+    }
+
+    my $cgi_url = $ctx->path;
+
+    # skim through the action list and find work
+
+    foreach my $action (@action_list) {
+	my ($method, $pattern, $plistref, $handler, @args) = @{$action};
+
+	# skip if wrong method
+
+	next unless ($cgi_method eq $method); 
+
+	# skip if not matching pattern
+
+	next unless ($cgi_url =~ /$pattern/);
+
+	# this is where we store key/value pairs from the 
+	# regular expression substring matcher
+
+	my %phash = ();
+
+	# do we need to do argument processing?
+
+	if (defined($plistref)) {
+
+	    # build the %phash
+
+	    my @plist = @{$plistref};
+
+	    $phash{$plist[0]} = $1 if ($#plist >= 0);
+	    $phash{$plist[1]} = $2 if ($#plist >= 1);
+	    $phash{$plist[2]} = $3 if ($#plist >= 2);
+	    $phash{$plist[3]} = $4 if ($#plist >= 3);
+	    $phash{$plist[4]} = $5 if ($#plist >= 4);
+	    $phash{$plist[5]} = $6 if ($#plist >= 5);
+	    $phash{$plist[6]} = $7 if ($#plist >= 6);
+	    $phash{$plist[7]} = $8 if ($#plist >= 7);
+	    $phash{$plist[8]} = $9 if ($#plist >= 8);
+
+	    # check the handler arguments for phash variables and
+	    # substitute them if you find them
+
+	    for (my $i = 0 ; $i <= $#args; $i++) {
+		my $replace = $args[$i];
+
+		if (defined($phash{$replace})) {
+		    $args[$i] = $phash{$replace};
+		}
+	    }
+	}
+
+	# handler takes pattern and url as well as arguments for
+	# verbose info; the structured programmer in me would love to
+	# take a return value here and print it using a method
+	# selected in the table of actions, but in truth there are too
+	# many side-effects and "drop back 10 yards and punt"
+	# scenarios that frankly i can't be arsed;
+
+	Log->msg("run method $cgi_method url $cgi_url ", %phash);
+
+	return &{$handler}($ctx, [$cgi_method, $cgi_url, $pattern], \%phash, @args);
+    }
+
+    # if we get here, we fell off the list of regular expressions
+
+    return Page->newError(404, "no handler for method $cgi_method url $cgi_url");
 }
 
 ##################################################################
@@ -349,7 +400,7 @@ sub smart_token {
 # ...shall end up in the match-execute function and:
 #
 # 1) match the URL '/foo/bar/wibble'
-# 2) create a paramhashref: $phr = { TEXT1 => 'bar' }
+# 2) create a phashref: $phr = { TEXT1 => 'bar' }
 # 3) invoke &api_foo($cgi, $info, $phr, 1, 2, 'bar');
 #
 # It is expected that most access to parameters will be done via
@@ -365,127 +416,52 @@ sub compile_action_list {
 	my ($url, $crud_method, $handler, @args) = @{$lref};
 
 	# extract and memorise the url pattern
-
-	my @paramlist = ();
+	my @plist = ();
 	my $regexp = $url;
 
 	# escape dots
 	$regexp =~ s!\.!\\.!go;
 
 	# extract all uppercase words from the url pattern, push them
-	# on paramlist replacing them with a regexp token
+	# on plist replacing them with a regexp token
 
 	while ($regexp =~ s/([A-Z]+\d*)/'(' . &smart_token($1) . ')'/e) {
-	    push(@paramlist, $1);
+	    push(@plist, $1);
 	}
 
 	# compile the new pattern and replace the url pattern with that
 	my $pattern = qr!^${regexp}/?$!i;
 
 	# have we any params?
-	my $paramlistref = ($#paramlist < 0) ? undef : \@paramlist;
+	my $plistref = ($#plist < 0) ? undef : \@plist;
 
 	# translate the crud
 	my $method = $crud{$crud_method};
 
 	# stash the compiled action
-	push( @action_list, [ $method, $pattern, $paramlistref, $handler, @args ] );
+	push( @action_list, [ $method, $pattern, $plistref, $handler, @args ] );
     }
 }
 
 ###################################################################
 
-# this is the main routine which encodes parameters and calls handlers
-# as described in the notes for &compile_action_list
+# this routine relates to the pseudo-urls in @raw_action_list; the
+# uppercase tokens in the pseudo-URL get ripped out and replaced by the
+# regular expressions below.
 
-sub match_and_execute {
-    my $ui = shift;
-
-    # sanity-check the supplied URL with any query info;
-    $ui->assertCanonicalURL;
-
-    # memorise the important stuff
-    my $cgi_method = $ui->method;
-
-    # sanity check the method, and provide the PUT/DELETE workaround
-
-    if ($cgi_method eq 'GET' or $cgi_method eq 'POST') {
-	my $p;
-	my $q = $ui->cgi;
-
-	if (defined($p = $q->param('_method'))) {
-	    if ($p eq 'POST' or # POST->POST is redundant but not a risk
-		$p eq 'PUT' or
-		$p eq 'DELETE') {
-		$cgi_method = $p;
-	    }
-	    else {
-		die "illegal value for _method: $p";
-	    }
-	}
-    }
-    elsif ($cgi_method eq 'PUT') {      # TODO: rewrite this
-	# $cgi_data = $q->param('POSTDATA');
-	# $cgi_datafh = *STDIN;
-    }
-
-    my $cgi_url = $ui->path;
-
-    # skim through the action list and find work
-
-    foreach my $action (@action_list) {
-	my ($method, $pattern, $paramlistref, $handler, @args) = @{$action};
-
-	# skip if wrong method
-	next unless ($cgi_method eq $method); 
-
-	# skip if not matching pattern
-	next unless ($cgi_url =~ /$pattern/);
-
-	# this is where we store key/value pairs from the 
-	# regular expression substring matcher
-	my %paramhash = ();
-
-	# do we need to do argument processing?
-	if (defined($paramlistref)) {
-	    # build the %paramhash
-	    my @paramlist = @{$paramlistref};
-
-	    $paramhash{$paramlist[0]} = $1 if ($#paramlist >= 0);
-	    $paramhash{$paramlist[1]} = $2 if ($#paramlist >= 1);
-	    $paramhash{$paramlist[2]} = $3 if ($#paramlist >= 2);
-	    $paramhash{$paramlist[3]} = $4 if ($#paramlist >= 3);
-	    $paramhash{$paramlist[4]} = $5 if ($#paramlist >= 4);
-	    $paramhash{$paramlist[5]} = $6 if ($#paramlist >= 5);
-	    $paramhash{$paramlist[6]} = $7 if ($#paramlist >= 6);
-	    $paramhash{$paramlist[7]} = $8 if ($#paramlist >= 7);
-	    $paramhash{$paramlist[8]} = $9 if ($#paramlist >= 8);
-
-	    # check the handler arguments for paramhash variables and
-	    # substitute them if you find them
-
-	    for (my $i = 0 ; $i <= $#args; $i++) {
-		my $replace = $args[$i];
-		if (defined($paramhash{$replace})) {
-		    $args[$i] = $paramhash{$replace};
-		}
-	    }
-	}
-
-	# handler takes pattern and url as well as arguments for
-	# verbose info; the structured programmer in me would love to
-	# take a return value here and print it using a method
-	# selected in the table of actions, but in truth there are too
-	# many side-effects and "drop back 10 yards and punt"
-	# scenarios that frankly i can't be arsed;
-
-	&log("run $cgi_method $cgi_url ", %paramhash);
-	return &{$handler}($ui, [$cgi_method, $cgi_url, $pattern], \%paramhash, @args);
-    }
-
-    # if we get here, we fell of the list of regular expressions
-    &log("wtf $cgi_method $cgi_url");
-    $ui->printError(404, "no handler for $cgi_method $cgi_url");
+sub smart_token {
+    my $token = shift;
+    return '(xml|json)' if ($token eq 'FMT'); # xml, json, html, text, atom, ...
+    return '\d+' if ($token eq 'OID');
+    return '\d+' if ($token eq 'RID');
+    return '\d+' if ($token eq 'TID');
+    return '\d+' if ($token eq 'RVSN');
+    return '\w+' if ($token eq 'COOKIE');
+    return '.*'  if ($token eq 'SUFFIX'); # magic names - greedy wildcard
+    return '.*?' if ($token eq 'TEXT\d*'); # magic names - conservative wildcard
+    return '\d+' if ($token =~ m!NUM\d+!o);    # magic names - NUM001
+    return '\w+' if ($token =~ m!WORD\d+!o);   # magic names - WORD001
+    return '[\-\.\w]+';
 }
 
 ##################################################################
@@ -493,9 +469,9 @@ sub match_and_execute {
 # this is the dummy no-op handler, use it as a template for other
 # handlers; it just dumps information to the browser
 
-sub noop {
-    my ($ui, $info, $phr, @args) = @_;
-    $ui->printPageText("noop @args");
+sub do_noop {
+    my ($ctx, $info, $phr, @args) = @_;
+    return Page->newText("do_noop @args");
 }
 
 ##################################################################
@@ -503,8 +479,8 @@ sub noop {
 # redirect whatever url to $target
 
 sub do_redirect {
-    my ($ui, $info, $phr, $target) = @_;
-    print $ui->printRedirect($target);
+    my ($ctx, $info, $phr, $target) = @_;
+    return Page->newRedirect($target);
 }
 
 ##################################################################
@@ -512,8 +488,8 @@ sub do_redirect {
 # stub to print whatever a API returns
 
 sub do_apidump {
-    my ($ui, $info, $phr, $fn, @rest) = @_;
-    $ui->printPageText(&{$fn}($ui, $info, $phr, @rest));
+    my ($ctx, $info, $phr, $fn, @rest) = @_;
+    return Page->newText(&{$fn}($ctx, $info, $phr, @rest));
 }
 
 ##################################################################
@@ -521,18 +497,18 @@ sub do_apidump {
 # stub to print whatever a API returns
 
 sub do_xml {
-    my ($ui, $info, $phr, $fn, @rest) = @_;
-    $ui->printTreeXML(&{$fn}($ui, $info, $phr, @rest));
+    my ($ctx, $info, $phr, $fn, @rest) = @_;
+    return Page->newXML(&{$fn}($ctx, $info, $phr, @rest));
 }
 
 ##################################################################
 
 sub do_remote_get {
-    my ($ui, $info, $phr, $fn, @rest) = @_;
+    my ($ctx, $info, $phr, $fn, @rest) = @_;
 
     # extract the key
 
-    my $q = $ui->cgi;
+    my $q = $ctx->cgi;
     my $key = $q->param('key');
 
     # decrypt the key
@@ -553,7 +529,7 @@ sub do_remote_get {
 
     unless ($rvsn eq $rvsn2) {		    
 	my $diag = "bad rvsn $key; supplied=$rvsn real=$rvsn2";
-	&log("security $diag");
+	Log->msg("security $diag");
 	die "do_remote_get: $diag\n";
     }
 
@@ -570,12 +546,12 @@ sub do_remote_get {
 	# check if the object wants to be seen by him
 	unless ($o->matchInterestsBlob($ib)) {
 	    my $diag = "bad object-get oid=$oid rid=$rid failed matchInterestsBlob";
-	    &log("security $diag");
+	    Log->msg("security $diag");
 	    die "do_remote_get: $diag\n";
 	}
 
 	# punt to api_read_oid_aux
-	return &api_read_oid_aux($ui, $info, $phr, $oid);
+	return &api_read_oid_aux($ctx, $info, $phr, $oid);
     }
     elsif ($oid == 0) {		# it's a feed-get
 	my @ofeed;		# the atom feed document
@@ -611,7 +587,7 @@ sub do_remote_get {
 
 	push(@ofeed, "</feed>\n");
 
-	return $ui->printTreeAtom(  \@ofeed );
+	return return Page->newAtom(  \@ofeed );
     }
 
     # fall off the end?
@@ -623,34 +599,28 @@ sub do_remote_get {
 # handle an actual proper document request
 
 sub do_document {
-    my ($ui, $info, $phr, $root, $cited) = @_;
+    my ($ctx, $info, $phr, $root, $cited) = @_;
 
     my $document = "$root/$cited";
 
     if (-d $document) {
-	$ui->assertTrailingSlash;
+	$ctx->assertTrailingSlash;
 
 	my @page;
-	push(@page, $ui->formatDirectory($document));
-	&log("dir $document");
-	$ui->printPageHTML(@page);
+
+	push(@page, $ctx->formatDirectory($document));
+
+	Log->msg("dir $document");
+
+	return Page->newHTML(@page);
     }
     elsif (-f $document) {
-	&log("file $document");
-	$ui->printFile($document);
+	Log->msg("file $document");
+	return Page->newFile($document);
     }
     else {
-	$ui->printError(404, "cannot do_document $document");
+	return Page->newError(404, "cannot do_document $document");
     }
-}
-
-##################################################################
-
-# stub for faffing about
-
-sub test_code {
-    my ($ui, $info, $phr, $fn, @rest) = @_;
-    die "method not yet implemented";
 }
 
 ##################################################################

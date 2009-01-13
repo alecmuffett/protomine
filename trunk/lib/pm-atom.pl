@@ -33,6 +33,18 @@ sub atom_format {
 
 ##################################################################
 
+sub yyyy_format {
+    my $t = shift;
+
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) = gmtime($t);
+
+    return 
+        sprintf "%04d%02d%02d%02%d%02d%02d",
+        $year + 1900, $mon+1, $mday, $hour, $min, $sec;
+}
+
+##################################################################
+
 sub get_permalink {
     my $r = shift;
     my $o = shift;
