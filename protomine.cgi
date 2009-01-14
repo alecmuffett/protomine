@@ -108,55 +108,50 @@ my @raw_action_list = (
     # the /get URL is a special case HTTP
     ###
 
-    [ '/get', 'GET', \&do_remote_get, 'GET', ],
-
-    ###
-    # unfinished crap
-    ###
-
-    [ '/ui/share/url/RID/OID.html', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
-    [ '/ui/share/url/RID.html', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
-    [ '/ui/share/redirect/RID/OID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
-    [ '/ui/share/redirect/RID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
-    [ '/ui/share/raw/RID/RVSN/OID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+    [ '/get', 'GET', \&do_remote_get, 'GET', ], # <---- FEED & OBJECT RETRIEVAL, COMMENT SUBMISSION BY EXTERNALS
 
     ###
     # the /ui/ hierarchy lives in HTTP space
     ###
 
-    [ '/ui/version.html', 'GET', \&ui_version ],
-    [ '/ui/update-tag/TID.html', 'POST', \&ui_update_tag, 'TID' ],
-    [ '/ui/update-tag/TID.html', 'GET', \&do_document, 'database/ui', 'update-tag-xxx.html' ],
-    [ '/ui/update-relation/RID.html', 'POST', \&ui_update_relation, 'RID' ],
-    [ '/ui/update-relation/RID.html', 'GET', \&do_document, 'database/ui', 'update-relation-xxx.html' ],
-    [ '/ui/update-object/OID.html','GET', \&do_document, 'database/ui', 'update-object-xxx.html' ],
-    [ '/ui/update-object/OID.html', 'POST', \&ui_update_object, 'OID' ],
-    [ '/ui/update-data/OID.html', 'POST', \&ui_update_data, 'OID' ],
-    [ '/ui/update-data/OID.html', 'GET', \&do_document, 'database/ui', 'update-data-xxx.html' ],
-    [ '/ui/update-config.html', 'POST', \&ui_update_config ],
-    [ '/ui/show-tags.html', 'GET', \&ui_show_tags ],
-    [ '/ui/show-relations.html', 'GET', \&ui_show_relations ],
-    [ '/ui/show-objects.html', 'GET', \&ui_show_objects ],
-    [ '/ui/show-config.html', 'GET', \&ui_show_config ],
-    [ '/ui/show-clones/OID.html', 'GET', \&ui_show_clones, 'OID' ],
-    [ '/ui/select/tag.html', 'GET', \&do_noop ],
-    [ '/ui/select/relation.html', 'GET', \&do_noop ],
-    [ '/ui/select/object.html', 'GET', \&do_noop ],
-    [ '/ui/read-tag/TID.html', 'GET', \&ui_read_tag, 'TID' ],
-    [ '/ui/read-relation/RID.html', 'GET', \&ui_read_relation, 'RID' ],
-    [ '/ui/read-object/OID.html', 'GET', \&ui_read_object, 'OID' ],
+    [  '/ui/version.html',              'GET',   \&ui_version           ],
+    [  '/ui/update-tag/TID.html',       'POST',  \&ui_update_tag,       'TID'           ],
+    [  '/ui/update-tag/TID.html',       'GET',   \&do_document,         'database/ui',  'update-tag-xxx.html'       ],
+    [  '/ui/update-relation/RID.html',  'POST',  \&ui_update_relation,  'RID'           ],
+    [  '/ui/update-relation/RID.html',  'GET',   \&do_document,         'database/ui',  'update-relation-xxx.html'  ],
+    [  '/ui/update-object/OID.html',    'GET',   \&do_document,         'database/ui',  'update-object-xxx.html'    ],
+    [  '/ui/update-object/OID.html',    'POST',  \&ui_update_object,    'OID'           ],
+    [  '/ui/update-data/OID.html',      'POST',  \&ui_update_data,      'OID'           ],
+    [  '/ui/update-data/OID.html',      'GET',   \&do_document,         'database/ui',  'update-data-xxx.html'      ],
+    [  '/ui/update-config.html',        'POST',  \&ui_update_config     ],
+    [  '/ui/show-tags.html',            'GET',   \&ui_show_tags         ],
+    [  '/ui/show-relations.html',       'GET',   \&ui_show_relations    ],
+    [  '/ui/show-objects.html',         'GET',   \&ui_show_objects      ],
+    [  '/ui/show-config.html',          'GET',   \&ui_show_config       ],
+    [  '/ui/show-clones/OID.html',      'GET',   \&ui_show_clones,      'OID'           ],
+    [  '/ui/share/url/RID/OID.html',    'GET',   \&do_noop,             'RID',          'RVSN',                     'OID'  ],
+    [  '/ui/share/url/RID.html',        'GET',   \&do_noop,             'RID',          'RVSN',                     'OID'  ],
+    [  '/ui/share/redirect/RID/OID',    'GET',   \&do_noop,             'RID',          'RVSN',                     'OID'  ],
+    [  '/ui/share/redirect/RID',        'GET',   \&do_noop,             'RID',          'RVSN',                     'OID'  ],
+    [  '/ui/share/raw/RID/RVSN/OID',    'GET',   \&do_noop,             'RID',          'RVSN',                     'OID'  ],
+    [  '/ui/select/tag.html',           'GET',   \&do_noop              ],
+    [  '/ui/select/relation.html',      'GET',   \&do_noop              ],
+    [  '/ui/select/object.html',        'GET',   \&do_noop              ],
+    [  '/ui/read-tag/TID.html',         'GET',   \&ui_read_tag,         'TID'           ],
+    [  '/ui/read-relation/RID.html',    'GET',   \&ui_read_relation,    'RID'           ],
+    [  '/ui/read-object/OID.html',      'GET',   \&ui_read_object,      'OID'           ],
+    [  '/ui/delete-tag/TID.html',       'GET',   \&ui_delete_tag,       'TID'           ],
+    [  '/ui/delete-relation/RID.html',  'GET',   \&ui_delete_relation,  'RID'           ],
+    [  '/ui/delete-object/OID.html',    'GET',   \&ui_delete_object,    'OID'           ],
+    [  '/ui/create-tag.html',           'POST',  \&ui_create_tag        ],
+    [  '/ui/create-relation.html',      'POST',  \&ui_create_relation   ],
+    [  '/ui/create-object.html',        'POST',  \&ui_create_object     ],
+    [  '/ui/clone-object/OID.html',     'GET',   \&ui_clone_object,     'OID'           ],
 
-    # this method deleted for security reasons; use the API version.
-    # there is no point in having TWO urls to rewrite, outbound
-    # [ '/ui/read-data/OID', 'GET', \&api_read_oid_aux, 'OID' ], # <---- AUX, SAME AS API
-
-    [ '/ui/delete-tag/TID.html', 'GET', \&ui_delete_tag, 'TID' ],
-    [ '/ui/delete-relation/RID.html', 'GET', \&ui_delete_relation, 'RID' ],
-    [ '/ui/delete-object/OID.html', 'GET', \&ui_delete_object, 'OID' ],
-    [ '/ui/create-tag.html', 'POST', \&ui_create_tag ],
-    [ '/ui/create-relation.html', 'POST', \&ui_create_relation ],
-    [ '/ui/create-object.html', 'POST', \&ui_create_object ],
-    [ '/ui/clone-object/OID.html', 'GET', \&ui_clone_object, 'OID' ],
+    # this method deleted for security/simplicity reasons; use the API
+    # version.  there is simply no point in having TWO urls to
+    # rewrite, outbound, when this is all user-facing stuff.
+    # [ '/ui/read-data/OID', 'GET', \&api_read_aux_oid, 'OID' ], # <---- AUX, SAME AS API
 
     ###
     # catchall for the methods above; we may pick up a *file* for
@@ -167,56 +162,60 @@ my @raw_action_list = (
     [ '/ui/SUFFIX', 'GET', \&do_document, 'database/ui', 'SUFFIX' ],
 
     ###
-    # unfinished crap
-    ###
-
-    [ '/api/share/url/RID/OID.xml', 'READ', \&do_noop, 'OID', 'RID' ],
-    [ '/api/share/url/RID.xml', 'READ', \&do_noop, 'RID' ],
-    [ '/api/share/redirect/RID/OID.xml', 'READ', \&do_noop, 'OID', 'RID' ],
-    [ '/api/share/redirect/RID.xml', 'READ', \&do_noop, 'RID' ],
-    [ '/api/share/raw/RID/RVSN/OID.xml', 'READ', \&do_noop, 'OID', 'RID', 'RVSN' ],
-
-    ###
     # the /api/ hierarchy lives in REST space
     ##
+    [  '/api/config.xml',                  'READ',    \&do_xml,  \&api_read_config           ],
+    [  '/api/config.xml',                  'UPDATE',  \&do_xml,  \&api_update_config         ],
+    [  '/api/object.xml',                  'CREATE',  \&do_xml,  \&api_create_object         ],
+    [  '/api/object.xml',                  'READ',    \&do_xml,  \&api_list_objects          ],
+    [  '/api/object/OID',                  'UPDATE',  \&do_xml,  \&api_update_aux_oid,       'OID'   ],
+    [  '/api/object/OID.xml',              'DELETE',  \&do_xml,  \&api_delete_oid,           'OID'   ],
+    [  '/api/object/OID.xml',              'READ',    \&do_xml,  \&api_read_oid,             'OID'   ],
+    [  '/api/object/OID.xml',              'UPDATE',  \&do_xml,  \&api_update_oid,           'OID'   ],
+    [  '/api/object/OID/CID.xml',          'DELETE',  \&do_xml,  \&api_delete_oid_cid        'OID',  'CID'   ],
+    [  '/api/object/OID/CID.xml',          'READ',    \&do_xml,  \&api_read_oid_cid          'OID',  'CID'   ],
+    [  '/api/object/OID/CID.xml',          'UPDATE',  \&do_xml,  \&api_update_oid_cid        'OID',  'CID'   ],
+    [  '/api/object/OID/CID/vars.xml',     'CREATE',  \&do_xml,  \&api_create_vars_oid_cid,  'OID',  'CID'   ],
+    [  '/api/object/OID/CID/vars.xml',     'DELETE',  \&do_xml,  \&api_delete_vars_oid_cid,  'OID',  'CID'   ],
+    [  '/api/object/OID/CID/vars.xml',     'READ',    \&do_xml,  \&api_read_vars_oid_cid,    'OID',  'CID'   ],
+    [  '/api/object/OID/CID/vars.xml',     'UPDATE',  \&do_xml,  \&api_update_vars_oid_cid,  'OID',  'CID'   ],
+    [  '/api/object/OID/clone.xml',        'CREATE',  \&do_xml,  \&api_create_clone_oid,     'OID'   ],
+    [  '/api/object/OID/clone.xml',        'READ',    \&do_xml,  \&api_list_clones_oid,      'OID'   ],
+    [  '/api/object/OID/comment.xml',      'CREATE',  \&do_xml,  \&api_create_comment_oid    'OID'   ],
+    [  '/api/object/OID/comment.xml',      'READ',    \&do_xml,  \&api_list_comments_oid     'OID'   ],
+    [  '/api/object/OID/vars.xml',         'CREATE',  \&do_xml,  \&api_create_vars_oid,      'OID'   ],
+    [  '/api/object/OID/vars.xml',         'DELETE',  \&do_xml,  \&api_delete_vars_oid,      'OID'   ],
+    [  '/api/object/OID/vars.xml',         'READ',    \&do_xml,  \&api_read_vars_oid,        'OID'   ],
+    [  '/api/object/OID/vars.xml',         'UPDATE',  \&do_xml,  \&api_update_vars_oid,      'OID'   ],
+    [  '/api/relation.xml',                'CREATE',  \&do_xml,  \&api_create_relation       ],
+    [  '/api/relation.xml',                'READ',    \&do_xml,  \&api_list_relations        ],
+    [  '/api/relation/RID.xml',            'DELETE',  \&do_xml,  \&api_delete_rid,           'RID'   ],
+    [  '/api/relation/RID.xml',            'READ',    \&do_xml,  \&api_read_rid,             'RID'   ],
+    [  '/api/relation/RID.xml',            'UPDATE',  \&do_xml,  \&api_update_rid,           'RID'   ],
+    [  '/api/relation/RID/vars.xml',       'CREATE',  \&do_xml,  \&api_create_vars_rid,      'RID'   ],
+    [  '/api/relation/RID/vars.xml',       'DELETE',  \&do_xml,  \&api_delete_vars_rid,      'RID'   ],
+    [  '/api/relation/RID/vars.xml',       'READ',    \&do_xml,  \&api_read_vars_rid,        'RID'   ],
+    [  '/api/relation/RID/vars.xml',       'UPDATE',  \&do_xml,  \&api_update_vars_rid,      'RID'   ],
+    [  '/api/select/object.xml',           'READ',    \&do_xml,  \&api_select_object         ],
+    [  '/api/select/relation.xml',         'READ',    \&do_xml,  \&api_select_relation       ],
+    [  '/api/select/tag.xml',              'READ',    \&do_xml,  \&api_select_tag            ],
+    [  '/api/share/raw/RID/RVSN/OID.xml',  'READ',    \&do_xml,  \&api_share_raw,            'OID',  'RID',  'RVSN'  ],
+    [  '/api/share/redirect/RID.xml',      'READ',    \&do_xml,  \&api_redirect_rid,         'RID'   ],
+    [  '/api/share/redirect/RID/OID.xml',  'READ',    \&do_xml,  \&api_redirect_rid_oid,     'OID',  'RID'   ],
+    [  '/api/share/url/RID.xml',           'READ',    \&do_xml,  \&api_share_rid,            'RID'   ],
+    [  '/api/share/url/RID/OID.xml',       'READ',    \&do_xml,  \&api_share_rid_oid,        'OID',  'RID'   ],
+    [  '/api/tag.xml',                     'CREATE',  \&do_xml,  \&api_create_tag            ],
+    [  '/api/tag.xml',                     'READ',    \&do_xml,  \&api_list_tags             ],
+    [  '/api/tag/TID.xml',                 'DELETE',  \&do_xml,  \&api_delete_tid,           'TID'   ],
+    [  '/api/tag/TID.xml',                 'READ',    \&do_xml,  \&api_read_tid,             'TID'   ],
+    [  '/api/tag/TID.xml',                 'UPDATE',  \&do_xml,  \&api_update_tid,           'TID'   ],
+    [  '/api/tag/TID/vars.xml',            'CREATE',  \&do_xml,  \&api_create_vars_tid,      'TID'   ],
+    [  '/api/tag/TID/vars.xml',            'DELETE',  \&do_xml,  \&api_delete_vars_tid,      'TID'   ],
+    [  '/api/tag/TID/vars.xml',            'READ',    \&do_xml,  \&api_read_vars_tid,        'TID'   ],
+    [  '/api/tag/TID/vars.xml',            'UPDATE',  \&do_xml,  \&api_update_vars_tid,      'TID'   ],
+    [  '/api/version.xml',                 'READ',    \&do_xml,  \&api_version               ],
 
-    [ '/api/version.xml', 'READ', \&do_xml, \&api_version  ],
-    [ '/api/tag/TID/param.xml', 'UPDATE', \&do_xml, \&api_tag_update_param, 'TID' ],
-    [ '/api/tag/TID/param.xml', 'READ', \&do_xml, \&api_tag_read_param, 'TID' ],
-    [ '/api/tag/TID/param.xml', 'DELETE', \&do_xml, \&api_tag_delete_param, 'TID' ],
-    [ '/api/tag/TID/param.xml', 'CREATE', \&do_xml, \&api_tag_create_param, 'TID' ],
-    [ '/api/tag/TID.xml', 'UPDATE', \&do_xml, \&api_update_tid, 'TID' ],
-    [ '/api/tag/TID.xml', 'READ', \&do_xml, \&api_read_tid, 'TID' ],
-    [ '/api/tag/TID.xml', 'DELETE', \&do_xml, \&api_delete_tid, 'TID' ],
-    [ '/api/tag.xml', 'READ', \&do_xml, \&api_list_tags ],
-    [ '/api/tag.xml', 'CREATE', \&do_xml, \&api_create_tag ],
-    [ '/api/select/tag.xml', 'READ', \&do_noop ],
-    [ '/api/select/relation.xml', 'READ', \&do_noop ],
-    [ '/api/select/object.xml', 'READ', \&do_noop ],
-    [ '/api/relation/RID/param.xml', 'UPDATE', \&do_xml, \&api_relation_update_param, 'RID' ],
-    [ '/api/relation/RID/param.xml', 'READ', \&do_xml, \&api_relation_read_param, 'RID' ],
-    [ '/api/relation/RID/param.xml', 'DELETE', \&do_xml, \&api_relation_delete_param, 'RID' ],
-    [ '/api/relation/RID/param.xml', 'CREATE', \&do_xml, \&api_relation_create_param, 'RID' ],
-    [ '/api/relation/RID.xml', 'UPDATE', \&do_xml, \&api_update_rid, 'RID' ],
-    [ '/api/relation/RID.xml', 'READ', \&do_xml, \&api_read_rid, 'RID' ],
-    [ '/api/relation/RID.xml', 'DELETE', \&do_xml, \&api_delete_rid, 'RID' ],
-    [ '/api/relation.xml', 'READ', \&do_xml, \&api_list_relations ],
-    [ '/api/relation.xml', 'CREATE', \&do_xml, \&api_create_relation ],
-    [ '/api/object/OID/param.xml', 'UPDATE', \&do_xml, \&api_object_update_param, 'OID' ],
-    [ '/api/object/OID/param.xml', 'READ', \&do_xml, \&api_object_read_param, 'OID' ],
-    [ '/api/object/OID/param.xml', 'DELETE', \&do_xml, \&api_object_delete_param, 'OID' ],
-    [ '/api/object/OID/param.xml', 'CREATE', \&do_xml, \&api_object_create_param, 'OID' ],
-    [ '/api/object/OID/clone.xml', 'READ', \&do_xml, \&api_list_clones, 'OID' ],
-    [ '/api/object/OID/clone.xml', 'CREATE', \&do_xml, \&api_create_clone, 'OID' ],
-    [ '/api/object/OID.xml', 'UPDATE', \&do_xml, \&api_update_oid, 'OID' ],
-    [ '/api/object/OID.xml', 'READ', \&do_xml, \&api_read_oid, 'OID' ],
-    [ '/api/object/OID.xml', 'DELETE', \&do_xml, \&api_delete_oid, 'OID' ],
-    [ '/api/object/OID', 'UPDATE', \&do_xml, \&api_update_oid_aux, 'OID' ],
-    [ '/api/object/OID', 'READ', \&api_read_oid_aux, 'OID' ], # <---- AUX, EMITS RAW DATA
-    [ '/api/object.xml', 'READ', \&do_xml, \&api_list_objects ],
-    [ '/api/object.xml', 'CREATE', \&do_xml, \&api_create_object ],
-    [ '/api/config.xml', 'UPDATE', \&do_xml, \&api_update_config ],
-    [ '/api/config.xml', 'READ', \&do_xml, \&api_read_config ],
+    [ '/api/object/OID', 'READ', \&api_read_aux_oid, 'OID' ], # <---- SPECIAL, EMITS RAW AUX DATA
 
     );
 
@@ -460,6 +459,7 @@ sub smart_token {
     return '\d+' if ($token eq 'OID');
     return '\d+' if ($token eq 'RID');
     return '\d+' if ($token eq 'TID');
+    return '\d+' if ($token eq 'CID');
     return '\d+' if ($token eq 'RVSN');
     return '\w+' if ($token eq 'COOKIE');
     return '.*'  if ($token eq 'SUFFIX'); # magic names - greedy wildcard
@@ -578,8 +578,8 @@ sub do_remote_get {
 	    die "do_remote_get: $diag\n";
 	}
 
-	# punt to api_read_oid_aux
-	return &api_read_oid_aux($ctx, $info, $phr, $oid);
+	# punt to api_read_aux_oid
+	return &api_read_aux_oid($ctx, $info, $phr, $oid);
     }
     elsif ($oid == 0) {		# it's a feed-get
 	my @ofeed;		# the atom feed document
