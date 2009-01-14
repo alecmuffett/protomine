@@ -77,23 +77,26 @@ sub decode_key {
     warn "decode_key: encoded=$encoded\n";
 
     my $key = pack($packfmt, $encoded);
+
     warn "decode_key: key=$key\n";
 
-    my ($magic, $rid, $rvsn, $oid, $crc);
-    unless (($magic, $rid, $rvsn, $oid, $crc) =
-	    ($key =~ m!^(\w+),(\d+),(\d+),(\d+),(\d+)$!o)) {
+    my ($magic, $method, $rid, $rvsn, $oid, $crc);
+
+    unless (($magic, $method, $rid, $rvsn, $oid, $crc) =
+	    ($key =~ m!^(\w+),(r|s),(\d+),(\d+),(\d+),(\d+)$!o)) {
 	die "decode_key: bad decode result\n";
     }
 
     die "decode_key: bad magic $magic vs \n" unless ($magic eq $magic_number);
+    # $method is typechecked in the regexp
     die "decode_key: bad rid $rid\n" unless ($rid > 0);
     die "decode_key: bad rvsn $rvsn\n" unless ($rvsn > 0);
     die "decode_key: bad oid $oid\n" unless ($oid >= 0); # probably redundant
 
-    my $prefix2 = "$magic,$rid,$rvsn,$oid";
+    my $prefix2 = "$magic,$method,$rid,$rvsn,$oid"; # try to recreate the hash
     warn "decode_key: prefix2=$prefix2\n";
 
-    my $crc2 = unpack("%C*", $prefix2);
+    my $crc2 = unpack("%C*", $prefix2); # compute the hash and compare
     warn "decode_key: crc2=$crc2\n";
 
     die "decode_key: bad crc check\n" unless ($crc2 eq $crc);
@@ -110,6 +113,7 @@ sub encode_key {
     my $packfmt = "H*";		# break out?
 
     my $magic = $magic_number;
+    my $method = 'r';		# r(ead) s(ubmit)
 
     die "encode_key: bad magic $magic\n" unless ($magic ne '');
     die "encode_key: bad rid $rid\n" unless ($rid > 0);
