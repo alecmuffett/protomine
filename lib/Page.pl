@@ -409,7 +409,21 @@ sub printUsing {
     }
 
     # print the body
-    $self->printBody($self->{DATA});
+    if ($self->{STYLE} == $DYNAMIC_PLAIN) {
+	$self->printBodyXML($self->{DATA}); # works equally well
+    }
+    elsif ($self->{STYLE} == $DYNAMIC_XML) {
+	$self->printBodyXML($self->{DATA});
+    }
+    elsif ($self->{STYLE} == $DYNAMIC_HTML) {
+        $self->printBodyHTML($self->{DATA});
+    }
+    elsif ($self->{STYLE} == $DYNAMIC_JSON) {
+	die "Page.pl JSON not yet implemented";
+    }
+    else {
+	die "this can't happen";
+    }
 
     # print HTML footer, if appropriate
     if ($self->{STYLE} == $DYNAMIC_HTML) {
@@ -422,7 +436,7 @@ sub printUsing {
 
 ##################################################################
 
-sub printBody {
+sub printBodyXML {
     my $self = shift;
 
     foreach my $arg (@_) {
@@ -435,27 +449,82 @@ sub printBody {
 	    print ${$arg};
 	}
 	elsif ($argtype eq 'ARRAY') { # 
-	    $self->printBody(@{$arg});
+	    $self->printBodyXML(@{$arg});
 	}
 	elsif ($argtype eq 'HASH') {
 	    foreach my $key (sort keys %{$arg}) {
 		my $value = $arg->{$key};
 		print "<$key>";
-		$self->printBody($value);
+		$self->printBodyXML($value);
 		print "</$key>\n";
 	    }
 	}
 	elsif ($argtype eq 'Object') {
-	    $self->printBody( { object => $arg->toDataStructure } );
+	    $self->printBodyXML( { object => $arg->toDataStructure } );
 	}
 	elsif ($argtype eq 'Relation') {
-	    $self->printBody( { relation => $arg->toDataStructure } );
+	    $self->printBodyXML( { relation => $arg->toDataStructure } );
 	}
 	elsif($argtype eq 'Tag') {
-	    $self->printBody( { tag => $arg->toDataStructure } );
+	    $self->printBodyXML( { tag => $arg->toDataStructure } );
 	}
 	else {
-	    die "printBody: encountered unknown object, type '$argtype'\n";
+	    die "printBodyXML: encountered unknown object, type '$argtype'\n";
+	}
+    }
+}
+
+##################################################################
+
+sub printBodyHTML {
+    my $self = shift;
+
+    foreach my $arg (@_) {
+	my $argtype = ref($arg);
+
+	if ($argtype eq '') {	# if it's primitive, print it
+	    print $arg;
+	}
+	elsif ($argtype eq 'SCALAR') { # if ref of primitive, print THAT
+	    print ${$arg};
+	}
+	elsif ($argtype eq 'ARRAY') { # 
+	    # print "<ul>\n";
+	    # foreach my $li (@{$arg}) {
+	    # print "<li>";
+	    # $self->printBodyHTML($li);
+	    # print "</li>\n";
+	    # }
+	    # print "</ul>\n";
+
+	    $self->printBodyHTML(@{$arg});
+	}
+	elsif ($argtype eq 'HASH') {
+
+	    print "<dl>\n";
+	    foreach my $key (sort keys %{$arg}) {
+                print "<dt>\n";
+		print $key;
+                print "</dt>\n";
+
+		print "<dd>\n";
+		my $value = $arg->{$key};
+		$self->printBodyHTML($value);
+		print "</dd>\n";
+	    }
+	    print "</dl>\n";
+	}
+	elsif ($argtype eq 'Object') {
+	    $self->printBodyHTML( $arg->toDataStructure );
+	}
+	elsif ($argtype eq 'Relation') {
+	    $self->printBodyHTML( $arg->toDataStructure );
+	}
+	elsif($argtype eq 'Tag') {
+	    $self->printBodyHTML( $arg->toDataStructure );
+	}
+	else {
+	    die "printBodyHTML: encountered unknown object, type '$argtype'\n";
 	}
     }
 }

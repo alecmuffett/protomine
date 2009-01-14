@@ -113,7 +113,7 @@ sub ui_show_objects {
 	    "update-object/$oid.html", "[update info]",
 		     });
 	$p->add("<br/>\n");
-	$p->add($object->toString);
+	$p->add($object);
 	$p->add("</dd>\n");
 	$p->add("<p/>\n");
     }
@@ -141,7 +141,7 @@ sub ui_show_relations {
 		 "update-relation/$rid.html", "[update info]",
 		     });
 	$p->add("<br/>\n");
-	$p->add($relation->toString);
+	$p->add($relation);
 	$p->add("</dd>\n");
 	$p->add("<p/>\n");
     }
@@ -168,7 +168,7 @@ sub ui_show_tags {
 	    "update-tag/$tid.html", "[update info]",
 		     });
 	$p->add("<br/>\n");
-	$p->add($tag->toString);
+	$p->add($tag);
 	$p->add("</dd>\n");
 	$p->add("<p/>\n");
     }
