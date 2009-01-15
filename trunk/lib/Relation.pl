@@ -114,7 +114,7 @@ sub set {
 		$foo = "t-$id";
 	    }
 	    else {
-		die "this can't happen";
+		die "Relation->set: this can't happen";
 	    }
 
 	    push(@dsts, $foo);
@@ -151,7 +151,7 @@ sub get {
 		$foo = 'except:' . $tag->name;
 	    }
 	    else {
-		die "this can't happen";
+		die "Relation->get: this can't happen";
 	    }
 
 	    push(@dsts, $foo);
@@ -190,9 +190,8 @@ sub getInterestsBlob {
 	    push(@{$iblob->{except}}, $2); # except
 	}
 	else {
-	    die "this can't happen";
+	    die "Relation->getInterestsBlob: this can't happen";
 	}
-
     }
 
     # return the reference for the iblob

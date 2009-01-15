@@ -213,7 +213,7 @@ sub get {
 		$foo = 'not:' . $relation->name;
 	    }
 	    else {
-		die "this can't happen";
+		die "Object->get: this can't happen";
 	    }
 
 	    push(@dsts, $foo);

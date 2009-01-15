@@ -419,10 +419,10 @@ sub printUsing {
         $self->printBodyHTML($self->{DATA});
     }
     elsif ($self->{STYLE} == $DYNAMIC_JSON) {
-	die "Page.pl JSON not yet implemented";
+	print "\"ceci n'est pas json.\"\n"; # semi legitimate placeholder 
     }
     else {
-	die "this can't happen";
+	die "printUsing: this can't happen";
     }
 
     # print HTML footer, if appropriate
