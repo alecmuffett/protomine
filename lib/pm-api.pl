@@ -68,7 +68,13 @@ sub keycrud_read {
 
 sub keycrud_update {
     my ($ctx, $thing, $key) = @_;
-    return { config => 'nyi' };
+
+    die "error keycrud_update is temporarily banned as potentially unsafe\n";
+
+    my $q = $ctx->cgi;
+    my $value = $q->param('POSTDATA'); # TBD: in theory this is correct; in practice?
+    $thing->set($key, $value);
+    return { status => $thing->update };
 }
 
 sub keycrud_delete {
