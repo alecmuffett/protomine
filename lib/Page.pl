@@ -80,7 +80,7 @@ sub newError {                  # handler for error pages
 	$p->add($error_string);
     }
 
-    Log->msg("newError $http_error $error_string");
+    Log->msg("http_error $http_error $error_string");
 
     return $p;
 }

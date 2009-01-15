@@ -41,7 +41,59 @@ if (0) {
 
 chdir($main::MINE_DIRECTORY) or die "chdir: $main::MINE_DIRECTORY: $!";
 
-# get the extra stuff we need
+# declare the raw action list so the requires can update it.
+
+# the table of paths and their handlers/arguments; the joy of this
+# mechanism is that if we want to create/try an alternative almost
+# wholly GET-based API, we can implement it in less than 10 minutes.
+
+# IMPORTANT: you must factor the METHOD into the match as well as the
+# URL, *and* the order of these rules *is* significant; for instance
+# performing "GET /foo/bar" will not match "POST /foo/bar" but *will*
+# match a subsequent "GET /foo/SUFFIX"; hence the manual addition of
+# catchall rules AFTER the "require" statements.
+
+# IMPORTANT: do not use parenthesis in the regex if you are using
+# parameters, it will clash with the rule compiler, below; better yet
+# do not use them at all, don't treat them as regex.
+
+my @compiled_action_list = ();
+
+my @raw_action_list = (
+    # empty / root request
+    [ '',            'GET',  \&do_redirect, '/ui/' ],
+
+    # feed and object retrieval, comment submission
+    [ '/get',        'GET',  \&do_remote_get ],
+    [ '/get',        'POST', \&do_remote_post ],
+
+    # public, unprotected documents
+    [ '/pub',        'GET',  \&do_document, 'database/pub', '.' ],
+    [ '/pub/SUFFIX', 'GET',  \&do_document, 'database/pub', 'SUFFIX' ],
+
+    # mine documentation
+    [ '/doc',        'GET',  \&do_document, 'database/doc', '.' ],
+    [ '/doc/SUFFIX', 'GET',  \&do_document, 'database/doc', 'SUFFIX' ],
+
+    # more added by ui and api modules
+    );
+
+# extra stuff to go into the main package
+
+require 'pm-api.pl';
+require 'pm-atom.pl';
+require 'pm-mime.pl';
+require 'pm-ui.pl';
+
+# push the final catch-all rules into the raw_action_list
+
+push (@raw_action_list,
+      [  '/ui',         'GET',  \&do_document,  'database/ui',  '.'       ],
+      [  '/ui/SUFFIX',  'GET',  \&do_document,  'database/ui',  'SUFFIX'  ],
+    );
+
+
+# objects we will need
 
 require 'Context.pl';
 require 'Log.pl';
@@ -50,10 +102,6 @@ require 'Page.pl';
 require 'Relation.pl';
 require 'Tag.pl';
 require 'Thing.pl';
-require 'pm-api.pl';
-require 'pm-atom.pl';
-require 'pm-mime.pl';
-require 'pm-ui.pl';
 
 # impose a 10Mb ceiling on POST data
 
@@ -71,161 +119,95 @@ my %crud = (
     PUT => 'PUT',               # HTTP
     );
 
-# the table of paths and their handlers/arguments; IMPORTANT: DO NOT
-# USE PARENTHESIS IN THE PATHS IF YOU ARE ALSO USING PARAMETERS
-
-# the joy of this mechanism is that if we want to create/try an
-# alternative almost wholly GET-based API, we can implement it in less
-# than 5 minutes.
-
-# you can guess, that the ".xml" suffix will soon be supplanted by
-# ".FORMAT" and a smart switch will provide output in the preferred
-# format for most URLs
-
-# the order of these rules *is* significant, and you must factor the
-# METHOD into the match as well as the URL; for instance performing
-# "GET /foo/bar" will not match "POST /foo/bar" but *will* match a
-# subsequent "GET /foo/SUFFIX"
-
-my @raw_action_list = (
-
-    ###
-    # empty / root request
-    ###
-
-    [ '', 'GET', \&do_redirect, '/ui/' ],
-
-    ###
-    # the /get URL is a special case HTTP
-    ###
-
-    [ '/get', 'GET', \&do_remote_get ], # <---- FEED AND OBJECT RETRIEVAL
-    [ '/get', 'POST', \&do_remote_post ], # <---- COMMENT SUBMISSION
-
-    ###
-    # API calls are safe to fasttrack / out of sequence, since they exact-match
-    ###
-
-    [ '/api/object/OID', 'READ', \&api_read_aux_oid, 'OID' ], # <---- SPECIAL, EMITS AUX DATA
-    # the following method deleted for security/simplicity reasons;
-    # use the API version.  there is simply no point in having TWO
-    # urls to rewrite, outbound, when this is all user-facing stuff.
-    # [ '/ui/read-data/OID', 'GET', \&api_read_aux_oid, 'OID' ],
-
-    ###
-    # public files and documentation
-    ###
-
-    [  '/pub',         'GET',  \&do_document,  'database/pub',  '.'       ],
-    [  '/pub/SUFFIX',  'GET',  \&do_document,  'database/pub',  'SUFFIX'  ],
-    [  '/doc',         'GET',  \&do_document,  'database/doc',  '.'       ],
-    [  '/doc/SUFFIX',  'GET',  \&do_document,  'database/doc',  'SUFFIX'  ],
-
-    ###
-    # the /ui/ hierarchy lives in HTTP space
-    ###
-
-    [  '/ui/version.html',              'GET',   \&ui_version           ],
-    [  '/ui/update-tag/TID.html',       'POST',  \&ui_update_tag,       'TID'           ],
-    [  '/ui/update-tag/TID.html',       'GET',   \&do_document,         'database/ui',  'update-tag-xxx.html'       ],
-    [  '/ui/update-relation/RID.html',  'POST',  \&ui_update_relation,  'RID'           ],
-    [  '/ui/update-relation/RID.html',  'GET',   \&do_document,         'database/ui',  'update-relation-xxx.html'  ],
-    [  '/ui/update-object/OID.html',    'GET',   \&do_document,         'database/ui',  'update-object-xxx.html'    ],
-    [  '/ui/update-object/OID.html',    'POST',  \&ui_update_object,    'OID'           ],
-    [  '/ui/update-data/OID.html',      'POST',  \&ui_update_data,      'OID'           ],
-    [  '/ui/update-data/OID.html',      'GET',   \&do_document,         'database/ui',  'update-data-xxx.html'      ],
-    [  '/ui/update-config.html',        'POST',  \&ui_update_config     ],
-    [  '/ui/show-tags.html',            'GET',   \&ui_show_tags         ],
-    [  '/ui/show-relations.html',       'GET',   \&ui_show_relations    ],
-    [  '/ui/show-objects.html',         'GET',   \&ui_show_objects      ],
-    [  '/ui/show-config.html',          'GET',   \&ui_show_config       ],
-    [  '/ui/show-clones/OID.html',      'GET',   \&ui_show_clones,      'OID'           ],
-    [  '/ui/share/url/RID/OID.html',    'GET',   \&do_noop,             'RID',          'RVSN',                     'OID'  ],
-    [  '/ui/share/url/RID.html',        'GET',   \&do_noop,             'RID',          'RVSN',                     'OID'  ],
-    [  '/ui/share/redirect/RID/OID',    'GET',   \&do_noop,             'RID',          'RVSN',                     'OID'  ],
-    [  '/ui/share/redirect/RID',        'GET',   \&do_noop,             'RID',          'RVSN',                     'OID'  ],
-    [  '/ui/share/raw/RID/RVSN/OID',    'GET',   \&do_noop,             'RID',          'RVSN',                     'OID'  ],
-    [  '/ui/select/tag.html',           'GET',   \&do_noop              ],
-    [  '/ui/select/relation.html',      'GET',   \&do_noop              ],
-    [  '/ui/select/object.html',        'GET',   \&do_noop              ],
-    [  '/ui/read-tag/TID.html',         'GET',   \&ui_read_tag,         'TID'           ],
-    [  '/ui/read-relation/RID.html',    'GET',   \&ui_read_relation,    'RID'           ],
-    [  '/ui/read-object/OID.html',      'GET',   \&ui_read_object,      'OID'           ],
-    [  '/ui/delete-tag/TID.html',       'GET',   \&ui_delete_tag,       'TID'           ],
-    [  '/ui/delete-relation/RID.html',  'GET',   \&ui_delete_relation,  'RID'           ],
-    [  '/ui/delete-object/OID.html',    'GET',   \&ui_delete_object,    'OID'           ],
-    [  '/ui/create-tag.html',           'POST',  \&ui_create_tag        ],
-    [  '/ui/create-relation.html',      'POST',  \&ui_create_relation   ],
-    [  '/ui/create-object.html',        'POST',  \&ui_create_object     ],
-    [  '/ui/clone-object/OID.html',     'GET',   \&ui_clone_object,     'OID'           ],
-
-    ###
-    # catchall/fallthru for the methods above; we may pick up a *file*
-    # for "GET" which corresponds with something that is "POST" above.
-    ###
-
-    [ '/ui', 'GET', \&do_document, 'database/ui', '.' ],
-    [ '/ui/SUFFIX', 'GET', \&do_document, 'database/ui', 'SUFFIX' ],
-
-    ###
-    # the /api/ hierarchy lives in REST space
-    ##
-    [  '/api/config.xml',                  'READ',    \&do_xml,  \&api_read_config           ],
-    [  '/api/config.xml',                  'UPDATE',  \&do_xml,  \&api_update_config         ],
-    [  '/api/object.xml',                  'CREATE',  \&do_xml,  \&api_create_object         ],
-    [  '/api/object.xml',                  'READ',    \&do_xml,  \&api_list_objects          ],
-    [  '/api/object/OID',                  'UPDATE',  \&do_xml,  \&api_update_aux_oid,       'OID'   ],
-    [  '/api/object/OID.xml',              'DELETE',  \&do_xml,  \&api_delete_oid,           'OID'   ],
-    [  '/api/object/OID.xml',              'READ',    \&do_xml,  \&api_read_oid,             'OID'   ],
-    [  '/api/object/OID.xml',              'UPDATE',  \&do_xml,  \&api_update_oid,           'OID'   ],
-    [  '/api/object/OID/CID.xml',          'DELETE',  \&do_xml,  \&api_delete_oid_cid,       'OID',  'CID'   ],
-    [  '/api/object/OID/CID.xml',          'READ',    \&do_xml,  \&api_read_oid_cid,         'OID',  'CID'   ],
-    [  '/api/object/OID/CID.xml',          'UPDATE',  \&do_xml,  \&api_update_oid_cid,       'OID',  'CID'   ],
-    [  '/api/object/OID/CID/vars.xml',     'CREATE',  \&do_xml,  \&api_create_vars_oid_cid,  'OID',  'CID'   ],
-    [  '/api/object/OID/CID/vars.xml',     'DELETE',  \&do_xml,  \&api_delete_vars_oid_cid,  'OID',  'CID'   ],
-    [  '/api/object/OID/CID/vars.xml',     'READ',    \&do_xml,  \&api_read_vars_oid_cid,    'OID',  'CID'   ],
-    [  '/api/object/OID/CID/vars.xml',     'UPDATE',  \&do_xml,  \&api_update_vars_oid_cid,  'OID',  'CID'   ],
-    [  '/api/object/OID/clone.xml',        'CREATE',  \&do_xml,  \&api_create_clone_oid,     'OID'   ],
-    [  '/api/object/OID/clone.xml',        'READ',    \&do_xml,  \&api_list_clones_oid,      'OID'   ],
-    [  '/api/object/OID/comment.xml',      'CREATE',  \&do_xml,  \&api_create_comment_oid,   'OID'   ],
-    [  '/api/object/OID/comment.xml',      'READ',    \&do_xml,  \&api_list_comments_oid ,   'OID'   ],
-    [  '/api/object/OID/vars.xml',         'CREATE',  \&do_xml,  \&api_create_vars_oid,      'OID'   ],
-    [  '/api/object/OID/vars.xml',         'DELETE',  \&do_xml,  \&api_delete_vars_oid,      'OID'   ],
-    [  '/api/object/OID/vars.xml',         'READ',    \&do_xml,  \&api_read_vars_oid,        'OID'   ],
-    [  '/api/object/OID/vars.xml',         'UPDATE',  \&do_xml,  \&api_update_vars_oid,      'OID'   ],
-    [  '/api/relation.xml',                'CREATE',  \&do_xml,  \&api_create_relation       ],
-    [  '/api/relation.xml',                'READ',    \&do_xml,  \&api_list_relations        ],
-    [  '/api/relation/RID.xml',            'DELETE',  \&do_xml,  \&api_delete_rid,           'RID'   ],
-    [  '/api/relation/RID.xml',            'READ',    \&do_xml,  \&api_read_rid,             'RID'   ],
-    [  '/api/relation/RID.xml',            'UPDATE',  \&do_xml,  \&api_update_rid,           'RID'   ],
-    [  '/api/relation/RID/vars.xml',       'CREATE',  \&do_xml,  \&api_create_vars_rid,      'RID'   ],
-    [  '/api/relation/RID/vars.xml',       'DELETE',  \&do_xml,  \&api_delete_vars_rid,      'RID'   ],
-    [  '/api/relation/RID/vars.xml',       'READ',    \&do_xml,  \&api_read_vars_rid,        'RID'   ],
-    [  '/api/relation/RID/vars.xml',       'UPDATE',  \&do_xml,  \&api_update_vars_rid,      'RID'   ],
-    [  '/api/select/object.xml',           'READ',    \&do_xml,  \&api_select_object         ],
-    [  '/api/select/relation.xml',         'READ',    \&do_xml,  \&api_select_relation       ],
-    [  '/api/select/tag.xml',              'READ',    \&do_xml,  \&api_select_tag            ],
-    [  '/api/share/raw/RID/RVSN/OID.xml',  'READ',    \&do_xml,  \&api_share_raw,            'OID',  'RID',  'RVSN'  ],
-    [  '/api/share/redirect/RID.xml',      'READ',    \&do_xml,  \&api_redirect_rid,         'RID'   ],
-    [  '/api/share/redirect/RID/OID.xml',  'READ',    \&do_xml,  \&api_redirect_rid_oid,     'OID',  'RID'   ],
-    [  '/api/share/url/RID.xml',           'READ',    \&do_xml,  \&api_share_rid,            'RID'   ],
-    [  '/api/share/url/RID/OID.xml',       'READ',    \&do_xml,  \&api_share_rid_oid,        'OID',  'RID'   ],
-    [  '/api/tag.xml',                     'CREATE',  \&do_xml,  \&api_create_tag            ],
-    [  '/api/tag.xml',                     'READ',    \&do_xml,  \&api_list_tags             ],
-    [  '/api/tag/TID.xml',                 'DELETE',  \&do_xml,  \&api_delete_tid,           'TID'   ],
-    [  '/api/tag/TID.xml',                 'READ',    \&do_xml,  \&api_read_tid,             'TID'   ],
-    [  '/api/tag/TID.xml',                 'UPDATE',  \&do_xml,  \&api_update_tid,           'TID'   ],
-    [  '/api/tag/TID/vars.xml',            'CREATE',  \&do_xml,  \&api_create_vars_tid,      'TID'   ],
-    [  '/api/tag/TID/vars.xml',            'DELETE',  \&do_xml,  \&api_delete_vars_tid,      'TID'   ],
-    [  '/api/tag/TID/vars.xml',            'READ',    \&do_xml,  \&api_read_vars_tid,        'TID'   ],
-    [  '/api/tag/TID/vars.xml',            'UPDATE',  \&do_xml,  \&api_update_vars_tid,      'TID'   ],
-    [  '/api/version.xml',                 'READ',    \&do_xml,  \&api_version               ],
-
+push (@raw_action_list,
+      [ '/ui/version.html', 'GET', \&ui_version ],
+      [ '/ui/update-tag/TID.html', 'POST', \&ui_update_tag, 'TID' ],
+      [ '/ui/update-tag/TID.html', 'GET', \&do_document, 'database/ui', 'update-tag-xxx.html' ],
+      [ '/ui/update-relation/RID.html', 'POST', \&ui_update_relation, 'RID' ],
+      [ '/ui/update-relation/RID.html', 'GET', \&do_document, 'database/ui', 'update-relation-xxx.html' ],
+      [ '/ui/update-object/OID.html', 'GET', \&do_document, 'database/ui', 'update-object-xxx.html' ],
+      [ '/ui/update-object/OID.html', 'POST', \&ui_update_object, 'OID' ],
+      [ '/ui/update-data/OID.html', 'POST', \&ui_update_data, 'OID' ],
+      [ '/ui/update-data/OID.html', 'GET', \&do_document, 'database/ui', 'update-data-xxx.html' ],
+      [ '/ui/update-config.html', 'POST', \&ui_update_config ],
+      [ '/ui/show-tags.html', 'GET', \&ui_show_tags ],
+      [ '/ui/show-relations.html', 'GET', \&ui_show_relations ],
+      [ '/ui/show-objects.html', 'GET', \&ui_show_objects ],
+      [ '/ui/show-config.html', 'GET', \&ui_show_config ],
+      [ '/ui/show-clones/OID.html', 'GET', \&ui_show_clones, 'OID' ],
+      [ '/ui/share/url/RID/OID.html', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+      [ '/ui/share/url/RID.html', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+      [ '/ui/share/redirect/RID/OID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+      [ '/ui/share/redirect/RID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+      [ '/ui/share/raw/RID/RVSN/OID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+      [ '/ui/select/tag.html', 'GET', \&do_noop ],
+      [ '/ui/select/relation.html', 'GET', \&do_noop ],
+      [ '/ui/select/object.html', 'GET', \&do_noop ],
+      [ '/ui/read-tag/TID.html', 'GET', \&ui_read_tag, 'TID' ],
+      [ '/ui/read-relation/RID.html', 'GET', \&ui_read_relation, 'RID' ],
+      [ '/ui/read-object/OID.html', 'GET', \&ui_read_object, 'OID' ],
+      [ '/ui/delete-tag/TID.html', 'GET', \&ui_delete_tag, 'TID' ],
+      [ '/ui/delete-relation/RID.html', 'GET', \&ui_delete_relation, 'RID' ],
+      [ '/ui/delete-object/OID.html', 'GET', \&ui_delete_object, 'OID' ],
+      [ '/ui/create-tag.html', 'POST', \&ui_create_tag ],
+      [ '/ui/create-relation.html', 'POST', \&ui_create_relation ],
+      [ '/ui/create-object.html', 'POST', \&ui_create_object ],
+      [ '/ui/clone-object/OID.html', 'GET', \&ui_clone_object, 'OID' ],
     );
 
-# where the compiled actions will reside
-
-my @action_list = ();
+push (@raw_action_list,
+      [ '/api/object/OID', 'READ', \&api_read_aux_oid, 'OID' ], # <---- SPECIAL, EMITS AUX DATA
+      [ '/api/config.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_config ],
+      [ '/api/config.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_config ],
+      [ '/api/object.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_object ],
+      [ '/api/object.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_objects ],
+      [ '/api/object/OID', 'UPDATE', \&do_fmt, 'FMT', \&api_update_aux_oid, 'OID' ],
+      [ '/api/object/OID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_oid, 'OID' ],
+      [ '/api/object/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_oid, 'OID' ],
+      [ '/api/object/OID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_oid, 'OID' ],
+      [ '/api/object/OID/CID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_oid_cid, 'OID', 'CID' ],
+      [ '/api/object/OID/CID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_oid_cid, 'OID', 'CID' ],
+      [ '/api/object/OID/CID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_oid_cid, 'OID', 'CID' ],
+      [ '/api/object/OID/CID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_oid_cid, 'OID', 'CID' ],
+      [ '/api/object/OID/CID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_oid_cid, 'OID', 'CID' ],
+      [ '/api/object/OID/CID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_oid_cid, 'OID', 'CID' ],
+      [ '/api/object/OID/CID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_oid_cid, 'OID', 'CID' ],
+      [ '/api/object/OID/clone.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_clone_oid, 'OID' ],
+      [ '/api/object/OID/clone.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_clones_oid, 'OID' ],
+      [ '/api/object/OID/comment.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_comment_oid, 'OID' ],
+      [ '/api/object/OID/comment.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_comments_oid , 'OID' ],
+      [ '/api/object/OID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_oid, 'OID' ],
+      [ '/api/object/OID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_oid, 'OID' ],
+      [ '/api/object/OID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_oid, 'OID' ],
+      [ '/api/object/OID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_oid, 'OID' ],
+      [ '/api/relation.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_relation ],
+      [ '/api/relation.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_relations ],
+      [ '/api/relation/RID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_rid, 'RID' ],
+      [ '/api/relation/RID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_rid, 'RID' ],
+      [ '/api/relation/RID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_rid, 'RID' ],
+      [ '/api/relation/RID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_rid, 'RID' ],
+      [ '/api/relation/RID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_rid, 'RID' ],
+      [ '/api/relation/RID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_rid, 'RID' ],
+      [ '/api/relation/RID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_rid, 'RID' ],
+      [ '/api/select/object.FMT', 'READ', \&do_fmt, 'FMT', \&api_select_object ],
+      [ '/api/select/relation.FMT', 'READ', \&do_fmt, 'FMT', \&api_select_relation ],
+      [ '/api/select/tag.FMT', 'READ', \&do_fmt, 'FMT', \&api_select_tag ],
+      [ '/api/share/raw/RID/RVSN/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_share_raw, 'OID', 'RID', 'RVSN' ],
+      [ '/api/share/redirect/RID.FMT', 'READ', \&do_fmt, 'FMT', \&api_redirect_rid, 'RID' ],
+      [ '/api/share/redirect/RID/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_redirect_rid_oid, 'OID', 'RID' ],
+      [ '/api/share/url/RID.FMT', 'READ', \&do_fmt, 'FMT', \&api_share_rid, 'RID' ],
+      [ '/api/share/url/RID/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_share_rid_oid, 'OID', 'RID' ],
+      [ '/api/tag.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_tag ],
+      [ '/api/tag.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_tags ],
+      [ '/api/tag/TID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_tid, 'TID' ],
+      [ '/api/tag/TID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_tid, 'TID' ],
+      [ '/api/tag/TID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_tid, 'TID' ],
+      [ '/api/tag/TID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_tid, 'TID' ],
+      [ '/api/tag/TID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_tid, 'TID' ],
+      [ '/api/tag/TID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_tid, 'TID' ],
+      [ '/api/tag/TID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_tid, 'TID' ],
+      [ '/api/version.FMT', 'READ', \&do_fmt, 'FMT', \&api_version ],
+    );
 
 ##################################################################
 ##################################################################
@@ -255,7 +237,7 @@ if (1) {
 
     # if there was an error during decoding, fail noisily
     if (my $barf = $q->cgi_error) {
-	$page = Page->newError(500, "cgi decoding error: $barf");
+	$page = Page->newError(500, "protomine.cgi: cgi decoding error: $barf");
     }
     else {
 	# execute the CGI input against the action list
@@ -264,13 +246,13 @@ if (1) {
 
 	# did we barf?
 	if ($@) {     
-	    $page = Page->newError(500, "software exception: $@\n");
+	    $page = Page->newError(500, "protomine.cgi: software exception: $@");
 	}
     }
 
     # one final mugtrap
     unless (defined($page)) {
-	$page = Page->newError(500, "match_and_execute returned undefined page");
+	$page = Page->newError(500, "protomine.cgi: match_and_execute returned undefined page");
     }
 
     # print the resulting page here - $ctx supplies context and CGI
@@ -310,7 +292,7 @@ sub match_and_execute {
 		$cgi_method = $p;
 	    }
 	    else {
-		die "illegal value for _method: $p";
+		die "match_and_execute: illegal value for _method: $p\n"
 	    }
 	}
     }
@@ -323,7 +305,7 @@ sub match_and_execute {
 
     # skim through the action list and find work
 
-    foreach my $action (@action_list) {
+    foreach my $action (@compiled_action_list) {
 	my ($method, $pattern, $plistref, $handler, @args) = @{$action};
 
 	# skip if wrong method
@@ -377,7 +359,6 @@ sub match_and_execute {
 	# scenarios that frankly i can't be arsed;
 
 	Log->msg("run method $cgi_method url $cgi_url ", %phash);
-
 	return &{$handler}($ctx, [$cgi_method, $cgi_url, $pattern], \%phash, @args);
     }
 
@@ -388,7 +369,7 @@ sub match_and_execute {
 
 ##################################################################
 
-# this routine relates to @raw_action_list and generates @action_list
+# this routine relates to @raw_action_list and generates @compiled_action_list
 
 # the pseudo-URLs in the former are compiled into regular expressions,
 # where all uppercase tokens of the form FRED or FRED001 (etc) get
@@ -430,8 +411,9 @@ sub compile_action_list {
 	# escape dots
 	$regexp =~ s!\.!\\.!go;
 
-	# extract all uppercase words from the url pattern, push them
-	# on plist replacing them with a regexp token
+	# extract all uppercase words (with optional numeric suffixes)
+	# from the url pattern, push them on plist replacing them with
+	# a regexp token
 
 	while ($regexp =~ s/([A-Z]+\d*)/'(' . &smart_token($1) . ')'/e) {
 	    push(@plist, $1);
@@ -447,7 +429,7 @@ sub compile_action_list {
 	my $method = $crud{$crud_method};
 
 	# stash the compiled action
-	push( @action_list, [ $method, $pattern, $plistref, $handler, @args ] );
+	push( @compiled_action_list, [ $method, $pattern, $plistref, $handler, @args ] );
     }
 }
 
@@ -459,7 +441,7 @@ sub compile_action_list {
 
 sub smart_token {
     my $token = shift;
-    return '(xml|json)' if ($token eq 'FMT'); # xml, json, html, text, atom, ...
+    return '(xml|json|txt)' if ($token eq 'FMT');
     return '\d+' if ($token eq 'OID');
     return '\d+' if ($token eq 'RID');
     return '\d+' if ($token eq 'TID');
@@ -496,18 +478,21 @@ sub do_redirect {
 
 # stub to print whatever a API returns
 
-sub do_apidump {
-    my ($ctx, $info, $phr, $fn, @rest) = @_;
-    return Page->newText(&{$fn}($ctx, $info, $phr, @rest));
-}
+sub do_fmt {
+    my ($ctx, $info, $phr, $fmt, $fn, @rest) = @_;
 
-##################################################################
-
-# stub to print whatever a API returns
-
-sub do_xml {
-    my ($ctx, $info, $phr, $fn, @rest) = @_;
-    return Page->newXML(&{$fn}($ctx, $info, $phr, @rest));
+    if ($fmt eq 'xml') {
+	return Page->newXML(&{$fn}($ctx, $info, $phr, @rest));
+    }
+    elsif ($fmt eq 'json') {
+	return Page->newJSON(&{$fn}($ctx, $info, $phr, @rest));
+    }
+    elsif ($fmt eq 'txt') {
+	return Page->newText(&{$fn}($ctx, $info, $phr, @rest));
+    }
+    else {
+	die "do_fmt: this can't happen: fmt=$fmt";
+    }
 }
 
 ##################################################################
@@ -529,7 +514,7 @@ sub do_document {
 	return Page->newFile($document);
     }
     else {
-	return Page->newError(404, "cannot do_document $document");
+	return Page->newError(404, "do_document: file not found: $document");
     }
 }
 
@@ -560,9 +545,7 @@ sub do_remote_get {
     my $rvsn2 = $r->relationVersion;
 
     unless ($rvsn eq $rvsn2) {		    
-	my $diag = "bad rvsn $key; supplied=$rvsn real=$rvsn2";
-	Log->msg("security $diag");
-	die "do_remote_get: $diag\n";
+	die "do_remote_get: bad rvsn $key; supplied=$rvsn real=$rvsn2";
     }
 
     # get his interests blob
@@ -577,9 +560,7 @@ sub do_remote_get {
 
 	# check if the object wants to be seen by him
 	unless ($o->matchInterestsBlob($ib)) {
-	    my $diag = "bad object-get oid=$oid rid=$rid failed matchInterestsBlob";
-	    Log->msg("security $diag");
-	    die "do_remote_get: $diag\n";
+	    die "do_remote_get: bad object-get oid=$oid rid=$rid failed matchInterestsBlob";
 	}
 
 	# punt to api_read_aux_oid

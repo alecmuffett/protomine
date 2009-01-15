@@ -41,14 +41,6 @@ sub msg {
 
 ##################################################################
 
-sub abort {
-    my $class = shift;
-    Log->msg($@);
-    die "$@\n";
-}
-
-##################################################################
-
 # __yyyyLog: provide filename and tag for logging purposes
 
 sub __yyyyLog {
