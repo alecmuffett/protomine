@@ -49,6 +49,7 @@ if (0) {
 # basic argument parsing
 
 my $json = 0;
+my $text = 0;
 my $debug = 0;
 my $auth = 0;
 my $help = 0;
@@ -57,6 +58,7 @@ while ($ARGV[0] =~ m!^-(\w+)!o) {
     my $switches = $1;
     $debug = 1 if ($switches =~ m!d!o);
     $json = 1 if ($switches =~ m!j!o);
+    $text = 1 if ($switches =~ m!T!o);
     $auth = 1 if ($switches =~ m!a!o);
     shift;
 }
@@ -243,8 +245,10 @@ while (<DATA>) {
 # did the user goof?
 
 unless ($we_did_something) {
-    warn "usage:\t$0 [-j] [command] [args ... ]\n";
-    warn "option: -j # select JSON output rather than XML\n";
+    warn "usage:\t$0 [-jT] [command] [args ... ]\n";
+    warn "options:\n";
+    warn "\t-j # select JSON output rather than XML\n";
+    warn "\t-T # select text output rather than XML\n";
     warn "commands:\n";
     warn join ('',  sort @cmdlist);
     exit 1;
@@ -290,6 +294,13 @@ sub Mine {
 	# only swap to .json if was .xml beforehand
 	unless ($api =~ s!\.xml$!.json!o) { 
 	    die "$0: API $api cannot be coersced to JSON format output\n";
+	}
+    }
+
+    if ($text) {
+	# only swap to .text if was .xml beforehand
+	unless ($api =~ s!\.xml$!.txt!o) { 
+	    die "$0: API $api cannot be coersced to TEXT format output\n";
 	}
     }
 
