@@ -34,15 +34,9 @@ our $MINE_HTTP_PATH;
 our $MINE_HTTP_SERVER;    
 
 # standard config for this system
-
 my $execdir = $0;
 $execdir =~ s![^/]+$!!g;
-do "$execdir/protomine-config.pl" || die "do $execdir/protomine-config.pl: $!"; # <---- populates global variables
-
-# stop perl debugger filling the apache logfile about single use variables
-#if (0) {
-#    print $MINE_HTTP_PATH;
-#}
+require "$execdir/protomine-config.pl";
 
 # impose a 10Mb ceiling on POST data
 
@@ -92,23 +86,10 @@ my @compiled_action_list = ();	# where the results go
 
 # extra stuff to go into the Protomine package
 
-my @includes = (
-    'pm-api.pl',
-    'pm-atom.pl',
-    'pm-mime.pl',
-    'pm-ui.pl',
-    'Context.pl',
-    'Log.pl',
-    'Object.pl',
-    'Page.pl',
-    'Relation.pl',
-    'Tag.pl',
-    'Thing.pl',
-);
-
-foreach my $include (@includes) {
-    do $include || die "do: $include: error='$!' status='$@'\n";
-}
+require 'pm-api.pl';
+require 'pm-atom.pl';
+require 'pm-mime.pl';
+require 'pm-ui.pl';
 
 # push the final catch-all rules into the raw_action_list
 
@@ -119,6 +100,14 @@ push (@raw_action_list,
 
 # objects we will need
 
+require 'Context.pl';
+require 'Crypto.pl';
+require 'Log.pl';
+require 'Object.pl';
+require 'Page.pl';
+require 'Relation.pl';
+require 'Tag.pl';
+require 'Thing.pl';
 
 ##################################################################
 
@@ -401,27 +390,6 @@ sub do_redirect {
 
 ##################################################################
 
-# stub to print whatever a API returns
-
-sub do_fmt {
-    my ($ctx, $info, $phr, $fmt, $fn, @rest) = @_;
-
-    if ($fmt eq 'xml') {
-	return Page->newXML(&{$fn}($ctx, $info, $phr, @rest));
-    }
-    elsif ($fmt eq 'json') {
-	return Page->newJSON(&{$fn}($ctx, $info, $phr, @rest));
-    }
-    elsif ($fmt eq 'txt') {
-	return Page->newText(&{$fn}($ctx, $info, $phr, @rest));
-    }
-    else {
-	die "do_fmt: this can't happen: fmt=$fmt";
-    }
-}
-
-##################################################################
-
 # handle an actual proper document request
 
 sub do_document {
@@ -492,26 +460,28 @@ sub do_remote_get {
 	return &api_read_aux_oid($ctx, $info, $phr, $oid);
     }
     elsif ($oid == 0) {		# it's a feed-get
-	my @ofeed;		# the atom feed document
-
-	# consider each object in the mine
-	# TBD: this should be the latest 50 in most-recently-modified order
+	my $page = Page->newAtom;
 
 	my $feed_owner = "alec";
 
-	my $feed_title = sprintf "%s for %s (%s)", $feed_owner, $r->name, $r->get('relationInterests');
+	my $feed_title = 
+	    sprintf "%s for %s (%s)", $feed_owner, $r->name, $r->get('relationInterests');
+
 	my $feed_link = &get_permalink($r);
 	my $feed_updated = &atom_format(time);
 	my $feed_author_name = $feed_owner;
 	my $feed_id = $feed_link;
 
-	push(@ofeed, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-	push(@ofeed, "<feed xmlns=\"http://www.w3.org/2005/Atom\">\n");
-	push(@ofeed, "<title>$feed_title</title>\n");
-	push(@ofeed, "<link href=\"$feed_link\" rel=\"self\"/>\n");
-	push(@ofeed, "<updated>$feed_updated</updated>\n");
-	push(@ofeed, "<author><name>$feed_author_name</name></author>\n");
-	push(@ofeed, "<id>$feed_id</id>\n");
+	$page->add("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+	$page->add("<feed xmlns=\"http://www.w3.org/2005/Atom\">\n");
+	$page->add("<title>$feed_title</title>\n");
+	$page->add("<link href=\"$feed_link\" rel=\"self\"/>\n");
+	$page->add("<updated>$feed_updated</updated>\n");
+	$page->add("<author><name>$feed_author_name</name></author>\n");
+	$page->add("<id>$feed_id</id>\n");
+
+	# consider each object in the mine; TBD: this should be the
+	# latest 50 in most-recently-modified order
 
 	foreach $oid (Object->list) {
 	    my $o = Object->new($oid);
@@ -520,12 +490,12 @@ sub do_remote_get {
 
 	    my $obj_link = &get_permalink($r, $o);
 
-	    push(@ofeed, $o->toAtom($obj_link));
+	    $page->add($o->toAtom($obj_link));
 	}
 
-	push(@ofeed, "</feed>\n");
+	$page->add("</feed>\n");
 
-	return return Page->newAtom(  \@ofeed );
+	return $page;
     }
 
     # fall off the end?
