@@ -23,8 +23,8 @@ our @raw_action_list;
 
 # api_create_clone --
 sub XXapi_create_clone {          # -- DONE --
-    my ($ctx, $info, $phr, $id) = @_;
-    my $object = Object->new($id);
+    my ($ctx, $info, $phr, $oid) = @_;
+    my $object = Object->new($oid);
     return { objectId => $object->clone };
 }
 
@@ -97,22 +97,22 @@ sub XXapi_create_tag {            # -- DONE --
 
 # api_delete_oid --
 sub XXapi_delete_oid {            # -- DONE --
-    my ($ctx, $info, $phr, $id) = @_;
-    my $object = Object->new($id);
+    my ($ctx, $info, $phr, $oid) = @_;
+    my $object = Object->new($oid);
     return { status => $object->delete };
 }
 
 # api_delete_rid --
 sub XXapi_delete_rid {            # -- DONE --
-    my ($ctx, $info, $phr, $id) = @_;
-    my $relation = Relation->new($id);
+    my ($ctx, $info, $phr, $rid) = @_;
+    my $relation = Relation->new($rid);
     return { status => $relation->delete };
 }
 
 # api_delete_tid --
 sub XXapi_delete_tid {            # -- DONE --
-    my ($ctx, $info, $phr, $id) = @_;
-    my $tag = Tag->new($id);
+    my ($ctx, $info, $phr, $tid) = @_;
+    my $tag = Tag->new($tid);
     return { status => $tag->delete };
 }
 
@@ -148,22 +148,22 @@ sub XXapi_list_tags {             # -- DONE --
 
 # api_read_oid --
 sub XXapi_read_oid {              # -- DONE --
-    my ($ctx, $info, $phr, $id) = @_;
-    my $object = Object->new($id);
+    my ($ctx, $info, $phr, $oid) = @_;
+    my $object = Object->new($oid);
     return { object => $object->toDataStructure };
 }
 
 # api_read_rid --
 sub XXapi_read_rid {              # -- DONE --
-    my ($ctx, $info, $phr, $id) = @_;
-    my $relation = Relation->new($id);
+    my ($ctx, $info, $phr, $rid) = @_;
+    my $relation = Relation->new($rid);
     return { relation => $relation->toDataStructure };
 }
 
 # api_read_tid --
 sub XXapi_read_tid {              # -- DONE --
-    my ($ctx, $info, $phr, $id) = @_;
-    my $tag = Tag->new($id);
+    my ($ctx, $info, $phr, $tid) = @_;
+    my $tag = Tag->new($tid);
     return { tag => $tag->toDataStructure };
 }
 
@@ -183,357 +183,357 @@ sub api_read_aux_oid {
 
 ##################################################################
 
-# api_read_config 
+# api_read_config
 push (@raw_action_list, [ '/api/config.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_config ]);
 sub api_read_config {
     my ($ctx, $info, $phr) = @_;
-    return { status => 'not yet implemented' };
+    return { config => 'nyi' };
 }
 
-# api_update_config 
+# api_update_config
 push (@raw_action_list, [ '/api/config.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_config ]);
 sub api_update_config {
     my ($ctx, $info, $phr) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
-# api_create_object 
+# api_create_object
 push (@raw_action_list, [ '/api/object.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_object ]);
 sub api_create_object {
     my ($ctx, $info, $phr) = @_;
-    return { status => 'not yet implemented' };
+    return { objectId => 'nyi' };
 }
 
-# api_list_objects 
+# api_list_objects
 push (@raw_action_list, [ '/api/object.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_objects ]);
 sub api_list_objects {
     my ($ctx, $info, $phr) = @_;
-    return { status => 'not yet implemented' };
+    return { objectIds => 'nyi' };
 }
 
 # api_update_aux_oid
 push (@raw_action_list, [ '/api/object/OID', 'UPDATE', \&do_fmt, 'FMT', \&api_update_aux_oid, 'OID' ]);
 sub api_update_aux_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_delete_oid
 push (@raw_action_list, [ '/api/object/OID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_oid, 'OID' ]);
 sub api_delete_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_read_oid
 push (@raw_action_list, [ '/api/object/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_oid, 'OID' ]);
 sub api_read_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'not yet implemented' };
+    return { object => 'nyi' };
 }
 
 # api_update_oid
 push (@raw_action_list, [ '/api/object/OID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_oid, 'OID' ]);
 sub api_update_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_delete_oid_cid
 push (@raw_action_list, [ '/api/object/OID/CID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_oid_cid, 'OID', 'CID' ]);
 sub api_delete_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_read_oid_cid
 push (@raw_action_list, [ '/api/object/OID/CID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_oid_cid, 'OID', 'CID' ]);
 sub api_read_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
-    return { status => 'not yet implemented' };
+    return { comment => 'nyi' };
 }
 
 # api_update_oid_cid
 push (@raw_action_list, [ '/api/object/OID/CID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_oid_cid, 'OID', 'CID' ]);
 sub api_update_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_create_vars_oid_cid
 push (@raw_action_list, [ '/api/object/OID/CID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_oid_cid, 'OID', 'CID' ]);
 sub api_create_vars_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_delete_vars_oid_cid
 push (@raw_action_list, [ '/api/object/OID/CID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_oid_cid, 'OID', 'CID' ]);
 sub api_delete_vars_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_read_vars_oid_cid
 push (@raw_action_list, [ '/api/object/OID/CID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_oid_cid, 'OID', 'CID' ]);
 sub api_read_vars_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_update_vars_oid_cid
 push (@raw_action_list, [ '/api/object/OID/CID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_oid_cid, 'OID', 'CID' ]);
 sub api_update_vars_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_create_clone_oid
 push (@raw_action_list, [ '/api/object/OID/clone.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_clone_oid, 'OID' ]);
 sub api_create_clone_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'not yet implemented' };
+    return { objectId => 'nyi' };
 }
 
 # api_list_clones_oid
 push (@raw_action_list, [ '/api/object/OID/clone.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_clones_oid, 'OID' ]);
 sub api_list_clones_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'not yet implemented' };
+    return { objectIds => 'nyi' };
 }
 
 # api_create_comment_oid
 push (@raw_action_list, [ '/api/object/OID/comment.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_comment_oid, 'OID' ]);
 sub api_create_comment_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'not yet implemented' };
+    return { commentId => 'nyi' };
 }
 
-# api_list_comments_oid 
+# api_list_comments_oid
 push (@raw_action_list, [ '/api/object/OID/comment.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_comments_oid , 'OID' ]);
 sub api_list_comments_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'not yet implemented' };
+    return { commentIds => 'nyi' };
 }
 
 # api_create_vars_oid
 push (@raw_action_list, [ '/api/object/OID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_oid, 'OID' ]);
 sub api_create_vars_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_delete_vars_oid
 push (@raw_action_list, [ '/api/object/OID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_oid, 'OID' ]);
 sub api_delete_vars_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_read_vars_oid
 push (@raw_action_list, [ '/api/object/OID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_oid, 'OID' ]);
 sub api_read_vars_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_update_vars_oid
 push (@raw_action_list, [ '/api/object/OID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_oid, 'OID' ]);
 sub api_update_vars_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
-# api_create_relation 
+# api_create_relation
 push (@raw_action_list, [ '/api/relation.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_relation ]);
 sub api_create_relation {
     my ($ctx, $info, $phr) = @_;
-    return { status => 'not yet implemented' };
+    return { relationId => 'nyi' };
 }
 
-# api_list_relations 
+# api_list_relations
 push (@raw_action_list, [ '/api/relation.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_relations ]);
 sub api_list_relations {
     my ($ctx, $info, $phr) = @_;
-    return { status => 'not yet implemented' };
+    return { relationIds => 'nyi' };
 }
 
 # api_delete_rid
 push (@raw_action_list, [ '/api/relation/RID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_rid, 'RID' ]);
 sub api_delete_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_read_rid
 push (@raw_action_list, [ '/api/relation/RID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_rid, 'RID' ]);
 sub api_read_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    return { status => 'not yet implemented' };
+    return { relation => 'nyi' };
 }
 
 # api_update_rid
 push (@raw_action_list, [ '/api/relation/RID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_rid, 'RID' ]);
 sub api_update_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_create_vars_rid
 push (@raw_action_list, [ '/api/relation/RID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_rid, 'RID' ]);
 sub api_create_vars_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_delete_vars_rid
 push (@raw_action_list, [ '/api/relation/RID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_rid, 'RID' ]);
 sub api_delete_vars_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_read_vars_rid
 push (@raw_action_list, [ '/api/relation/RID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_rid, 'RID' ]);
 sub api_read_vars_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_update_vars_rid
 push (@raw_action_list, [ '/api/relation/RID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_rid, 'RID' ]);
 sub api_update_vars_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
-# api_select_object 
+# api_select_object
 push (@raw_action_list, [ '/api/select/object.FMT', 'READ', \&do_fmt, 'FMT', \&api_select_object ]);
 sub api_select_object {
     my ($ctx, $info, $phr) = @_;
-    return { status => 'not yet implemented' };
+    return { objectIds => 'nyi' };
 }
 
-# api_select_relation 
+# api_select_relation
 push (@raw_action_list, [ '/api/select/relation.FMT', 'READ', \&do_fmt, 'FMT', \&api_select_relation ]);
 sub api_select_relation {
     my ($ctx, $info, $phr) = @_;
-    return { status => 'not yet implemented' };
+    return { relationIds => 'nyi' };
 }
 
-# api_select_tag 
+# api_select_tag
 push (@raw_action_list, [ '/api/select/tag.FMT', 'READ', \&do_fmt, 'FMT', \&api_select_tag ]);
 sub api_select_tag {
     my ($ctx, $info, $phr) = @_;
-    return { status => 'not yet implemented' };
+    return { tagIds => 'nyi' };
 }
 
 # api_share_raw
 push (@raw_action_list, [ '/api/share/raw/RID/RVSN/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_share_raw, 'OID', 'RID', 'RVSN' ]);
 sub api_share_raw {
     my ($ctx, $info, $phr, $oid, $rid, $rvsn) = @_;
-    return { status => 'not yet implemented' };
+    return { url => 'nyi' };
 }
 
-# api_redirect_rid
+# api_redirect_rid # <-------- THIS IS SPECIAL
 push (@raw_action_list, [ '/api/share/redirect/RID.FMT', 'READ', \&do_fmt, 'FMT', \&api_redirect_rid, 'RID' ]);
 sub api_redirect_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    return { status => 'not yet implemented' };
+    die;
 }
 
-# api_redirect_rid_oid
+# api_redirect_rid_oid # <-------- THIS IS SPECIAL
 push (@raw_action_list, [ '/api/share/redirect/RID/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_redirect_rid_oid, 'OID', 'RID' ]);
 sub api_redirect_rid_oid {
     my ($ctx, $info, $phr, $oid, $rid) = @_;
-    return { status => 'not yet implemented' };
+    die;
 }
 
 # api_share_rid
 push (@raw_action_list, [ '/api/share/url/RID.FMT', 'READ', \&do_fmt, 'FMT', \&api_share_rid, 'RID' ]);
 sub api_share_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    return { status => 'not yet implemented' };
+    return { url => 'nyi' };
 }
 
 # api_share_rid_oid
 push (@raw_action_list, [ '/api/share/url/RID/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_share_rid_oid, 'OID', 'RID' ]);
 sub api_share_rid_oid {
     my ($ctx, $info, $phr, $oid, $rid) = @_;
-    return { status => 'not yet implemented' };
+    return { url => 'nyi' };
 }
 
-# api_create_tag 
+# api_create_tag
 push (@raw_action_list, [ '/api/tag.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_tag ]);
 sub api_create_tag {
     my ($ctx, $info, $phr) = @_;
-    return { status => 'not yet implemented' };
+    return { tagId => 'nyi' };
 }
 
-# api_list_tags 
+# api_list_tags
 push (@raw_action_list, [ '/api/tag.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_tags ]);
 sub api_list_tags {
     my ($ctx, $info, $phr) = @_;
-    return { status => 'not yet implemented' };
+    return { tagIds => 'nyi' };
 }
 
 # api_delete_tid
 push (@raw_action_list, [ '/api/tag/TID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_tid, 'TID' ]);
 sub api_delete_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_read_tid
 push (@raw_action_list, [ '/api/tag/TID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_tid, 'TID' ]);
 sub api_read_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    return { status => 'not yet implemented' };
+    return { tag => 'nyi' };
 }
 
 # api_update_tid
 push (@raw_action_list, [ '/api/tag/TID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_tid, 'TID' ]);
 sub api_update_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_create_vars_tid
 push (@raw_action_list, [ '/api/tag/TID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_tid, 'TID' ]);
 sub api_create_vars_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_delete_vars_tid
 push (@raw_action_list, [ '/api/tag/TID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_tid, 'TID' ]);
 sub api_delete_vars_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_read_vars_tid
 push (@raw_action_list, [ '/api/tag/TID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_tid, 'TID' ]);
 sub api_read_vars_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
 # api_update_vars_tid
 push (@raw_action_list, [ '/api/tag/TID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_tid, 'TID' ]);
 sub api_update_vars_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    return { status => 'not yet implemented' };
+    return { status => 'nyi' };
 }
 
-# api_version 
+# api_version
 push (@raw_action_list, [ '/api/version.FMT', 'READ', \&do_fmt, 'FMT', \&api_version ]);
 sub api_version {
     my ($ctx, $info, $phr) = @_;
-    return { version => { api => '1.001', mine => '1.001' } };
+    return { version => 
+	     { api => '1.001', 
+	       mine => '1.001' } };
 }
-
-
 
 ##################################################################
 

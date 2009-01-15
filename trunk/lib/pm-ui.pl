@@ -19,11 +19,13 @@
 use strict;
 use warnings;
 
+our @raw_action_list;
+
 ##################################################################
 ##################################################################
 ##################################################################
 
-sub ui_create_object {
+sub XXui_create_object {
     my ($ctx, $info, $phr) = @_;
 
     my $result = &api_create_object(@_);
@@ -34,7 +36,7 @@ sub ui_create_object {
     return $p;
 }
 
-sub ui_create_relation {
+sub XXui_create_relation {
     my ($ctx, $info, $phr) = @_;
 
     my $result = &api_create_relation(@_);
@@ -45,7 +47,7 @@ sub ui_create_relation {
     return $p;
 }
 
-sub ui_create_tag {
+sub XXui_create_tag {
     my ($ctx, $info, $phr) = @_;
 
     my $result = &api_create_tag(@_);
@@ -56,7 +58,7 @@ sub ui_create_tag {
     return $p;
 }
 
-sub ui_show_objects {
+sub XXui_show_objects {
     my ($ctx, $info, $phr) = @_;
 
     my @oids = Object->list;
@@ -85,7 +87,7 @@ sub ui_show_objects {
     return $p;
 }
 
-sub ui_show_relations {
+sub XXui_show_relations {
     my ($ctx, $info, $phr) = @_;
 
     my @rids = Relation->list;
@@ -113,7 +115,7 @@ sub ui_show_relations {
     return $p;
 }
 
-sub ui_show_tags {
+sub XXui_show_tags {
     my ($ctx, $info, $phr) = @_;
 
     my @tids = Tag->list;
@@ -145,41 +147,41 @@ sub ui_show_tags {
 ##################################################################
 ##################################################################
 
-push (@main::raw_action_list,
-      [ '/ui/version.html', 'GET', \&ui_version ],
-      [ '/ui/update-tag/TID.html', 'POST', \&ui_update_tag, 'TID' ],
-      [ '/ui/update-tag/TID.html', 'GET', \&do_document, 'database/ui', 'update-tag-xxx.html' ],
-      [ '/ui/update-relation/RID.html', 'POST', \&ui_update_relation, 'RID' ],
-      [ '/ui/update-relation/RID.html', 'GET', \&do_document, 'database/ui', 'update-relation-xxx.html' ],
-      [ '/ui/update-object/OID.html', 'GET', \&do_document, 'database/ui', 'update-object-xxx.html' ],
-      [ '/ui/update-object/OID.html', 'POST', \&ui_update_object, 'OID' ],
-      [ '/ui/update-data/OID.html', 'POST', \&ui_update_data, 'OID' ],
-      [ '/ui/update-data/OID.html', 'GET', \&do_document, 'database/ui', 'update-data-xxx.html' ],
-      [ '/ui/update-config.html', 'POST', \&ui_update_config ],
-      [ '/ui/show-tags.html', 'GET', \&ui_show_tags ],
-      [ '/ui/show-relations.html', 'GET', \&ui_show_relations ],
-      [ '/ui/show-objects.html', 'GET', \&ui_show_objects ],
-      [ '/ui/show-config.html', 'GET', \&ui_show_config ],
-      [ '/ui/show-clones/OID.html', 'GET', \&ui_show_clones, 'OID' ],
-      [ '/ui/share/url/RID/OID.html', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
-      [ '/ui/share/url/RID.html', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
-      [ '/ui/share/redirect/RID/OID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
-      [ '/ui/share/redirect/RID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
-      [ '/ui/share/raw/RID/RVSN/OID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
-      [ '/ui/select/tag.html', 'GET', \&do_noop ],
-      [ '/ui/select/relation.html', 'GET', \&do_noop ],
-      [ '/ui/select/object.html', 'GET', \&do_noop ],
-      [ '/ui/read-tag/TID.html', 'GET', \&ui_read_tag, 'TID' ],
-      [ '/ui/read-relation/RID.html', 'GET', \&ui_read_relation, 'RID' ],
-      [ '/ui/read-object/OID.html', 'GET', \&ui_read_object, 'OID' ],
-      [ '/ui/delete-tag/TID.html', 'GET', \&ui_delete_tag, 'TID' ],
-      [ '/ui/delete-relation/RID.html', 'GET', \&ui_delete_relation, 'RID' ],
-      [ '/ui/delete-object/OID.html', 'GET', \&ui_delete_object, 'OID' ],
-      [ '/ui/create-tag.html', 'POST', \&ui_create_tag ],
-      [ '/ui/create-relation.html', 'POST', \&ui_create_relation ],
-      [ '/ui/create-object.html', 'POST', \&ui_create_object ],
-      [ '/ui/clone-object/OID.html', 'GET', \&ui_clone_object, 'OID' ],
-    );
+push (@raw_action_list, [ '/ui/clone-object/OID.html', 'GET', \&ui_clone_object, 'OID' ]);
+push (@raw_action_list, [ '/ui/create-object.html', 'POST', \&ui_create_object ]);
+push (@raw_action_list, [ '/ui/create-relation.html', 'POST', \&ui_create_relation ]);
+push (@raw_action_list, [ '/ui/create-tag.html', 'POST', \&ui_create_tag ]);
+push (@raw_action_list, [ '/ui/delete-object/OID.html', 'GET', \&ui_delete_object, 'OID' ]);
+push (@raw_action_list, [ '/ui/delete-relation/RID.html', 'GET', \&ui_delete_relation, 'RID' ]);
+push (@raw_action_list, [ '/ui/delete-tag/TID.html', 'GET', \&ui_delete_tag, 'TID' ]);
+push (@raw_action_list, [ '/ui/read-object/OID.html', 'GET', \&ui_read_object, 'OID' ]);
+push (@raw_action_list, [ '/ui/read-relation/RID.html', 'GET', \&ui_read_relation, 'RID' ]);
+push (@raw_action_list, [ '/ui/read-tag/TID.html', 'GET', \&ui_read_tag, 'TID' ]);
+push (@raw_action_list, [ '/ui/select/object.html', 'GET', \&do_noop ]);
+push (@raw_action_list, [ '/ui/select/relation.html', 'GET', \&do_noop ]);
+push (@raw_action_list, [ '/ui/select/tag.html', 'GET', \&do_noop ]);
+
+push (@raw_action_list, [ '/ui/share/raw/RID/RVSN/OID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ]);
+push (@raw_action_list, [ '/ui/share/redirect/RID', 'GET', \&do_noop, 'RID' ]);
+push (@raw_action_list, [ '/ui/share/redirect/RID/OID', 'GET', \&do_noop, 'RID', 'OID' ]);
+push (@raw_action_list, [ '/ui/share/url/RID.html', 'GET', \&do_noop, 'RID' ]);
+push (@raw_action_list, [ '/ui/share/url/RID/OID.html', 'GET', \&do_noop, 'RID', 'OID' ]);
+
+push (@raw_action_list, [ '/ui/show-clones/OID.html', 'GET', \&ui_show_clones, 'OID' ]);
+push (@raw_action_list, [ '/ui/show-config.html', 'GET', \&ui_show_config ]);
+push (@raw_action_list, [ '/ui/show-objects.html', 'GET', \&ui_show_objects ]);
+push (@raw_action_list, [ '/ui/show-relations.html', 'GET', \&ui_show_relations ]);
+push (@raw_action_list, [ '/ui/show-tags.html', 'GET', \&ui_show_tags ]);
+push (@raw_action_list, [ '/ui/update-config.html', 'POST', \&ui_update_config ]);
+push (@raw_action_list, [ '/ui/update-data/OID.html', 'GET', \&do_document, 'database/ui', 'update-data-xxx.html' ]);
+push (@raw_action_list, [ '/ui/update-data/OID.html', 'POST', \&ui_update_data, 'OID' ]);
+push (@raw_action_list, [ '/ui/update-object/OID.html', 'GET', \&do_document, 'database/ui', 'update-object-xxx.html' ]);
+push (@raw_action_list, [ '/ui/update-object/OID.html', 'POST', \&ui_update_object, 'OID' ]);
+push (@raw_action_list, [ '/ui/update-relation/RID.html', 'GET', \&do_document, 'database/ui', 'update-relation-xxx.html' ]);
+push (@raw_action_list, [ '/ui/update-relation/RID.html', 'POST', \&ui_update_relation, 'RID' ]);
+push (@raw_action_list, [ '/ui/update-tag/TID.html', 'GET', \&do_document, 'database/ui', 'update-tag-xxx.html' ]);
+push (@raw_action_list, [ '/ui/update-tag/TID.html', 'POST', \&ui_update_tag, 'TID' ]);
+push (@raw_action_list, [ '/ui/version.html', 'GET', \&ui_version ]);
 
 ##################################################################
 
