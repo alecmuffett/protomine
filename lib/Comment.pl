@@ -25,20 +25,33 @@ use vars qw(@ISA);
 #require 'mine/Thing.pl';
 @ISA = qw( Thing );
 
-##################################################################
+# Comments can be dealt with pretty easily by just wholly overriding
+# the Thing constructor to make use of the necessary second argument
 
-sub boot {
-    my $self = shift;
+sub new {
+    my $class = shift;
+    my $oid = shift;
+    my $cid = shift;
 
-    $self->{DIRECTORY} = 'database/comments'; # NEEDS FIXING FOR COMMENTS; OVERRIDE new()
+    if (ref($class)) {
+        $class = ref($class);
+    }
 
-    $self->{ENFORCE_UNIQUE_NAMES} = 0;	# false, for comments
+    my $self = {};
+
+    $self->{CLASS} = $class;
+    $self->{DATA} = {};
+
+    bless $self, $class;
+
+    $self->{DIRECTORY} = 'database/objects/$oid';
+    $self->{ENFORCE_UNIQUE_NAMES} = 0;
     $self->{ID_KEY} = 'commentId';
     $self->{NAME_KEY} = 'commentSubject';
 
     $self->{REQUIRED_KEYS} = {
 	commentBody => 1,
-	commentRelationID => 1,	# from infrastructure, not user supplied
+	commentRelationID => 1,
     };
 
     $self->{VALID_KEYS} = {
@@ -54,9 +67,12 @@ sub boot {
 	commentRelationId => 1,
     };
 
+    if (defined($cid)) {
+        $self->load($cid)
+    }
+
     return $self;
 }
-
 
 ##################################################################
 
