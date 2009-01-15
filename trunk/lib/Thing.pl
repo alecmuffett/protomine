@@ -295,7 +295,7 @@ sub set {
 	$value =~ s!^\s!!o;	# kill leading whitespace
 	$value =~ s! $!!o;	# kill trailing whitespace
 
-	# this is how we delete params, set them to empty string
+	# this is how we delete keys, set them to empty string
 	if ($value eq '') {
 	    die "set($key, '') [ie: DELETE] however $key is REQUIRED\n" 
 		if ($self->{REQUIRED_KEYS}->{$key}); 
