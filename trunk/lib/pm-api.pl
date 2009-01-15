@@ -43,36 +43,37 @@ sub do_fmt {
 }
 
 # keycrud: cRUD atop get/set for Things
-# create == update, so skipped
-# delete == update with empty value, so skipped
+# create == bulk update with a bunch of key/value pairs
+# read(key)
+# update(key)
+# delete(key)
 
-sub keycrud_read {
+sub keycrud_create {
     my ($ctx, $thing, $prefix) = @_;
 
     my $q = $ctx->cgi;
-    my @container;
-
-    foreach my $key (grep(/^$prefix/, $q->param)) {
-        my $value = $thing->get($key);
-        push(@container, { $key => $value });
-    }
-
-    return { values => \@container };
-}
-
-sub keycrud_update {
-    my ($ctx, $thing, $prefix) = @_;
-
-    my $q = $ctx->cgi;
-
     foreach my $key (grep(/^$prefix/, $q->param)) {
 	my $value = $q->param($key);
-
 	if (defined($value)) {
 	    $thing->set($key, $value);
 	}
     }
+    return { status => $thing->update };
+}
 
+sub keycrud_read {
+    my ($ctx, $thing, $key) = @_;
+    return { value => $thing->get($key) };
+}
+
+sub keycrud_update {
+    my ($ctx, $thing, $key) = @_;
+    return { config => 'nyi' };
+}
+
+sub keycrud_delete {
+    my ($ctx, $thing, $key) = @_;
+    $thing->set($key, '');	# delete == set to empty string
     return { status => $thing->update };
 }
 
@@ -194,18 +195,32 @@ sub api_update_oid_cid {
     return { status => 'nyi' };
 }
 
-# api_read_key_oid_cid
-push (@raw_action_list, [ '/api/object/OID/CID/key.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_key_oid_cid, 'OID', 'CID' ]);
-sub api_read_key_oid_cid {
+# api_create_keys_oid_cid
+push (@raw_action_list, [ '/api/object/OID/CID/key.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_keys_oid_cid, 'OID', 'CID' ]);
+sub api_create_keys_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
-    return &keycrud_read($ctx, Comment->new($oid, $cid), 'comment');
+    return &keycrud_create($ctx, Comment->new($oid, $cid), 'comment');
 }
 
-# api_update_key_oid_cid
-push (@raw_action_list, [ '/api/object/OID/CID/key.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_key_oid_cid, 'OID', 'CID' ]);
-sub api_update_key_oid_cid {
-    my ($ctx, $info, $phr, $oid, $cid) = @_;
-    return &keycrud_update($ctx, Comment->new($oid, $cid), 'comment');
+# api_read_key_oid_cid_key
+push (@raw_action_list, [ '/api/object/OID/CID/key/KEY.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_key_oid_cid_key, 'OID', 'CID', 'KEY' ]);
+sub api_read_key_oid_cid_key {
+    my ($ctx, $info, $phr, $oid, $cid, $key) = @_;
+    return &keycrud_read($ctx, Comment->new($oid, $cid), $key);
+}
+
+# api_update_key_oid_cid_key
+push (@raw_action_list, [ '/api/object/OID/CID/key/KEY.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_key_oid_cid_key, 'OID', 'CID', 'KEY' ]);
+sub api_update_key_oid_cid_key {
+    my ($ctx, $info, $phr, $oid, $cid, $key) = @_;
+    return &keycrud_update($ctx, Comment->new($oid, $cid), $key);
+}
+
+# api_delete_key_oid_cid_key
+push (@raw_action_list, [ '/api/object/OID/CID/key/KEY.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_key_oid_cid_key, 'OID', 'CID', 'KEY' ]);
+sub api_delete_key_oid_cid_key {
+    my ($ctx, $info, $phr, $oid, $cid, $key) = @_;
+    return &keycrud_delete($ctx, Comment->new($oid, $cid), $key);
 }
 
 # api_create_clone_oid
@@ -237,18 +252,32 @@ sub api_list_comments_oid {
     return { commentIds => \@container };
 }
 
-# api_read_key_oid
-push (@raw_action_list, [ '/api/object/OID/key.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_key_oid, 'OID' ]);
-sub api_read_key_oid {
+# api_create_keys_oid
+push (@raw_action_list, [ '/api/object/OID/key.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_keys_oid, 'OID' ]);
+sub api_create_keys_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return &keycrud_read($ctx, Object->new($oid), 'object');
+    return &keycrud_create($ctx, Object->new($oid), 'object');
 }
 
-# api_update_key_oid
-push (@raw_action_list, [ '/api/object/OID/key.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_key_oid, 'OID' ]);
-sub api_update_key_oid {
-    my ($ctx, $info, $phr, $oid) = @_;
-    return &keycrud_update($ctx, Object->new($oid), 'object');
+# api_read_key_oid_key
+push (@raw_action_list, [ '/api/object/OID/key/KEY.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_key_oid_key, 'OID', 'KEY' ]);
+sub api_read_key_oid_key {
+    my ($ctx, $info, $phr, $oid, $key) = @_;
+    return &keycrud_read($ctx, Object->new($oid), $key);
+}
+
+# api_update_key_oid_key
+push (@raw_action_list, [ '/api/object/OID/key/KEY.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_key_oid_key, 'OID', 'KEY' ]);
+sub api_update_key_oid_key {
+    my ($ctx, $info, $phr, $oid, $key) = @_;
+    return &keycrud_update($ctx, Object->new($oid), $key);
+}
+
+# api_delete_key_oid_key
+push (@raw_action_list, [ '/api/object/OID/key/KEY.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_key_oid_key, 'OID', 'KEY' ]);
+sub api_delete_key_oid_key {
+    my ($ctx, $info, $phr, $oid, $key) = @_;
+    return &keycrud_delete($ctx, Object->new($oid), $key);
 }
 
 # api_create_relation
@@ -301,18 +330,32 @@ sub api_update_rid {
     return { status => 'nyi' };
 }
 
-# api_read_key_rid
-push (@raw_action_list, [ '/api/relation/RID/key.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_key_rid, 'RID' ]);
-sub api_read_key_rid {
+# api_create_keys_rid
+push (@raw_action_list, [ '/api/relation/RID/key.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_keys_rid, 'RID' ]);
+sub api_create_keys_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    return &keycrud_read($ctx, Relation->new($rid), 'relation');
+    return &keycrud_create($ctx, Relation->new($rid), 'relation');
 }
 
-# api_update_key_rid
-push (@raw_action_list, [ '/api/relation/RID/key.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_key_rid, 'RID' ]);
-sub api_update_key_rid {
-    my ($ctx, $info, $phr, $rid) = @_;
-    return &keycrud_update($ctx, Relation->new($rid), 'relation');
+# api_read_key_rid_key
+push (@raw_action_list, [ '/api/relation/RID/key/KEY.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_key_rid_key, 'RID', 'KEY' ]);
+sub api_read_key_rid_key {
+    my ($ctx, $info, $phr, $rid, $key) = @_;
+    return &keycrud_read($ctx, Relation->new($rid), $key);
+}
+
+# api_update_key_rid_key
+push (@raw_action_list, [ '/api/relation/RID/key/KEY.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_key_rid_key, 'RID', 'KEY' ]);
+sub api_update_key_rid_key {
+    my ($ctx, $info, $phr, $rid, $key) = @_;
+    return &keycrud_update($ctx, Relation->new($rid), $key);
+}
+
+# api_delete_key_rid_key
+push (@raw_action_list, [ '/api/relation/RID/key/KEY.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_key_rid_key, 'RID', 'KEY' ]);
+sub api_delete_key_rid_key {
+    my ($ctx, $info, $phr, $rid, $key) = @_;
+    return &keycrud_delete($ctx, Relation->new($rid), $key);
 }
 
 # api_select_object # <--------------------------------------- TO BE DONE
@@ -421,18 +464,32 @@ sub api_update_tid {
     return { status => 'nyi' };
 }
 
-# api_read_key_tid
-push (@raw_action_list, [ '/api/tag/TID/key.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_key_tid, 'TID' ]);
-sub api_read_key_tid {
+# api_create_keys_tid
+push (@raw_action_list, [ '/api/tag/TID/key.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_keys_tid, 'TID' ]);
+sub api_create_keys_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    return &keycrud_read($ctx, Tag->new($tid), 'tag');
+    return &keycrud_create($ctx, Tag->new($tid), 'tag');
 }
 
-# api_update_key_tid
-push (@raw_action_list, [ '/api/tag/TID/key.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_key_tid, 'TID' ]);
-sub api_update_key_tid {
-    my ($ctx, $info, $phr, $tid) = @_;
-    return &keycrud_update($ctx, Tag->new($tid), 'tag');
+# api_read_key_tid_key
+push (@raw_action_list, [ '/api/tag/TID/key/KEY.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_key_tid_key, 'TID', 'KEY' ]);
+sub api_read_key_tid_key {
+    my ($ctx, $info, $phr, $tid, $key) = @_;
+    return &keycrud_read($ctx, Tag->new($tid), $key);
+}
+
+# api_update_key_tid_key
+push (@raw_action_list, [ '/api/tag/TID/key/KEY.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_key_tid_key, 'TID', 'KEY' ]);
+sub api_update_key_tid_key {
+    my ($ctx, $info, $phr, $tid, $key) = @_;
+    return &keycrud_update($ctx, Tag->new($tid), $key);
+}
+
+# api_delete_key_tid_key
+push (@raw_action_list, [ '/api/tag/TID/key/KEY.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_key_tid_key, 'TID', 'KEY' ]);
+sub api_delete_key_tid_key {
+    my ($ctx, $info, $phr, $tid, $key) = @_;
+    return &keycrud_delete($ctx, Tag->new($tid), $key);
 }
 
 # api_version

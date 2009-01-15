@@ -297,6 +297,8 @@ sub set {
 
 	# this is how we delete params, set them to empty string
 	if ($value eq '') {
+	    die "set($key, '') [ie: DELETE] however $key is REQUIRED\n" 
+		if ($self->{REQUIRED_KEYS}->{$key}); 
 	    delete($self->{DATA}->{$key});
 	}
 	else {
