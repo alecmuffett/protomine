@@ -96,19 +96,30 @@ my @raw_action_list = (
     [ '', 'GET', \&do_redirect, '/ui/' ],
 
     ###
-    # public files and documentation
-    ###
-
-    [ '/pub', 'GET', \&do_document, 'database/pub', '.' ],
-    [ '/pub/SUFFIX', 'GET', \&do_document, 'database/pub', 'SUFFIX' ],
-    [ '/doc', 'GET', \&do_document, 'database/doc', '.' ],
-    [ '/doc/SUFFIX', 'GET', \&do_document, 'database/doc', 'SUFFIX' ],
-
-    ###
     # the /get URL is a special case HTTP
     ###
 
-    [ '/get', 'GET', \&do_remote_get, 'GET', ], # <---- FEED & OBJECT RETRIEVAL, COMMENT SUBMISSION BY EXTERNALS
+    [ '/get', 'GET', \&do_remote_get ], # <---- FEED AND OBJECT RETRIEVAL
+    [ '/get', 'POST', \&do_remote_post ], # <---- COMMENT SUBMISSION
+
+    ###
+    # API calls are safe to fasttrack / out of sequence, since they exact-match
+    ###
+
+    [ '/api/object/OID', 'READ', \&api_read_aux_oid, 'OID' ], # <---- SPECIAL, EMITS AUX DATA
+    # the following method deleted for security/simplicity reasons;
+    # use the API version.  there is simply no point in having TWO
+    # urls to rewrite, outbound, when this is all user-facing stuff.
+    # [ '/ui/read-data/OID', 'GET', \&api_read_aux_oid, 'OID' ],
+
+    ###
+    # public files and documentation
+    ###
+
+    [  '/pub',         'GET',  \&do_document,  'database/pub',  '.'       ],
+    [  '/pub/SUFFIX',  'GET',  \&do_document,  'database/pub',  'SUFFIX'  ],
+    [  '/doc',         'GET',  \&do_document,  'database/doc',  '.'       ],
+    [  '/doc/SUFFIX',  'GET',  \&do_document,  'database/doc',  'SUFFIX'  ],
 
     ###
     # the /ui/ hierarchy lives in HTTP space
@@ -148,14 +159,9 @@ my @raw_action_list = (
     [  '/ui/create-object.html',        'POST',  \&ui_create_object     ],
     [  '/ui/clone-object/OID.html',     'GET',   \&ui_clone_object,     'OID'           ],
 
-    # this method deleted for security/simplicity reasons; use the API
-    # version.  there is simply no point in having TWO urls to
-    # rewrite, outbound, when this is all user-facing stuff.
-    # [ '/ui/read-data/OID', 'GET', \&api_read_aux_oid, 'OID' ], # <---- AUX, SAME AS API
-
     ###
-    # catchall for the methods above; we may pick up a *file* for
-    # "GET" which corresponds with something that is "POST" above.
+    # catchall/fallthru for the methods above; we may pick up a *file*
+    # for "GET" which corresponds with something that is "POST" above.
     ###
 
     [ '/ui', 'GET', \&do_document, 'database/ui', '.' ],
@@ -172,17 +178,17 @@ my @raw_action_list = (
     [  '/api/object/OID.xml',              'DELETE',  \&do_xml,  \&api_delete_oid,           'OID'   ],
     [  '/api/object/OID.xml',              'READ',    \&do_xml,  \&api_read_oid,             'OID'   ],
     [  '/api/object/OID.xml',              'UPDATE',  \&do_xml,  \&api_update_oid,           'OID'   ],
-    [  '/api/object/OID/CID.xml',          'DELETE',  \&do_xml,  \&api_delete_oid_cid        'OID',  'CID'   ],
-    [  '/api/object/OID/CID.xml',          'READ',    \&do_xml,  \&api_read_oid_cid          'OID',  'CID'   ],
-    [  '/api/object/OID/CID.xml',          'UPDATE',  \&do_xml,  \&api_update_oid_cid        'OID',  'CID'   ],
+    [  '/api/object/OID/CID.xml',          'DELETE',  \&do_xml,  \&api_delete_oid_cid,       'OID',  'CID'   ],
+    [  '/api/object/OID/CID.xml',          'READ',    \&do_xml,  \&api_read_oid_cid,         'OID',  'CID'   ],
+    [  '/api/object/OID/CID.xml',          'UPDATE',  \&do_xml,  \&api_update_oid_cid,       'OID',  'CID'   ],
     [  '/api/object/OID/CID/vars.xml',     'CREATE',  \&do_xml,  \&api_create_vars_oid_cid,  'OID',  'CID'   ],
     [  '/api/object/OID/CID/vars.xml',     'DELETE',  \&do_xml,  \&api_delete_vars_oid_cid,  'OID',  'CID'   ],
     [  '/api/object/OID/CID/vars.xml',     'READ',    \&do_xml,  \&api_read_vars_oid_cid,    'OID',  'CID'   ],
     [  '/api/object/OID/CID/vars.xml',     'UPDATE',  \&do_xml,  \&api_update_vars_oid_cid,  'OID',  'CID'   ],
     [  '/api/object/OID/clone.xml',        'CREATE',  \&do_xml,  \&api_create_clone_oid,     'OID'   ],
     [  '/api/object/OID/clone.xml',        'READ',    \&do_xml,  \&api_list_clones_oid,      'OID'   ],
-    [  '/api/object/OID/comment.xml',      'CREATE',  \&do_xml,  \&api_create_comment_oid    'OID'   ],
-    [  '/api/object/OID/comment.xml',      'READ',    \&do_xml,  \&api_list_comments_oid     'OID'   ],
+    [  '/api/object/OID/comment.xml',      'CREATE',  \&do_xml,  \&api_create_comment_oid,   'OID'   ],
+    [  '/api/object/OID/comment.xml',      'READ',    \&do_xml,  \&api_list_comments_oid ,   'OID'   ],
     [  '/api/object/OID/vars.xml',         'CREATE',  \&do_xml,  \&api_create_vars_oid,      'OID'   ],
     [  '/api/object/OID/vars.xml',         'DELETE',  \&do_xml,  \&api_delete_vars_oid,      'OID'   ],
     [  '/api/object/OID/vars.xml',         'READ',    \&do_xml,  \&api_read_vars_oid,        'OID'   ],
@@ -214,8 +220,6 @@ my @raw_action_list = (
     [  '/api/tag/TID/vars.xml',            'READ',    \&do_xml,  \&api_read_vars_tid,        'TID'   ],
     [  '/api/tag/TID/vars.xml',            'UPDATE',  \&do_xml,  \&api_update_vars_tid,      'TID'   ],
     [  '/api/version.xml',                 'READ',    \&do_xml,  \&api_version               ],
-
-    [ '/api/object/OID', 'READ', \&api_read_aux_oid, 'OID' ], # <---- SPECIAL, EMITS RAW AUX DATA
 
     );
 
