@@ -3,4 +3,6 @@ there are a few instances of:
 	die "this can't happen"
 
 ...in the code; they typically do not have linefeed '\n' appended, so
-that Perl will dump the line number when it aborts...
+that Perl will dump the line number when it aborts; that said the
+backtraces tend to come from Carp,. so maybe they should be labelled
+instead?

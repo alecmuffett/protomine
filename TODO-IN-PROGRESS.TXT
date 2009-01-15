@@ -1,0 +1,51 @@
+add access control for documents which are not public or final or draft
+
+------------------------------------------------------------------
+
+redo argument parsing for minectl
+
+	minectl [opts] command [cmdopts] arg ...
+	minectl upload -t "tags ..." -s status arg arg arg
+
+------------------------------------------------------------------
+
+break raw_action_table into chunks, install in relevant pm-* files
+
+------------------------------------------------------------------
+
+add public/final/draft access control into matchInterests
+
+------------------------------------------------------------------
+
+rewrite and test the ACTUAL (rather than fake) PUT handler
+
+------------------------------------------------------------------
+
+crypto object: implement simple hash and crypto, use in minekey generation
+
+------------------------------------------------------------------
+
+add relation->currentlyValid() and use in do_remote_get and do_remote_post
+
+------------------------------------------------------------------
+
+add IP address of client machine into Context object
+
+------------------------------------------------------------------
+
+add accessor methods for all pertinent data, into Context object
+
+------------------------------------------------------------------
+
+purge auxGet/PutBlob and other unused code
+
+------------------------------------------------------------------
+
+updateThingParam has to work two ways, updating (several) param/value
+pairs, *or* nuke the entire thing and replace.
+
+------------------------------------------------------------------
+
+toAtom - needs GUID generation; hook this into Crypto object, or maybe
+as getGUID method on each Object?
+
