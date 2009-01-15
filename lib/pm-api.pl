@@ -21,153 +21,45 @@ use warnings;
 
 our @raw_action_list;
 
-# api_create_clone --
-sub XXapi_create_clone {          # -- DONE --
-    my ($ctx, $info, $phr, $oid) = @_;
-    my $object = Object->new($oid);
-    return { objectId => $object->clone };
-}
-
-# api_create_object --
-sub XXapi_create_object {         # -- DONE --
-    my ($ctx, $info, $phr) = @_;
-
-    my $q = $ctx->cgi;
-    my $object = Object->new;
-    my @import_list = grep(/^object/o, $q->param);
-
-    foreach my $key (@import_list) {
-	my $value = $q->param($key);
-
-	if (defined($value)) {
-	    $object->set($key, $value);
-	}
-    }
-
-    my $oid = $object->save;    # now it is in the database
-
-    if (defined($q->param('data'))) { # install that which is uploaded
-	my $fh = $q->upload('data');
-	unless (defined($fh)) {
-	    die "api_create_object: bad fh passed back from cgi";
-	}
-	$object->auxPutFH($fh);
-    }
-
-    return { objectId => $oid };
-}
-
-# api_create_relation --
-sub XXapi_create_relation {       # -- DONE --
-    my ($ctx, $info, $phr) = @_;
-
-    my $q = $ctx->cgi;
-    my $relation = Relation->new;
-    my @import_list = grep(/^relation/o, $q->param);
-
-    foreach my $key (@import_list ) {
-	my $value = $q->param($key);
-
-	if (defined($value)) {
-	    $relation->set($key, $value);
-	}
-    }
-
-    return { relationId => $relation->save };
-}
-
-# api_create_tag --
-sub XXapi_create_tag {            # -- DONE --
-    my ($ctx, $info, $phr) = @_;
-
-    my $q = $ctx->cgi;
-    my $tag = Tag->new;
-    my @import_list = grep(/^tag/o, $q->param);
-
-    foreach my $key (@import_list) {
-	my $value = $q->param($key);
-
-	if (defined($value)) {
-	    $tag->set($key, $value);
-	}
-    }
-
-    return { tagId => $tag->save };
-}
-
-# api_delete_oid --
-sub XXapi_delete_oid {            # -- DONE --
-    my ($ctx, $info, $phr, $oid) = @_;
-    my $object = Object->new($oid);
-    return { status => $object->delete };
-}
-
-# api_delete_rid --
-sub XXapi_delete_rid {            # -- DONE --
-    my ($ctx, $info, $phr, $rid) = @_;
-    my $relation = Relation->new($rid);
-    return { status => $relation->delete };
-}
-
-# api_delete_tid --
-sub XXapi_delete_tid {            # -- DONE --
-    my ($ctx, $info, $phr, $tid) = @_;
-    my $tag = Tag->new($tid);
-    return { status => $tag->delete };
-}
-
-# api_list_objects --
-sub XXapi_list_objects {          # -- DONE --
-    my ($ctx, $info, $phr) = @_;
-    my @structure;
-    foreach my $oid (Object->list) {
-	push(@structure, { objectId => $oid });
-    }
-    return { objectIds => \@structure };
-}
-
-# api_list_relations --
-sub XXapi_list_relations {        # -- DONE --
-    my ($ctx, $info, $phr) = @_;
-    my @structure;
-    foreach my $rid (Relation->list) {
-	push(@structure, { relationId => $rid });
-    }
-    return { relationIds => \@structure };
-}
-
-# api_list_tags --
-sub XXapi_list_tags {             # -- DONE --
-    my ($ctx, $info, $phr) = @_;
-    my @structure;
-    foreach my $tid (Tag->list) {
-	push(@structure, { tagId => $tid });
-    }
-    return { tagIds => \@structure };
-}
-
-# api_read_oid --
-sub XXapi_read_oid {              # -- DONE --
-    my ($ctx, $info, $phr, $oid) = @_;
-    my $object = Object->new($oid);
-    return { object => $object->toDataStructure };
-}
-
-# api_read_rid --
-sub XXapi_read_rid {              # -- DONE --
-    my ($ctx, $info, $phr, $rid) = @_;
-    my $relation = Relation->new($rid);
-    return { relation => $relation->toDataStructure };
-}
-
-# api_read_tid --
-sub XXapi_read_tid {              # -- DONE --
-    my ($ctx, $info, $phr, $tid) = @_;
-    my $tag = Tag->new($tid);
-    return { tag => $tag->toDataStructure };
-}
-
 ##################################################################
+
+# stub to print whatever a API returns
+
+sub do_fmt {
+    my ($ctx, $info, $phr, $fmt, $fn, @rest) = @_;
+
+    if ($fmt eq 'xml') {
+	return Page->newXML(&{$fn}($ctx, $info, $phr, @rest));
+    }
+    elsif ($fmt eq 'json') {
+	return Page->newJSON(&{$fn}($ctx, $info, $phr, @rest));
+    }
+    elsif ($fmt eq 'txt') {
+	return Page->newText(&{$fn}($ctx, $info, $phr, @rest));
+    }
+    else {
+	die "do_fmt: this can't happen: fmt=$fmt";
+    }
+}
+
+# keycrud
+
+sub keycrud_create {
+    my ($ctx, $thing) = @_;
+}
+
+sub keycrud_read {
+    my ($ctx, $thing) = @_;
+}
+
+sub keycrud_update {
+    my ($ctx, $thing) = @_;
+}
+
+sub keycrud_delete {
+    my ($ctx, $thing) = @_;
+}
+
 ##################################################################
 ##################################################################
 ##################################################################
@@ -176,21 +68,20 @@ sub XXapi_read_tid {              # -- DONE --
 push (@raw_action_list, [ '/api/object/OID', 'READ', \&api_read_aux_oid, 'OID' ]);
 sub api_read_aux_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-
-    my $object = Object->new($oid);
-    return Page->newFile($object->auxGetFile, $object->get('objectType'));
+    my $o = Object->new($oid);
+    return Page->newFile($o->auxGetFile, $o->get('objectType'));
 }
 
 ##################################################################
 
-# api_read_config
+# api_read_config # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/config.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_config ]);
 sub api_read_config {
     my ($ctx, $info, $phr) = @_;
     return { config => 'nyi' };
 }
 
-# api_update_config
+# api_update_config # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/config.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_config ]);
 sub api_update_config {
     my ($ctx, $info, $phr) = @_;
@@ -201,17 +92,43 @@ sub api_update_config {
 push (@raw_action_list, [ '/api/object.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_object ]);
 sub api_create_object {
     my ($ctx, $info, $phr) = @_;
-    return { objectId => 'nyi' };
+
+    my $q = $ctx->cgi;
+    my $o = Object->new;
+    my @import_list = grep(/^object/o, $q->param);
+
+    # try setting keys
+    foreach my $key (@import_list) {
+	my $value = $q->param($key);
+
+	if (defined($value)) {
+	    $o->set($key, $value);
+	}
+    }
+
+    my $oid = $o->save;         # now it is in the database
+
+    # install that which is uploaded
+    if (defined($q->param('data'))) {
+	my $fh = $q->upload('data');
+	unless (defined($fh)) {
+	    die "api_create_object: bad fh passed back from cgi";
+	}
+	$o->auxPutFH($fh);
+    }
+
+    return { objectId => $oid };
 }
 
 # api_list_objects
 push (@raw_action_list, [ '/api/object.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_objects ]);
 sub api_list_objects {
     my ($ctx, $info, $phr) = @_;
-    return { objectIds => 'nyi' };
+    my @container = map { +{ objectId => $_ } } Object->list;
+    return { objectIds => \@container };
 }
 
-# api_update_aux_oid
+# api_update_aux_oid # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/object/OID', 'UPDATE', \&do_fmt, 'FMT', \&api_update_aux_oid, 'OID' ]);
 sub api_update_aux_oid {
     my ($ctx, $info, $phr, $oid) = @_;
@@ -222,87 +139,88 @@ sub api_update_aux_oid {
 push (@raw_action_list, [ '/api/object/OID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_oid, 'OID' ]);
 sub api_delete_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'nyi' };
+    return { status => Object->new($oid)->delete };
 }
 
 # api_read_oid
 push (@raw_action_list, [ '/api/object/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_oid, 'OID' ]);
 sub api_read_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { object => 'nyi' };
+    my $o = Object->new($oid);
+    return { object => $o->toDataStructure };
 }
 
-# api_update_oid
+# api_update_oid # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/object/OID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_oid, 'OID' ]);
 sub api_update_oid {
     my ($ctx, $info, $phr, $oid) = @_;
     return { status => 'nyi' };
 }
 
-# api_delete_oid_cid
+# api_delete_oid_cid # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/object/OID/CID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_oid_cid, 'OID', 'CID' ]);
 sub api_delete_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
     return { status => 'nyi' };
 }
 
-# api_read_oid_cid
+# api_read_oid_cid # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/object/OID/CID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_oid_cid, 'OID', 'CID' ]);
 sub api_read_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
     return { comment => 'nyi' };
 }
 
-# api_update_oid_cid
+# api_update_oid_cid # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/object/OID/CID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_oid_cid, 'OID', 'CID' ]);
 sub api_update_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
     return { status => 'nyi' };
 }
 
-# api_create_vars_oid_cid
-push (@raw_action_list, [ '/api/object/OID/CID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_oid_cid, 'OID', 'CID' ]);
-sub api_create_vars_oid_cid {
+# api_create_key_oid_cid
+push (@raw_action_list, [ '/api/object/OID/CID/key.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_key_oid_cid, 'OID', 'CID' ]);
+sub api_create_key_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
-    return { status => 'nyi' };
+    return &keycrud_create($ctx, Comment->new($oid, $cid));
 }
 
-# api_delete_vars_oid_cid
-push (@raw_action_list, [ '/api/object/OID/CID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_oid_cid, 'OID', 'CID' ]);
-sub api_delete_vars_oid_cid {
+# api_delete_key_oid_cid
+push (@raw_action_list, [ '/api/object/OID/CID/key.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_key_oid_cid, 'OID', 'CID' ]);
+sub api_delete_key_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
-    return { status => 'nyi' };
+    return &keycrud_delete($ctx, Comment->new($oid, $cid));
 }
 
-# api_read_vars_oid_cid
-push (@raw_action_list, [ '/api/object/OID/CID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_oid_cid, 'OID', 'CID' ]);
-sub api_read_vars_oid_cid {
+# api_read_key_oid_cid
+push (@raw_action_list, [ '/api/object/OID/CID/key.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_key_oid_cid, 'OID', 'CID' ]);
+sub api_read_key_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
-    return { status => 'nyi' };
+    return &keycrud_read($ctx, Comment->new($oid, $cid));
 }
 
-# api_update_vars_oid_cid
-push (@raw_action_list, [ '/api/object/OID/CID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_oid_cid, 'OID', 'CID' ]);
-sub api_update_vars_oid_cid {
+# api_update_key_oid_cid
+push (@raw_action_list, [ '/api/object/OID/CID/key.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_key_oid_cid, 'OID', 'CID' ]);
+sub api_update_key_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
-    return { status => 'nyi' };
+    return &keycrud_update($ctx, Comment->new($oid, $cid));
 }
 
 # api_create_clone_oid
 push (@raw_action_list, [ '/api/object/OID/clone.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_clone_oid, 'OID' ]);
 sub api_create_clone_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { objectId => 'nyi' };
+    return { objectId => Object->new($oid)->clone };
 }
 
-# api_list_clones_oid
+# api_list_clones_oid # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/object/OID/clone.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_clones_oid, 'OID' ]);
 sub api_list_clones_oid {
     my ($ctx, $info, $phr, $oid) = @_;
     return { objectIds => 'nyi' };
 }
 
-# api_create_comment_oid
+# api_create_comment_oid # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/object/OID/comment.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_comment_oid, 'OID' ]);
 sub api_create_comment_oid {
     my ($ctx, $info, $phr, $oid) = @_;
@@ -313,122 +231,139 @@ sub api_create_comment_oid {
 push (@raw_action_list, [ '/api/object/OID/comment.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_comments_oid , 'OID' ]);
 sub api_list_comments_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { commentIds => 'nyi' };
+    my @container = map { +{ commentId => $_ } } Comment->new($oid)->list;
+    return { commentIds => \@container };
 }
 
-# api_create_vars_oid
-push (@raw_action_list, [ '/api/object/OID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_oid, 'OID' ]);
-sub api_create_vars_oid {
+# api_create_key_oid 
+push (@raw_action_list, [ '/api/object/OID/key.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_key_oid, 'OID' ]);
+sub api_create_key_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'nyi' };
+    return &keycrud_create($ctx, Object->new($oid));
 }
 
-# api_delete_vars_oid
-push (@raw_action_list, [ '/api/object/OID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_oid, 'OID' ]);
-sub api_delete_vars_oid {
+# api_delete_key_oid
+push (@raw_action_list, [ '/api/object/OID/key.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_key_oid, 'OID' ]);
+sub api_delete_key_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'nyi' };
+    return &keycrud_delete($ctx, Object->new($oid));
 }
 
-# api_read_vars_oid
-push (@raw_action_list, [ '/api/object/OID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_oid, 'OID' ]);
-sub api_read_vars_oid {
+# api_read_key_oid
+push (@raw_action_list, [ '/api/object/OID/key.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_key_oid, 'OID' ]);
+sub api_read_key_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'nyi' };
+    return &keycrud_read($ctx, Object->new($oid));
 }
 
-# api_update_vars_oid
-push (@raw_action_list, [ '/api/object/OID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_oid, 'OID' ]);
-sub api_update_vars_oid {
+# api_update_key_oid
+push (@raw_action_list, [ '/api/object/OID/key.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_key_oid, 'OID' ]);
+sub api_update_key_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'nyi' };
+    return &keycrud_update($ctx, Object->new($oid));
 }
 
 # api_create_relation
 push (@raw_action_list, [ '/api/relation.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_relation ]);
 sub api_create_relation {
     my ($ctx, $info, $phr) = @_;
-    return { relationId => 'nyi' };
+
+    my $q = $ctx->cgi;
+    my $r = Relation->new;
+    my @import_list = grep(/^relation/o, $q->param);
+
+    foreach my $key (@import_list ) {
+	my $value = $q->param($key);
+
+	if (defined($value)) {
+	    $r->set($key, $value);
+	}
+    }
+
+    return { relationId => $r->save };
 }
 
 # api_list_relations
 push (@raw_action_list, [ '/api/relation.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_relations ]);
 sub api_list_relations {
     my ($ctx, $info, $phr) = @_;
-    return { relationIds => 'nyi' };
+    my @container = map { +{ relationId => $_ } } Relation->list;
+    return { relationIds => \@container };
 }
 
 # api_delete_rid
 push (@raw_action_list, [ '/api/relation/RID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_rid, 'RID' ]);
 sub api_delete_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    return { status => 'nyi' };
+    return { status => Relation->new($rid)->delete };
 }
 
 # api_read_rid
 push (@raw_action_list, [ '/api/relation/RID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_rid, 'RID' ]);
 sub api_read_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    return { relation => 'nyi' };
+    my $r = Relation->new($rid);
+    return { relation => $r->toDataStructure };
 }
 
-# api_update_rid
+# api_update_rid # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/relation/RID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_rid, 'RID' ]);
 sub api_update_rid {
     my ($ctx, $info, $phr, $rid) = @_;
     return { status => 'nyi' };
 }
 
-# api_create_vars_rid
-push (@raw_action_list, [ '/api/relation/RID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_rid, 'RID' ]);
-sub api_create_vars_rid {
+# api_create_key_rid
+push (@raw_action_list, [ '/api/relation/RID/key.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_key_rid, 'RID' ]);
+sub api_create_key_rid {
     my ($ctx, $info, $phr, $rid) = @_;
+    return &keycrud_create($ctx, Relation->new($rid));
+}
+
+# api_delete_key_rid
+push (@raw_action_list, [ '/api/relation/RID/key.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_key_rid, 'RID' ]);
+sub api_delete_key_rid {
+    my ($ctx, $info, $phr, $rid) = @_;
+    return &keycrud_delete($ctx, Relation->new($rid));
     return { status => 'nyi' };
 }
 
-# api_delete_vars_rid
-push (@raw_action_list, [ '/api/relation/RID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_rid, 'RID' ]);
-sub api_delete_vars_rid {
+# api_read_key_rid
+push (@raw_action_list, [ '/api/relation/RID/key.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_key_rid, 'RID' ]);
+sub api_read_key_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    return { status => 'nyi' };
+    return &keycrud_read($ctx, Relation->new($rid));
 }
 
-# api_read_vars_rid
-push (@raw_action_list, [ '/api/relation/RID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_rid, 'RID' ]);
-sub api_read_vars_rid {
+# api_update_key_rid
+push (@raw_action_list, [ '/api/relation/RID/key.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_key_rid, 'RID' ]);
+sub api_update_key_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    return { status => 'nyi' };
+    return &keycrud_update($ctx, Relation->new($rid));
 }
 
-# api_update_vars_rid
-push (@raw_action_list, [ '/api/relation/RID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_rid, 'RID' ]);
-sub api_update_vars_rid {
-    my ($ctx, $info, $phr, $rid) = @_;
-    return { status => 'nyi' };
-}
-
-# api_select_object
+# api_select_object # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/select/object.FMT', 'READ', \&do_fmt, 'FMT', \&api_select_object ]);
 sub api_select_object {
     my ($ctx, $info, $phr) = @_;
     return { objectIds => 'nyi' };
 }
 
-# api_select_relation
+# api_select_relation # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/select/relation.FMT', 'READ', \&do_fmt, 'FMT', \&api_select_relation ]);
 sub api_select_relation {
     my ($ctx, $info, $phr) = @_;
     return { relationIds => 'nyi' };
 }
 
-# api_select_tag
+# api_select_tag # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/select/tag.FMT', 'READ', \&do_fmt, 'FMT', \&api_select_tag ]);
 sub api_select_tag {
     my ($ctx, $info, $phr) = @_;
     return { tagIds => 'nyi' };
 }
 
-# api_share_raw
+# api_share_raw # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/share/raw/RID/RVSN/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_share_raw, 'OID', 'RID', 'RVSN' ]);
 sub api_share_raw {
     my ($ctx, $info, $phr, $oid, $rid, $rvsn) = @_;
@@ -449,14 +384,14 @@ sub api_redirect_rid_oid {
     die;
 }
 
-# api_share_rid
+# api_share_rid # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/share/url/RID.FMT', 'READ', \&do_fmt, 'FMT', \&api_share_rid, 'RID' ]);
 sub api_share_rid {
     my ($ctx, $info, $phr, $rid) = @_;
     return { url => 'nyi' };
 }
 
-# api_share_rid_oid
+# api_share_rid_oid # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/share/url/RID/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_share_rid_oid, 'OID', 'RID' ]);
 sub api_share_rid_oid {
     my ($ctx, $info, $phr, $oid, $rid) = @_;
@@ -467,71 +402,86 @@ sub api_share_rid_oid {
 push (@raw_action_list, [ '/api/tag.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_tag ]);
 sub api_create_tag {
     my ($ctx, $info, $phr) = @_;
-    return { tagId => 'nyi' };
+
+    my $q = $ctx->cgi;
+    my $t = Tag->new;
+    my @import_list = grep(/^tag/o, $q->param);
+
+    foreach my $key (@import_list) {
+	my $value = $q->param($key);
+
+	if (defined($value)) {
+	    $t->set($key, $value);
+	}
+    }
+
+    return { tagId => $t->save };
 }
 
 # api_list_tags
 push (@raw_action_list, [ '/api/tag.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_tags ]);
 sub api_list_tags {
     my ($ctx, $info, $phr) = @_;
-    return { tagIds => 'nyi' };
+    my @container = map { +{ tagId => $_ } } Tag->list;
+    return { tagIds => \@container };
 }
 
 # api_delete_tid
 push (@raw_action_list, [ '/api/tag/TID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_tid, 'TID' ]);
 sub api_delete_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    return { status => 'nyi' };
+    return { status => Tag->new($tid)->delete };
 }
 
 # api_read_tid
 push (@raw_action_list, [ '/api/tag/TID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_tid, 'TID' ]);
 sub api_read_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    return { tag => 'nyi' };
+    my $t = Tag->new($tid);
+    return { tag => $t->toDataStructure };
 }
 
-# api_update_tid
+# api_update_tid # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/tag/TID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_tid, 'TID' ]);
 sub api_update_tid {
     my ($ctx, $info, $phr, $tid) = @_;
     return { status => 'nyi' };
 }
 
-# api_create_vars_tid
-push (@raw_action_list, [ '/api/tag/TID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_tid, 'TID' ]);
-sub api_create_vars_tid {
+# api_create_key_tid
+push (@raw_action_list, [ '/api/tag/TID/key.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_key_tid, 'TID' ]);
+sub api_create_key_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    return { status => 'nyi' };
+    return &keycrud_create($ctx, Tag->new($tid));
 }
 
-# api_delete_vars_tid
-push (@raw_action_list, [ '/api/tag/TID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_tid, 'TID' ]);
-sub api_delete_vars_tid {
+# api_delete_key_tid
+push (@raw_action_list, [ '/api/tag/TID/key.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_key_tid, 'TID' ]);
+sub api_delete_key_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    return { status => 'nyi' };
+    return &keycrud_delete($ctx, Tag->new($tid));
 }
 
-# api_read_vars_tid
-push (@raw_action_list, [ '/api/tag/TID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_tid, 'TID' ]);
-sub api_read_vars_tid {
+# api_read_key_tid
+push (@raw_action_list, [ '/api/tag/TID/key.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_key_tid, 'TID' ]);
+sub api_read_key_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    return { status => 'nyi' };
+    return &keycrud_read($ctx, Tag->new($tid));
 }
 
-# api_update_vars_tid
-push (@raw_action_list, [ '/api/tag/TID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_tid, 'TID' ]);
-sub api_update_vars_tid {
+# api_update_key_tid
+push (@raw_action_list, [ '/api/tag/TID/key.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_key_tid, 'TID' ]);
+sub api_update_key_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    return { status => 'nyi' };
+    return &keycrud_update($ctx, Tag->new($tid));
 }
 
 # api_version
 push (@raw_action_list, [ '/api/version.FMT', 'READ', \&do_fmt, 'FMT', \&api_version ]);
 sub api_version {
     my ($ctx, $info, $phr) = @_;
-    return { version => 
-	     { api => '1.001', 
+    return { version =>
+	     { api => '1.001',
 	       mine => '1.001' } };
 }
 

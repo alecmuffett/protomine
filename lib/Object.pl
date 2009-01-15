@@ -27,6 +27,7 @@ use vars qw(@ISA);
 
 use FileHandle;
 
+our $MINE_HTTP_FULLPATH;
 my $BUFSIZ = 1024 * 64;
 
 ##################################################################
@@ -422,7 +423,7 @@ sub toAtom {
 	$content .= "[synthetic stub for object of type $objectType]";
     }
 
-    push(@atom, "<entry xml:base='$main::MINE_HTTP_FULLPATH'>\n");
+    push(@atom, "<entry xml:base='$MINE_HTTP_FULLPATH'>\n");
     push(@atom, "<title>$title</title>\n");
     push(@atom, "<link href='$permalink'/>\n");
     push(@atom, "<id>$id</id>\n");

@@ -16,6 +16,8 @@
 ## permissions and limitations under the License.
 ##
 
+our $MINE_DIRECTORY;
+
 ##################################################################
 
 sub mime_type {
