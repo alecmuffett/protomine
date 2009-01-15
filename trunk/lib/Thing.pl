@@ -205,6 +205,8 @@ sub filepath {
     return $self->directory . "/" . $file;
 }
 
+##################################################################
+
 ## keysRequired -- returns list, list of keys required to be output
 
 sub keysRequired {
@@ -212,6 +214,17 @@ sub keysRequired {
     my @klist = keys %{$self->{REQUIRED_KEYS}};
     return @klist;
 }
+
+## requiredKey (key) -- returns scalar, whether argument is a required
+## key
+
+sub requiredKey {
+    my $self = shift ;
+    my $key = shift;
+    return $self->{REQUIRED_KEYS}->{$key};
+}
+
+##################################################################
 
 ## keysValid -- returns list, list of keys that are valid
 
@@ -230,6 +243,8 @@ sub validKey {
     my $key = shift;
     return $self->{VALID_KEYS}->{$key};
 }
+
+##################################################################
 
 ## keysWritable -- returns list, list of keys writable to output
 
@@ -296,9 +311,10 @@ sub set {
 	$value =~ s! $!!o;	# kill trailing whitespace
 
 	# this is how we delete keys, set them to empty string
-	if ($value eq '') {
-	    die "set($key, '') [ie: DELETE] however $key is REQUIRED\n" 
-		if ($self->{REQUIRED_KEYS}->{$key}); 
+	if ($value eq '') {	    
+	    if ($self->requiredKey($key)) {
+		die "set($key, '') [ie: DELETE] however $key is REQUIRED\n";
+	    }
 	    delete($self->{DATA}->{$key});
 	}
 	else {
