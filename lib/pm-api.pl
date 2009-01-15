@@ -105,8 +105,8 @@ sub api_read_config {
 }
 
 # api_update_config # <--------------------------------------- TO BE DONE
-push (@raw_action_list, [ '/api/config.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_config ]);
-sub api_update_config {
+push (@raw_action_list, [ '/api/config.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_update_config ]);
+sub api_update_config {		# actually a create since it updates multi-values
     my ($ctx, $info, $phr) = @_;
     return { status => 'nyi' };
 }
@@ -173,13 +173,6 @@ sub api_read_oid {
     return { object => $o->toDataStructure };
 }
 
-# api_update_oid # <--------------------------------------- TO BE DONE
-push (@raw_action_list, [ '/api/object/OID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_oid, 'OID' ]);
-sub api_update_oid {
-    my ($ctx, $info, $phr, $oid) = @_;
-    return { status => 'nyi' };
-}
-
 # api_delete_oid_cid # <--------------------------------------- TO BE DONE
 push (@raw_action_list, [ '/api/object/OID/CID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_oid_cid, 'OID', 'CID' ]);
 sub api_delete_oid_cid {
@@ -192,13 +185,6 @@ push (@raw_action_list, [ '/api/object/OID/CID.FMT', 'READ', \&do_fmt, 'FMT', \&
 sub api_read_oid_cid {
     my ($ctx, $info, $phr, $oid, $cid) = @_;
     return { comment => 'nyi' };
-}
-
-# api_update_oid_cid # <--------------------------------------- TO BE DONE
-push (@raw_action_list, [ '/api/object/OID/CID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_oid_cid, 'OID', 'CID' ]);
-sub api_update_oid_cid {
-    my ($ctx, $info, $phr, $oid, $cid) = @_;
-    return { status => 'nyi' };
 }
 
 # api_create_keys_oid_cid
@@ -329,13 +315,6 @@ sub api_read_rid {
     return { relation => $r->toDataStructure };
 }
 
-# api_update_rid # <--------------------------------------- TO BE DONE
-push (@raw_action_list, [ '/api/relation/RID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_rid, 'RID' ]);
-sub api_update_rid {
-    my ($ctx, $info, $phr, $rid) = @_;
-    return { status => 'nyi' };
-}
-
 # api_create_keys_rid
 push (@raw_action_list, [ '/api/relation/RID/key.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_keys_rid, 'RID' ]);
 sub api_create_keys_rid {
@@ -461,13 +440,6 @@ sub api_read_tid {
     my ($ctx, $info, $phr, $tid) = @_;
     my $t = Tag->new($tid);
     return { tag => $t->toDataStructure };
-}
-
-# api_update_tid # <--------------------------------------- TO BE DONE
-push (@raw_action_list, [ '/api/tag/TID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_tid, 'TID' ]);
-sub api_update_tid {
-    my ($ctx, $info, $phr, $tid) = @_;
-    return { status => 'nyi' };
 }
 
 # api_create_keys_tid
