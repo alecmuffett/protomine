@@ -16,36 +16,48 @@
 ## permissions and limitations under the License.
 ##
 
+package main;
+
 use strict;
 use warnings;
+use diagnostics;
 
 use CGI qw/:standard/;
 use CGI::Carp;
 use CGI::Pretty;
 
+# global variables
+
+our $MINE_DIRECTORY;      
+our $MINE_HTTP_FULLPATH;  
+our $MINE_HTTP_PATH;      
+our $MINE_HTTP_SERVER;    
+
 # standard config for this system
+
 my $execdir = $0;
 $execdir =~ s![^/]+$!!g;
-require "$execdir/protomine-config.pl";
-
-##################################################################
+do "$execdir/protomine-config.pl" || die "do $execdir/protomine-config.pl: $!"; # <---- populates global variables
 
 # stop perl debugger filling the apache logfile about single use variables
+#if (0) {
+#    print $MINE_HTTP_PATH;
+#}
 
-if (0) {
-    print $main::MINE_DIRECTORY;
-    print $main::MINE_HTTP_PATH;
-}
+# impose a 10Mb ceiling on POST data
+
+$CGI::POST_MAX = 10 * (1024**2);
 
 # go to the mine home directory
 
-chdir($main::MINE_DIRECTORY) or die "chdir: $main::MINE_DIRECTORY: $!";
+chdir($MINE_DIRECTORY) or die "chdir: $MINE_DIRECTORY: $!";
 
-# declare the raw action list so the requires can update it.
+##################################################################
 
-# the table of paths and their handlers/arguments; the joy of this
-# mechanism is that if we want to create/try an alternative almost
-# wholly GET-based API, we can implement it in less than 10 minutes.
+# this is the table of paths and their handlers/arguments; the joy of
+# this mechanism is that if we want to create/try an alternative
+# almost wholly GET-based API, we can implement it in less than 10
+# minutes.
 
 # IMPORTANT: you must factor the METHOD into the match as well as the
 # URL, *and* the order of these rules *is* significant; for instance
@@ -57,9 +69,7 @@ chdir($main::MINE_DIRECTORY) or die "chdir: $main::MINE_DIRECTORY: $!";
 # parameters, it will clash with the rule compiler, below; better yet
 # do not use them at all, don't treat them as regex.
 
-my @compiled_action_list = ();
-
-my @raw_action_list = (
+our @raw_action_list = (	# NOTE: THIS IS 'our' SO IT CAN BE POKED EXTERNALLY
     # empty / root request
     [ '',            'GET',  \&do_redirect, '/ui/' ],
 
@@ -78,12 +88,27 @@ my @raw_action_list = (
     # more added by ui and api modules
     );
 
-# extra stuff to go into the main package
+my @compiled_action_list = ();	# where the results go
 
-require 'pm-api.pl';
-require 'pm-atom.pl';
-require 'pm-mime.pl';
-require 'pm-ui.pl';
+# extra stuff to go into the Protomine package
+
+my @includes = (
+    'pm-api.pl',
+    'pm-atom.pl',
+    'pm-mime.pl',
+    'pm-ui.pl',
+    'Context.pl',
+    'Log.pl',
+    'Object.pl',
+    'Page.pl',
+    'Relation.pl',
+    'Tag.pl',
+    'Thing.pl',
+);
+
+foreach my $include (@includes) {
+    do $include || die "do: $include: error='$!' status='$@'\n";
+}
 
 # push the final catch-all rules into the raw_action_list
 
@@ -92,20 +117,10 @@ push (@raw_action_list,
       [  '/ui/SUFFIX',  'GET',  \&do_document,  'database/ui',  'SUFFIX'  ],
     );
 
-
 # objects we will need
 
-require 'Context.pl';
-require 'Log.pl';
-require 'Object.pl';
-require 'Page.pl';
-require 'Relation.pl';
-require 'Tag.pl';
-require 'Thing.pl';
 
-# impose a 10Mb ceiling on POST data
-
-$CGI::POST_MAX = 10 * (1024**2);
+##################################################################
 
 # mappings from CRUD to HTTP for readability
 
@@ -117,96 +132,6 @@ my %crud = (
     POST => 'POST',             # HTTP
     GET => 'GET',               # HTTP
     PUT => 'PUT',               # HTTP
-    );
-
-push (@raw_action_list,
-      [ '/ui/version.html', 'GET', \&ui_version ],
-      [ '/ui/update-tag/TID.html', 'POST', \&ui_update_tag, 'TID' ],
-      [ '/ui/update-tag/TID.html', 'GET', \&do_document, 'database/ui', 'update-tag-xxx.html' ],
-      [ '/ui/update-relation/RID.html', 'POST', \&ui_update_relation, 'RID' ],
-      [ '/ui/update-relation/RID.html', 'GET', \&do_document, 'database/ui', 'update-relation-xxx.html' ],
-      [ '/ui/update-object/OID.html', 'GET', \&do_document, 'database/ui', 'update-object-xxx.html' ],
-      [ '/ui/update-object/OID.html', 'POST', \&ui_update_object, 'OID' ],
-      [ '/ui/update-data/OID.html', 'POST', \&ui_update_data, 'OID' ],
-      [ '/ui/update-data/OID.html', 'GET', \&do_document, 'database/ui', 'update-data-xxx.html' ],
-      [ '/ui/update-config.html', 'POST', \&ui_update_config ],
-      [ '/ui/show-tags.html', 'GET', \&ui_show_tags ],
-      [ '/ui/show-relations.html', 'GET', \&ui_show_relations ],
-      [ '/ui/show-objects.html', 'GET', \&ui_show_objects ],
-      [ '/ui/show-config.html', 'GET', \&ui_show_config ],
-      [ '/ui/show-clones/OID.html', 'GET', \&ui_show_clones, 'OID' ],
-      [ '/ui/share/url/RID/OID.html', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
-      [ '/ui/share/url/RID.html', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
-      [ '/ui/share/redirect/RID/OID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
-      [ '/ui/share/redirect/RID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
-      [ '/ui/share/raw/RID/RVSN/OID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
-      [ '/ui/select/tag.html', 'GET', \&do_noop ],
-      [ '/ui/select/relation.html', 'GET', \&do_noop ],
-      [ '/ui/select/object.html', 'GET', \&do_noop ],
-      [ '/ui/read-tag/TID.html', 'GET', \&ui_read_tag, 'TID' ],
-      [ '/ui/read-relation/RID.html', 'GET', \&ui_read_relation, 'RID' ],
-      [ '/ui/read-object/OID.html', 'GET', \&ui_read_object, 'OID' ],
-      [ '/ui/delete-tag/TID.html', 'GET', \&ui_delete_tag, 'TID' ],
-      [ '/ui/delete-relation/RID.html', 'GET', \&ui_delete_relation, 'RID' ],
-      [ '/ui/delete-object/OID.html', 'GET', \&ui_delete_object, 'OID' ],
-      [ '/ui/create-tag.html', 'POST', \&ui_create_tag ],
-      [ '/ui/create-relation.html', 'POST', \&ui_create_relation ],
-      [ '/ui/create-object.html', 'POST', \&ui_create_object ],
-      [ '/ui/clone-object/OID.html', 'GET', \&ui_clone_object, 'OID' ],
-    );
-
-push (@raw_action_list,
-      [ '/api/object/OID', 'READ', \&api_read_aux_oid, 'OID' ], # <---- SPECIAL, EMITS AUX DATA
-      [ '/api/config.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_config ],
-      [ '/api/config.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_config ],
-      [ '/api/object.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_object ],
-      [ '/api/object.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_objects ],
-      [ '/api/object/OID', 'UPDATE', \&do_fmt, 'FMT', \&api_update_aux_oid, 'OID' ],
-      [ '/api/object/OID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_oid, 'OID' ],
-      [ '/api/object/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_oid, 'OID' ],
-      [ '/api/object/OID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_oid, 'OID' ],
-      [ '/api/object/OID/CID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_oid_cid, 'OID', 'CID' ],
-      [ '/api/object/OID/CID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_oid_cid, 'OID', 'CID' ],
-      [ '/api/object/OID/CID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_oid_cid, 'OID', 'CID' ],
-      [ '/api/object/OID/CID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_oid_cid, 'OID', 'CID' ],
-      [ '/api/object/OID/CID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_oid_cid, 'OID', 'CID' ],
-      [ '/api/object/OID/CID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_oid_cid, 'OID', 'CID' ],
-      [ '/api/object/OID/CID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_oid_cid, 'OID', 'CID' ],
-      [ '/api/object/OID/clone.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_clone_oid, 'OID' ],
-      [ '/api/object/OID/clone.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_clones_oid, 'OID' ],
-      [ '/api/object/OID/comment.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_comment_oid, 'OID' ],
-      [ '/api/object/OID/comment.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_comments_oid , 'OID' ],
-      [ '/api/object/OID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_oid, 'OID' ],
-      [ '/api/object/OID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_oid, 'OID' ],
-      [ '/api/object/OID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_oid, 'OID' ],
-      [ '/api/object/OID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_oid, 'OID' ],
-      [ '/api/relation.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_relation ],
-      [ '/api/relation.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_relations ],
-      [ '/api/relation/RID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_rid, 'RID' ],
-      [ '/api/relation/RID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_rid, 'RID' ],
-      [ '/api/relation/RID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_rid, 'RID' ],
-      [ '/api/relation/RID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_rid, 'RID' ],
-      [ '/api/relation/RID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_rid, 'RID' ],
-      [ '/api/relation/RID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_rid, 'RID' ],
-      [ '/api/relation/RID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_rid, 'RID' ],
-      [ '/api/select/object.FMT', 'READ', \&do_fmt, 'FMT', \&api_select_object ],
-      [ '/api/select/relation.FMT', 'READ', \&do_fmt, 'FMT', \&api_select_relation ],
-      [ '/api/select/tag.FMT', 'READ', \&do_fmt, 'FMT', \&api_select_tag ],
-      [ '/api/share/raw/RID/RVSN/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_share_raw, 'OID', 'RID', 'RVSN' ],
-      [ '/api/share/redirect/RID.FMT', 'READ', \&do_fmt, 'FMT', \&api_redirect_rid, 'RID' ],
-      [ '/api/share/redirect/RID/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_redirect_rid_oid, 'OID', 'RID' ],
-      [ '/api/share/url/RID.FMT', 'READ', \&do_fmt, 'FMT', \&api_share_rid, 'RID' ],
-      [ '/api/share/url/RID/OID.FMT', 'READ', \&do_fmt, 'FMT', \&api_share_rid_oid, 'OID', 'RID' ],
-      [ '/api/tag.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_tag ],
-      [ '/api/tag.FMT', 'READ', \&do_fmt, 'FMT', \&api_list_tags ],
-      [ '/api/tag/TID.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_tid, 'TID' ],
-      [ '/api/tag/TID.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_tid, 'TID' ],
-      [ '/api/tag/TID.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_tid, 'TID' ],
-      [ '/api/tag/TID/vars.FMT', 'CREATE', \&do_fmt, 'FMT', \&api_create_vars_tid, 'TID' ],
-      [ '/api/tag/TID/vars.FMT', 'DELETE', \&do_fmt, 'FMT', \&api_delete_vars_tid, 'TID' ],
-      [ '/api/tag/TID/vars.FMT', 'READ', \&do_fmt, 'FMT', \&api_read_vars_tid, 'TID' ],
-      [ '/api/tag/TID/vars.FMT', 'UPDATE', \&do_fmt, 'FMT', \&api_update_vars_tid, 'TID' ],
-      [ '/api/version.FMT', 'READ', \&do_fmt, 'FMT', \&api_version ],
     );
 
 ##################################################################
@@ -230,7 +155,7 @@ if (1) {
     my $q = CGI->new;
 
     # create a context from it
-    my $ctx = Context->new($q, $main::MINE_HTTP_PATH);
+    my $ctx = Context->new($q, $MINE_HTTP_PATH);
 
     # define the page we will print
     my $page;
@@ -268,7 +193,7 @@ exit 0;
 ###################################################################
 ###################################################################
 
-# this is the main routine which encodes parameters and calls handlers
+# this is the routine which encodes parameters and calls handlers
 # as described in the notes for &compile_action_list
 
 sub match_and_execute {

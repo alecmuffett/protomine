@@ -23,10 +23,6 @@ use warnings;
 ##################################################################
 ##################################################################
 
-sub ui_clone_object {		# OID
-    die "method not yet implemented\n";
-}
-
 sub ui_create_object {
     my ($ctx, $info, $phr) = @_;
 
@@ -58,38 +54,6 @@ sub ui_create_tag {
     my $p = Page->newHTML("ui/");
     $p->add("created tag $tid");
     return $p;
-}
-
-sub ui_delete_object {		# OID
-    die "method not yet implemented\n";
-}
-
-sub ui_delete_relation {	# RID
-    die "method not yet implemented\n";
-}
-
-sub ui_delete_tag {		# TID
-    die "method not yet implemented\n";
-}
-
-sub ui_read_object {		# OID
-    die "method not yet implemented\n";
-}
-
-sub ui_read_relation {		# RID
-    die "method not yet implemented\n";
-}
-
-sub ui_read_tag {		# TID
-    die "method not yet implemented\n";
-}
-
-sub ui_show_clones {		# OID
-    die "method not yet implemented\n";
-}
-
-sub ui_show_config {
-    die "method not yet implemented\n";
 }
 
 sub ui_show_objects {
@@ -176,29 +140,46 @@ sub ui_show_tags {
     return $p;
 }
 
-sub ui_update_config {
-    die "method not yet implemented\n";
-}
+##################################################################
+##################################################################
+##################################################################
+##################################################################
 
-sub ui_update_data {		# OID
-    die "method not yet implemented\n";
-}
-
-sub ui_update_object {		# OID
-    die "method not yet implemented\n";
-}
-
-sub ui_update_relation {	# RID
-    die "method not yet implemented\n";
-}
-
-sub ui_update_tag {		# TID
-    die "method not yet implemented\n";
-}
-
-sub ui_version {
-    die "method not yet implemented\n";
-}
+push (@main::raw_action_list,
+      [ '/ui/version.html', 'GET', \&ui_version ],
+      [ '/ui/update-tag/TID.html', 'POST', \&ui_update_tag, 'TID' ],
+      [ '/ui/update-tag/TID.html', 'GET', \&do_document, 'database/ui', 'update-tag-xxx.html' ],
+      [ '/ui/update-relation/RID.html', 'POST', \&ui_update_relation, 'RID' ],
+      [ '/ui/update-relation/RID.html', 'GET', \&do_document, 'database/ui', 'update-relation-xxx.html' ],
+      [ '/ui/update-object/OID.html', 'GET', \&do_document, 'database/ui', 'update-object-xxx.html' ],
+      [ '/ui/update-object/OID.html', 'POST', \&ui_update_object, 'OID' ],
+      [ '/ui/update-data/OID.html', 'POST', \&ui_update_data, 'OID' ],
+      [ '/ui/update-data/OID.html', 'GET', \&do_document, 'database/ui', 'update-data-xxx.html' ],
+      [ '/ui/update-config.html', 'POST', \&ui_update_config ],
+      [ '/ui/show-tags.html', 'GET', \&ui_show_tags ],
+      [ '/ui/show-relations.html', 'GET', \&ui_show_relations ],
+      [ '/ui/show-objects.html', 'GET', \&ui_show_objects ],
+      [ '/ui/show-config.html', 'GET', \&ui_show_config ],
+      [ '/ui/show-clones/OID.html', 'GET', \&ui_show_clones, 'OID' ],
+      [ '/ui/share/url/RID/OID.html', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+      [ '/ui/share/url/RID.html', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+      [ '/ui/share/redirect/RID/OID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+      [ '/ui/share/redirect/RID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+      [ '/ui/share/raw/RID/RVSN/OID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ],
+      [ '/ui/select/tag.html', 'GET', \&do_noop ],
+      [ '/ui/select/relation.html', 'GET', \&do_noop ],
+      [ '/ui/select/object.html', 'GET', \&do_noop ],
+      [ '/ui/read-tag/TID.html', 'GET', \&ui_read_tag, 'TID' ],
+      [ '/ui/read-relation/RID.html', 'GET', \&ui_read_relation, 'RID' ],
+      [ '/ui/read-object/OID.html', 'GET', \&ui_read_object, 'OID' ],
+      [ '/ui/delete-tag/TID.html', 'GET', \&ui_delete_tag, 'TID' ],
+      [ '/ui/delete-relation/RID.html', 'GET', \&ui_delete_relation, 'RID' ],
+      [ '/ui/delete-object/OID.html', 'GET', \&ui_delete_object, 'OID' ],
+      [ '/ui/create-tag.html', 'POST', \&ui_create_tag ],
+      [ '/ui/create-relation.html', 'POST', \&ui_create_relation ],
+      [ '/ui/create-object.html', 'POST', \&ui_create_object ],
+      [ '/ui/clone-object/OID.html', 'GET', \&ui_clone_object, 'OID' ],
+    );
 
 ##################################################################
 

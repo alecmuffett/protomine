@@ -49,3 +49,7 @@ pairs, *or* nuke the entire thing and replace.
 toAtom - needs GUID generation; hook this into Crypto object, or maybe
 as getGUID method on each Object?
 
+------------------------------------------------------------------
+
+minectl to have an option to abort-on-error
+
