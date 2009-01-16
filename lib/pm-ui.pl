@@ -101,7 +101,7 @@ sub XXui_show_relations {
 	$p->add("<dt>relation $rid: $name</dt>\n");
 	$p->add("<dd>");
 	$p->addCloud({
-		 &get_permalink($relation), "[feed]",
+		 &get_permalink("read", $relation), "[feed]",
 		 "delete-relation/$rid.html", "[delete]",
 		 "read-relation/$rid.html", "[info]",
 		 "update-relation/$rid.html", "[update info]",

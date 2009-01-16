@@ -38,6 +38,23 @@ while (<>) {
 foreach $input (@lines) {
     ($line, $debug) = @{$input};
 
+    if ($line =~ s!^#\s*\$LINT\s*!!o) {
+	my ($cmd, $sym, @notes) = split(" ", $line);
+
+	warn "$0: pragma $cmd $sym\n";
+
+	if ($cmd eq 'external') {
+	    push(@{$defns{$sym}}, "$debug [PRAGMA] @notes");
+	}
+	elsif ($cmd eq 'reference') {
+	    push(@{$calls{$sym}}, "$debug [PRAGMA] @notes");
+	}
+	else {
+	    die "$0: bad pragma at $debug: $line\n";
+	}
+	next;
+    }
+
     $line =~ s!#.*!!o;
 
     if ($line =~ /^\s*sub\s+(\w+)/o) {

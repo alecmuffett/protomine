@@ -48,6 +48,8 @@ sub yyyy_format {
 ##################################################################
 
 sub get_permalink {
+    my ($method, $r, $o) = @_;
+
     my $r = shift;
     my $o = shift;
 
@@ -64,7 +66,7 @@ sub get_permalink {
 	}
     }
 
-    my $key = &encode_key($rid, $rvsn, $oid);
+    my $key = Crypto->encodeMineKey($method, $rid, $rvsn, $oid);
 
     return $MINE_HTTP_FULLPATH . "/get?key=$key";
 }

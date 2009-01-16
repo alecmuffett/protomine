@@ -24,6 +24,7 @@ use warnings;
 my $MINEKEY_MAGIC = "mine";
 my $CRYPTFMT = "%H*";
 my $HASHFMT = "%C*";
+my $METHODRX = qr!(read|post)!;
 
 ##################################################################
 
@@ -59,12 +60,12 @@ sub hashify {
 ##################################################################
 
 sub encodeMineKey {
-    my ($self, $rid, $rvsn, $oid, $method) = @_;
+    my ($self, $method, $rid, $rvsn, $oid) = @_;
 
+    die "encodeMineKey: bad method $method\n" unless ($method =~ m!^$METHODRX$o!);
     die "encodeMineKey: bad rid $rid\n" unless ($rid > 0);
     die "encodeMineKey: bad rvsn $rvsn\n" unless ($rvsn > 0);
     die "encodeMineKey: bad oid $oid\n" unless ($oid >= 0);
-    die "encodeMineKey: bad method $method\n" unless ($method =~ m!^(read|post)$!o);
 
     my $prefix = "$MINEKEY_MAGIC,$method,$rid,$rvsn,$oid";
     my $crc = Crypto->hashify($prefix);
@@ -84,7 +85,7 @@ sub decodeMineKey {
     my ($magic, $method, $rid, $rvsn, $oid, $crc);
 
     unless (($magic, $method, $rid, $rvsn, $oid, $crc) =
-	    ($plaintext =~ m!^(\w+),(read|post),(\d+),(\d+),(\d+),(\d+)$!o)) {
+	    ($plaintext =~ m!^(\w+),$METHODRX,(\d+),(\d+),(\d+),(\d+)$!o)) {
 	die "decodeMineKey: bad decode result\n";
     }
 
@@ -99,7 +100,7 @@ sub decodeMineKey {
     my $crc2 = Crypto->hashify($prefix2);
     die "decodeMineKey: bad crc check\n" unless ($crc2 eq $crc);
 
-    return ($rid, $rvsn, $oid, $method);
+    return ($method, $rid, $rvsn, $oid);
 }
 
 ##################################################################
