@@ -419,7 +419,18 @@ sub printUsing {
         $self->printBodyHTML($self->{DATA});
     }
     elsif ($self->{STYLE} == $DYNAMIC_JSON) {
-	print "\"ceci n'est pas json.\"\n"; # semi legitimate placeholder 
+	my $json = new JSON::XS;
+	my $root;
+
+	if ($#{$self->{DATA}} == 0) {
+	    $root = $self->{DATA}->[0];
+	}
+	else {
+	    $root = $self->{DATA};
+	}
+	$json->pretty(1);
+	print $json->encode($root);
+	print "\n";
     }
     else {
 	die "printUsing: this can't happen";
