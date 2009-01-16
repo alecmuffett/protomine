@@ -21,7 +21,7 @@ rewrite and test the ACTUAL (rather than fake) PUT handler
 
 ------------------------------------------------------------------
 
-crypto object: implement simple hash and crypto, use in minekey generation
+overhaul Crypto object to do the real thing
 
 ------------------------------------------------------------------
 
@@ -41,15 +41,18 @@ purge auxGet/PutBlob and other unused code
 
 ------------------------------------------------------------------
 
-updateThingParam has to work two ways, updating (several) param/value
-pairs, *or* nuke the entire thing and replace.
-
-------------------------------------------------------------------
-
-toAtom - needs GUID generation; hook this into Crypto object, or maybe
-as getGUID method on each Object?
+toAtom - needs GUID generation; hook this into Crypto object, 
+or maybe as getGUID method on each Object?
 
 ------------------------------------------------------------------
 
 minectl to have an option to abort-on-error
+
+------------------------------------------------------------------
+
+add caching to Thing->load ($self->{CACHE$ID}?) with appropriate purging
+
+------------------------------------------------------------------
+
+add "sub __sort_method" to thing, pertinent to list(), overridable by subclass?
 

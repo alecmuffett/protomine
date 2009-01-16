@@ -1,0 +1,54 @@
+A method for massively cutting UPDATE/HTTP-PUT methods in complex Rest APIs
+
+I like the ReST interface, but I am not fundamentalist about it.
+
+Most of the objects in the Mine implementation are "Things" - ie: a series of key=value pairs which are bundled together under a numeric identifier, which have a Class and associated methods that operate on them.
+
+For reasons of security and sheer implementability, "Things" may not be updated under the ReST CRUD scheme; to recap ReST you are allowed four "CRUD" operations against a URL which represents an object:
+
+<UL> <LI>Create (a new object, in a directory, say)</LI> <LI>Read (an existing object)</LI> <LI>Update (an existing object)</LI> <LI>Delete (an existing object)</LI> </UL>
+
+So for example:
+
+<CODE>CREATE (key=value ...) /api/object.xml</CODE> -> new object populated with keys/values, id = 42
+
+<CODE>READ /api/object/42.xml</CODE> -> a bunch of key=value pairs in XML
+
+<CODE>READ /api/object/42.json</CODE> -> a bunch of key=value pairs in JSON
+
+<CODE>DELETE /api/object/42.xml</CODE> -> deletes object 42, status returned in XML
+
+...but the one that gives problems is "UPDATE" since the presumption is that you will atomically replace an old Thing with a new thing, much as:
+
+mv new.jpg current.jpg
+
+...might work in a filesystem; you are swapping one bunch of bytes for another one; but Things are complex structures with some bits you can poke, and other bits you cannot. 
+
+Merely splatting them with replacement data would be painful.
+
+Amongst the other problems with this is that "Update" is usually mapped to the HTTP-PUT method, which is badly implemented in web browsers and actually I think is below the tipping point - ie: it's so badly implemented that ReSTful people work around it rather than get it fixed.
+
+Standard Perl::CGI for instance, does not support it.
+
+The way I have gotten around this is slight but elegant piece of doublethink; I have implemented a ReST interface atop each Thing object, to access its key=value pairs:
+
+<CODE>READ /api/object/42/key/keyName.xml</CODE> 
+-> value associated with keyName for object 42, in XML
+
+<CODE>READ /api/object/42/key/keyName.json</CODE> 
+-> value associated with keyName for object 42, in JSON
+
+<CODE>DELETE /api/object/42/key/keyName.xml</CODE> 
+-> unset keyName in object 42
+
+...and then realising that object 42 now must exist for this trick to work at all, and that there is no point in having CREATE "choose" a key name for you - predefined variable names do not for the ReST-CREATE model - then the key/CREATE and key/UPDATE operations are otherwise functionally identical (ie: they poke the values of keys) and therefore the latter can be dropped.
+
+Also key/CREATE is cooler, since it can poke multiple keys at the same time.
+
+Further, that means key/CREATE is functionally identical to Thing/UPDATE so <em>that</em> can be dropped, too.
+
+So all that is necessary is to mentally "rebrand" the key/CREATE operation as the Thing/UPDATE operation, and a whole pile of UPDATE operations go out of the window.
+
+So now there is only 1 ReST-UPDATE operation that remains in the Mine - down from 11 - and that is the "update of auxilliary data", for example replacing one JPEG that is associated with object 42, with a different JPEG.
+
+To me this is a straigt swap of one blog of data for another one, and so should remain as a ReST-UPDATE; but anywhere else that I have a ReST interface onto complex objects, I shall in future consider very carefully before implementing a UPDATE method.
