@@ -23,9 +23,9 @@ use warnings;
 use diagnostics;
 
 use CGI qw/:standard/;
-#use CGI::Simple;
 use CGI::Carp;
 use CGI::Pretty;
+use JSON::XS;
 
 # global variables
 
