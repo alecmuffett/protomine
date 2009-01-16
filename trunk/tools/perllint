@@ -80,8 +80,8 @@ foreach $loop (0..1) {
 print "\n";
 
 foreach $loop (0..1) {
-    print "**** UNDEFINED ROUTINES\n\n" if ($loop == 0);
-    print "**** MULTIPLY-DEFINED ROUTINES\n\n" if ($v and $loop == 1);
+    print "**** UNCALLED ROUTINES\n\n" if ($loop == 0);
+    print "**** MULTIPLY-CALLED ROUTINES\n\n" if ($v and $loop == 1);
 
     foreach $defn (sort keys %defns) {
 	$ncalls = ($#{$calls{$defn}} + 1);
