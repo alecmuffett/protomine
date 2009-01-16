@@ -16,6 +16,23 @@
 ## permissions and limitations under the License.
 ##
 
+#  $LINT  external  Carp            debugging    module
+#  $LINT  external  POST_MAX        cgi::        scalar
+#  $LINT  external  Pretty          cgi::pretty  module
+#  $LINT  external  SUPER           superclass   method
+#  $LINT  external  XS              json::xs     module
+#  $LINT  external  cgi_error       cgi::        method
+#  $LINT  external  encode          json::xs     method
+#  $LINT  external  end_html        cgi::        method
+#  $LINT  external  header          cgi::        method
+#  $LINT  external  param           cgi::        method
+#  $LINT  external  pretty
+#  $LINT  external  redirect
+#  $LINT  external  request_method
+#  $LINT  external  start_html      cgi::        method
+#  $LINT  external  upload
+#  $LINT  external  url
+
 package main;
 
 use strict;
@@ -425,7 +442,7 @@ sub do_remote_get {
     # decrypt the key
     # TBD: better security audit trail here
 
-    my ($rid, $rvsn, $oid) = &decode_key($key);
+    my ($meth, $rid, $rvsn, $oid) = Crypto->decodeMineKey($key);
 
     # load the relation
     # TBD: trap this better so you log a security exception
@@ -466,9 +483,12 @@ sub do_remote_get {
 	my $feed_owner = "alec";
 
 	my $feed_title = 
-	    sprintf "%s for %s (%s)", $feed_owner, $r->name, $r->get('relationInterests');
+	    sprintf "%s for %s (%s)", 
+	    $feed_owner, 
+	    $r->name, 
+	    $r->get('relationInterests');
 
-	my $feed_link = &get_permalink($r);
+	my $feed_link = &get_permalink("read", $r);
 	my $feed_updated = &atom_format(time);
 	my $feed_author_name = $feed_owner;
 	my $feed_id = $feed_link;
@@ -501,6 +521,12 @@ sub do_remote_get {
 
     # fall off the end?
     die "do_remote_get: this can't happen";
+}
+
+##################################################################
+
+sub do_remote_post {
+    die "not yet implemented";
 }
 
 ##################################################################
