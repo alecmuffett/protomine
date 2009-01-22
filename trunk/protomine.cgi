@@ -52,9 +52,10 @@ our $MINE_HTTP_PATH;
 our $MINE_HTTP_SERVER;    
 
 # standard config for this system
-my $execdir = $0;
-$execdir =~ s![^/]+$!!g;
-require "$execdir/protomine-config.pl";
+$execdir = $0;                  # what is my invocation path?
+$execdir =~ s![^/]+$!!g;        # trim off everytihng after the trailing slash
+# the result is possibly blank, in which case leave @INC to sort it out
+require "${execdir}protomine-config.pl"; # try to get my config
 
 # impose a 10Mb ceiling on POST data
 
