@@ -431,7 +431,6 @@ sub printUsing {
 	else {
 	    $root = $self->{DATA};
 	}
-	$json->pretty(1);
 	print $json->encode($root);
 	print "\n";
     }
