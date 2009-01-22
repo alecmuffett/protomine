@@ -73,7 +73,7 @@ while ($ARGV[0] =~ m!^-(\w+)!o) {
 	    $FLAG{'userpass'} = shift(@ARGV);
 	}
 	else {
-	    die "$0: unknown option $switch\n";
+	    die "$0: unknown option $switch (fatal)\n";
 	}
     }
 
@@ -81,7 +81,7 @@ while ($ARGV[0] =~ m!^-(\w+)!o) {
 }
 
 if (($FLAG{'json'} + $FLAG{'text'}) > 1) {
-    die "$0: sorry, json/text options are mutually exclusive\n";
+    die "$0: sorry, json/text options are mutually exclusive (fatal)\n";
 }
 
 if ($FLAG{'verbose'} >= 3) {
@@ -247,11 +247,11 @@ while (<DATA>) {
 		shift(@ARGV);		# dump -s
 		$status = shift(@ARGV); # stash and dump the arg
 		unless ($status =~ /^(public|final|draft)$/o) {
-		    die "$0: upload: bad status $status\n";
+		    die "$0: upload: bad status $status (fatal)\n";
 		}
 	    }
 	    else {
-		die "$0: upload: unknown argument $ARGV[0]\n";
+		die "$0: upload: unknown argument $ARGV[0] (fatal)\n";
 	    }
 	}
 
@@ -307,7 +307,7 @@ while (<DATA>) {
     # THIS CAN'T HAPPEN
 
     else {
-	die "LOL WHUT?\n";
+	die "LOL WHUT? (fatal)\n";
     }
 }
 
@@ -357,7 +357,7 @@ sub Mine {
 	$query = "?_method=DELETE";
     }
     else {
-	die "$0: unrecognised method $method\n";
+	die "$0: unrecognised method $method (fatal)\n";
     }
 
     foreach $arg (@args) {
@@ -367,14 +367,14 @@ sub Mine {
     if ($FLAG{'json'}) {
 	# only swap to .json if was .xml beforehand
 	unless ($api =~ s!\.xml$!.json!o) {
-	    die "$0: API $api cannot be coersced to JSON format output\n";
+	    die "$0: API $api cannot be coersced to JSON format output (fatal)\n";
 	}
     }
 
     if ($FLAG{'text'}) {
 	# only swap to .text if was .xml beforehand
 	unless ($api =~ s!\.xml$!.txt!o) {
-	    die "$0: API $api cannot be coersced to TEXT format output\n";
+	    die "$0: API $api cannot be coersced to TEXT format output (fatal)\n";
 	}
     }
 
@@ -386,10 +386,10 @@ sub Mine {
     my $retval2 = $retval >> 8;
 
     unless ($FLAG{'dontquit'}) {
-	die "$0: curl returned status $retval2 ($retval)\n" if ($retval);
+	die "$0: curl returned exit status $retval2 (fatal)\n" if ($retval);
     }
 
-    warn "+ curl returned status $retval2 ($retval)\n" if ($FLAG{'verbose'} >= 2);
+    warn "+ curl returned exit status $retval2 (info)\n" if ($FLAG{'verbose'} >= 2);
 }
 
 ##################################################################
