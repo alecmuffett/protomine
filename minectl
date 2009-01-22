@@ -36,13 +36,13 @@ require "pm-mime.pl";
 # basic argument parsing
 
 my %FLAGDESC = (
+    e => '# print error-page upon HTTP error (side effect: sets exit status to 0)',
     h => '# help mode; use also "help" command',
     j => '# JSON output, if possible',
+    q => '# do NOT quit upon curl returning an error code',
     t => '# TEXT output, if possible (currently gets XML as text/plain)',
-    Q => '# do NOT quit upon curl returning an error code',
-    E => '# curl prints error-page upon HTTP error (but sets no error code)',
-    v => '# verbose; -vv, -vvv = more verbose',
     u => '[username:password] # use curl with digest authentication',
+    v => '# verbose; -vv, -vvv = more verbose',
     );
 
 my %FLAG;
@@ -63,10 +63,10 @@ while ($ARGV[0] =~ m!^-(\w+)!o) {
 	elsif ($switch eq 't') {
 	    $FLAG{'text'} = 1;
 	}
-	elsif ($switch eq 'Q') {
+	elsif ($switch eq 'q') {
 	    $FLAG{'dontquit'} = 1;
 	}
-	elsif ($switch eq 'E') {
+	elsif ($switch eq 'e') {
 	    $FLAG{'curlerrs'} = 1;
 	}
 	elsif ($switch eq 'u') {
