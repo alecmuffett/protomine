@@ -16,11 +16,9 @@
 
 #### THIS IS IN THE PROTOMINE WORKING DIRECTORY
 
-# if set to true, will treat protomine config as a scratch file
-STILL_IN_TESTING=true
-
 UI=database/ui
 DOC=database/doc
+PRODUCTION_LOCKFILE=.this_mine_is_being_used
 
 ##################################################################
 # METATARGETS
@@ -61,7 +59,7 @@ clobber: clean
 	rm -f database/objects/*
 	rm -f database/relations/*
 	rm -f database/tags/* # leave logs alone
-	$(STILL_IN_TESTING) && rm -f protomine-config.pl
+	test -f $(PRODUCTION_LOCKFILE) || rm -f protomine-config.pl
 	rm -f minecode.ps
 
 ###
@@ -119,7 +117,7 @@ errs:
 ###
 
 protomine-config.pl: generate-config.sh
-	$(STILL_IN_TESTING) && ./generate-config.sh > protomine-config.pl
+	test -f $(PRODUCTION_LOCKFILE) || ./generate-config.sh > protomine-config.pl
 	chmod 755 protomine-config.pl
 
 ###
