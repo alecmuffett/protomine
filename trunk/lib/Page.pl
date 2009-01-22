@@ -21,6 +21,9 @@ package Page;
 use strict;
 use warnings;
 
+use JSON::XS;
+use HTML::Template;
+
 # for the C-programmer in me, and you
 my $BUFSIZ = 1024 * 64;
 my $DIRMAGIC = '[directory]';

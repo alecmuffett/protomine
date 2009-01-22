@@ -16,22 +16,23 @@
 ## permissions and limitations under the License.
 ##
 
-#  $LINT  external  Carp            debugging    module
-#  $LINT  external  POST_MAX        cgi::        scalar
-#  $LINT  external  Pretty          cgi::pretty  module
-#  $LINT  external  SUPER           superclass   method
-#  $LINT  external  XS              json::xs     module
-#  $LINT  external  cgi_error       cgi::        method
+#  $LINT  external  Carp            cgi::module
+#  $LINT  external  Pretty          cgi::module
+#  $LINT  external  POST_MAX        cgi::scalar
+#  $LINT  external  Template        html::template
+#  $LINT  external  SUPER           superclass
+#  $LINT  external  XS              module
+#  $LINT  external  cgi_error       cgi::method
 #  $LINT  external  encode          json::xs     method
-#  $LINT  external  end_html        cgi::        method
-#  $LINT  external  header          cgi::        method
-#  $LINT  external  param           cgi::        method
-#  $LINT  external  pretty
-#  $LINT  external  redirect
-#  $LINT  external  request_method
-#  $LINT  external  start_html      cgi::        method
-#  $LINT  external  upload
-#  $LINT  external  url
+#  $LINT  external  end_html        cgi::method
+#  $LINT  external  header          cgi::method
+#  $LINT  external  param           cgi::method
+#  $LINT  external  pretty          json::xs     method
+#  $LINT  external  redirect        cgi::method
+#  $LINT  external  request_method  cgi::method
+#  $LINT  external  start_html      cgi::method
+#  $LINT  external  upload          cgi::method
+#  $LINT  external  url             cgi::method
 
 package main;
 
@@ -42,7 +43,6 @@ use diagnostics;
 use CGI qw/:standard/;
 use CGI::Carp;
 use CGI::Pretty;
-use JSON::XS;
 
 # global variables
 

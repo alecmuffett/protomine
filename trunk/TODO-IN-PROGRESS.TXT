@@ -56,3 +56,16 @@ add caching to Thing->load ($self->{CACHE$ID}?) with appropriate purging
 
 add "sub __sort_method" to thing, pertinent to list(), overridable by subclass?
 
+------------------------------------------------------------------
+
+use HTML::Template
+
+------------------------------------------------------------------
+
+create a perl output type for debugging?  :-)
+
+------------------------------------------------------------------
+
+mv the require JSON::XS into Page.pl
+
+

@@ -50,6 +50,8 @@ sub boot {
 
     $self->{VALID_KEYS} = {
 	objectDescription => 1,
+	objectHideAfter => 1,
+	objectHideBefore => 1,
 	objectId => 1,
 	objectName => 1,
 	objectStatus => [ qw{ draft final public } ],
@@ -59,6 +61,8 @@ sub boot {
 
     $self->{WRITABLE_KEYS} = {
 	objectDescription => 1,
+	objectHideAfter => 1,
+	objectHideBefore => 1,
 	objectName => 1,
 	objectStatus => 1,
 	objectTags => 1,
