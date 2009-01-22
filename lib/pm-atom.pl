@@ -50,9 +50,6 @@ sub yyyy_format {
 sub get_permalink {
     my ($method, $r, $o) = @_;
 
-    my $r = shift;
-    my $o = shift;
-
     my $rid = 0;
     my $rvsn = 0;
     my $oid = 0;

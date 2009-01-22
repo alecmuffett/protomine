@@ -43,26 +43,30 @@ sub boot {
     };
 
     $self->{VALID_KEYS} = {
-	relationDescription => 1,
 	relationContact => 1,
+	relationDescription => 1,
+	relationEmbargoAfter => 1,
+	relationEmbargoBefore => 1,
+	relationIPAddress => 1,
 	relationId => 1,
-	relationName => 1,
-	relationNetworkAddress => 1,
-	relationInterests => 1,
 	relationImageURL => 1,
+	relationInterests => 1,
+	relationName => 1,
 	relationURL => 1,
 	relationVersion => 1,
     };
 
     $self->{WRITABLE_KEYS} = {
-	relationDescription => 1,
 	relationContact => 1,
-	relationName => 1,
-	relationNetworkAddress => 1,
+	relationDescription => 1,
+	relationEmbargoAfter => 1,
+	relationEmbargoBefore => 1,
+	relationIPAddress => 1,
 	relationInterests => 1,
-        relationImageURL => 1,
+	relationName => 1,
 	relationURL => 1,
 	relationVersion => 1,
+        relationImageURL => 1,
     };
 
     return $self;

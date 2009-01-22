@@ -42,13 +42,13 @@ sub boot {
 
     $self->{VALID_KEYS} = {
 	tagId => 1,
-	tagName => 1,
 	tagImplies => 1,
+	tagName => 1,
     };
 
     $self->{WRITABLE_KEYS} = {
-	tagName => 1,
 	tagImplies => 1,
+	tagName => 1,
     };
 
     return $self;

@@ -62,7 +62,7 @@ sub hashify {
 sub encodeMineKey {
     my ($self, $method, $rid, $rvsn, $oid) = @_;
 
-    die "encodeMineKey: bad method $method\n" unless ($method =~ m!^$METHODRX$o!);
+    die "encodeMineKey: bad method $method\n" unless ($method =~ m!^$METHODRX$!o);
     die "encodeMineKey: bad rid $rid\n" unless ($rid > 0);
     die "encodeMineKey: bad rvsn $rvsn\n" unless ($rvsn > 0);
     die "encodeMineKey: bad oid $oid\n" unless ($oid >= 0);
