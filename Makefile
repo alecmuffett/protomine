@@ -73,12 +73,14 @@ clean: permissions
 	-rm *.tmp
 
 ###
-# coersce the permissions to plausible values for development
+# coersce the permissions to plausible values for development; we are
+# flexible with the files since logfiles may be owned by the webserver
+# and not be chmod-able
 ###
 
 permissions:
+	-chmod 0644 `find . -type f -print`
 	chmod 0755 `find . -type d -print`
-	chmod 0644 `find . -type f -print`
 	chmod 0755 *.pl *.sh minectl protomine.cgi lib/* tools/*
 	( cd database ; chmod 01777 objects tags relations logs )
 
