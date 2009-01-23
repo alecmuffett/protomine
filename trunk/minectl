@@ -117,8 +117,12 @@ my $we_did_something = 0;
 ##################################################################
 
 if ($FLAG{'help'}) {
-    $usercmd = '.' unless (defined($usercmd));
-    print "help: all commands matching /$usercmd/\n";
+    if (!defined($usercmd)) {
+	$FLAG{'help'} = 0;	# no pattern, drop thru to std message
+    }
+    else {
+	print "help: all commands matching /$usercmd/\n";
+    }
 }
 
 while (<DATA>) {
