@@ -14,10 +14,19 @@
 ## permissions and limitations under the License.
 ##
 
-#### THIS IS IN THE PROTOMINE WORKING DIRECTORY
+# pagesize for printing
+PAGESIZE=A4
 
-UI=database/ui
-DOC=database/doc
+# where stuff goes
+
+DB=database
+UI=$(DB)/ui
+DOC=$(DB)/doc
+
+# if this file exists, the makefile will (hopefully) avoid doing
+# anything that will disturb the database/user, eg: blowing away all
+# their objects, or adding to them unnecessarily...
+
 PRODUCTION_LOCKFILE=.this_mine_is_being_used
 
 ##################################################################
@@ -56,9 +65,9 @@ syntax:
 ###
 
 clobber: clean
-	rm -f database/objects/*
-	rm -f database/relations/*
-	rm -f database/tags/* # leave logs alone
+	test -f $(PRODUCTION_LOCKFILE) || rm -f $(DB)/objects/*
+	test -f $(PRODUCTION_LOCKFILE) || rm -f $(DB)/relations/*
+	test -f $(PRODUCTION_LOCKFILE) || rm -f $(DB)/tags/*
 	test -f $(PRODUCTION_LOCKFILE) || rm -f protomine-config.pl
 	rm -f minecode.ps
 
@@ -72,15 +81,15 @@ clean: permissions
 
 ###
 # coersce the permissions to plausible values for development; we are
-# flexible with the files since logfiles may be owned by the webserver
-# and not be chmod-able
+# flexible about the files/644 since logfiles may be owned by the
+# webserver and therefore may not be chmod-able
 ###
 
 permissions:
 	-chmod 0644 `find . -type f -print`
 	chmod 0755 `find . -type d -print`
 	chmod 0755 *.pl *.sh minectl protomine.cgi lib/* tools/*
-	( cd database ; chmod 01777 objects tags relations logs )
+	( cd $(DB) ; chmod 01777 objects tags relations logs )
 
 
 ###
@@ -93,7 +102,7 @@ config: protomine-config.pl
 print:
 	enscript --file-align=2 \
 		--mark-wrapped-lines=arrow \
-		--media=A4 \
+		--media=$(PAGESIZE) \
 		--output=minecode.ps \
 		--pretty-print=perl \
 		protomine.cgi lib/* minectl generate-homepage.pl
@@ -104,7 +113,7 @@ lint:
 reset:
 	make clobber
 	make
-	./populate-mine.sh
+	test -f $(PRODUCTION_LOCKFILE) || ./populate-mine.sh
 
 errs:
 	tail -f /var/log/apache2/error_log
@@ -126,4 +135,3 @@ protomine-config.pl: generate-config.sh
 
 $(UI)/index.html: generate-homepage.pl
 	$? > $@
-
