@@ -117,6 +117,7 @@ my $we_did_something = 0;
 ##################################################################
 
 if ($FLAG{'help'}) {
+    $usercmd = '.' unless (defined($usercmd));
     print "help: all commands matching /$usercmd/\n";
 }
 
