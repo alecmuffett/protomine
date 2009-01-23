@@ -163,6 +163,12 @@ sub set {
 
 	    if (!defined($1)) { # no "for:" or "not:" prefix
 		my $id = Tag->existsName($2);
+		if ($id < 0) {
+		    die "Object: tag database corrupt regarding: '$2'\n";
+		}
+		elsif ($id == 0) {
+		    die "Object: cannot assign unknown tag: '$2'\n";
+		}
 		$foo = $id;
 	    }
 	    else {
