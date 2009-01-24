@@ -147,41 +147,192 @@ sub XXui_show_tags {
 ##################################################################
 ##################################################################
 
-push (@raw_action_list, [ '/ui/clone-object/OID.html', 'GET', \&ui_clone_object, 'OID' ]);
+# ui_clone_object_oid --
+push (@raw_action_list, [ '/ui/clone-object/OID.html', 'GET', \&ui_clone_object_oid, 'OID' ]);
+
+sub ui_clone_object_oid {
+}
+
+# ui_create_object --
 push (@raw_action_list, [ '/ui/create-object.html', 'POST', \&ui_create_object ]);
+
+sub ui_create_object {
+}
+
+# ui_create_relation --
 push (@raw_action_list, [ '/ui/create-relation.html', 'POST', \&ui_create_relation ]);
+
+sub ui_create_relation {
+}
+
+# ui_create_tag --
 push (@raw_action_list, [ '/ui/create-tag.html', 'POST', \&ui_create_tag ]);
-push (@raw_action_list, [ '/ui/delete-object/OID.html', 'GET', \&ui_delete_object, 'OID' ]);
-push (@raw_action_list, [ '/ui/delete-relation/RID.html', 'GET', \&ui_delete_relation, 'RID' ]);
-push (@raw_action_list, [ '/ui/delete-tag/TID.html', 'GET', \&ui_delete_tag, 'TID' ]);
-push (@raw_action_list, [ '/ui/read-object/OID.html', 'GET', \&ui_read_object, 'OID' ]);
-push (@raw_action_list, [ '/ui/read-relation/RID.html', 'GET', \&ui_read_relation, 'RID' ]);
-push (@raw_action_list, [ '/ui/read-tag/TID.html', 'GET', \&ui_read_tag, 'TID' ]);
-push (@raw_action_list, [ '/ui/select/object.html', 'GET', \&do_noop ]);
-push (@raw_action_list, [ '/ui/select/relation.html', 'GET', \&do_noop ]);
-push (@raw_action_list, [ '/ui/select/tag.html', 'GET', \&do_noop ]);
 
-push (@raw_action_list, [ '/ui/share/raw/RID/RVSN/OID', 'GET', \&do_noop, 'RID', 'RVSN', 'OID' ]);
-push (@raw_action_list, [ '/ui/share/redirect/RID', 'GET', \&do_noop, 'RID' ]);
-push (@raw_action_list, [ '/ui/share/redirect/RID/OID', 'GET', \&do_noop, 'RID', 'OID' ]);
-push (@raw_action_list, [ '/ui/share/url/RID.html', 'GET', \&do_noop, 'RID' ]);
-push (@raw_action_list, [ '/ui/share/url/RID/OID.html', 'GET', \&do_noop, 'RID', 'OID' ]);
+sub ui_create_tag {
+}
 
-push (@raw_action_list, [ '/ui/show-clones/OID.html', 'GET', \&ui_show_clones, 'OID' ]);
+# ui_delete_object_oid --
+push (@raw_action_list, [ '/ui/delete-object/OID.html', 'GET', \&ui_delete_object_oid, 'OID' ]);
+
+sub ui_delete_object_oid {
+}
+
+# ui_delete_relation_rid --
+push (@raw_action_list, [ '/ui/delete-relation/RID.html', 'GET', \&ui_delete_relation_rid, 'RID' ]);
+
+sub ui_delete_relation_rid {
+}
+
+# ui_delete_tag_tid --
+push (@raw_action_list, [ '/ui/delete-tag/TID.html', 'GET', \&ui_delete_tag_tid, 'TID' ]);
+
+sub ui_delete_tag_tid {
+}
+
+# ui_read_object_oid --
+push (@raw_action_list, [ '/ui/read-object/OID.html', 'GET', \&ui_read_object_oid, 'OID' ]);
+
+sub ui_read_object_oid {
+}
+
+# ui_read_relation_rid --
+push (@raw_action_list, [ '/ui/read-relation/RID.html', 'GET', \&ui_read_relation_rid, 'RID' ]);
+
+sub ui_read_relation_rid {
+}
+
+# ui_read_tag_tid --
+push (@raw_action_list, [ '/ui/read-tag/TID.html', 'GET', \&ui_read_tag_tid, 'TID' ]);
+
+sub ui_read_tag_tid {
+}
+
+# ui_select_object --
+push (@raw_action_list, [ '/ui/select/object.html', 'GET', \&ui_select_object ]);
+
+sub ui_select_object {
+}
+
+# ui_select_relation --
+push (@raw_action_list, [ '/ui/select/relation.html', 'GET', \&ui_select_relation ]);
+
+sub ui_select_relation {
+}
+
+# ui_select_tag --
+push (@raw_action_list, [ '/ui/select/tag.html', 'GET', \&ui_select_tag ]);
+
+sub ui_select_tag {
+}
+
+# ui_share_raw_rid_rvsn_oid --
+push (@raw_action_list, [ '/ui/share/raw/RID/RVSN/OID', 'GET', \&ui_share_raw_rid_rvsn_oid, 'RID', 'RVSN', 'OID' ]);
+
+sub ui_share_raw_rid_rvsn_oid {
+}
+
+# ui_share_redirect_rid --
+push (@raw_action_list, [ '/ui/share/redirect/RID', 'GET', \&ui_share_redirect_rid, 'RID' ]);
+
+sub ui_share_redirect_rid {
+}
+
+# ui_share_redirect_rid_oid --
+push (@raw_action_list, [ '/ui/share/redirect/RID/OID', 'GET', \&ui_share_redirect_rid_oid, 'RID', 'OID' ]);
+
+sub ui_share_redirect_rid_oid {
+}
+
+# ui_share_url_rid --
+push (@raw_action_list, [ '/ui/share/url/RID.html', 'GET', \&ui_share_url_rid, 'RID' ]);
+
+sub ui_share_url_rid {
+}
+
+# ui_share_url_rid_oid --
+push (@raw_action_list, [ '/ui/share/url/RID/OID.html', 'GET', \&ui_share_url_rid_oid, 'RID', 'OID' ]);
+
+sub ui_share_url_rid_oid {
+}
+
+# ui_show_clones_oid --
+push (@raw_action_list, [ '/ui/show-clones/OID.html', 'GET', \&ui_show_clones_oid, 'OID' ]);
+
+sub ui_show_clones_oid {
+}
+
+# ui_show_config --
 push (@raw_action_list, [ '/ui/show-config.html', 'GET', \&ui_show_config ]);
+
+sub ui_show_config {
+}
+
+# ui_show_objects --
 push (@raw_action_list, [ '/ui/show-objects.html', 'GET', \&ui_show_objects ]);
+
+sub ui_show_objects {
+}
+
+# ui_show_relations --
 push (@raw_action_list, [ '/ui/show-relations.html', 'GET', \&ui_show_relations ]);
+
+sub ui_show_relations {
+}
+
+# ui_show_tags --
 push (@raw_action_list, [ '/ui/show-tags.html', 'GET', \&ui_show_tags ]);
-push (@raw_action_list, [ '/ui/update-config.html', 'POST', \&ui_update_config ]);
-push (@raw_action_list, [ '/ui/update-data/OID.html', 'GET', \&do_document, 'database/ui', 'update-data-xxx.html' ]);
-push (@raw_action_list, [ '/ui/update-data/OID.html', 'POST', \&ui_update_data, 'OID' ]);
-push (@raw_action_list, [ '/ui/update-object/OID.html', 'GET', \&do_document, 'database/ui', 'update-object-xxx.html' ]);
-push (@raw_action_list, [ '/ui/update-object/OID.html', 'POST', \&ui_update_object, 'OID' ]);
-push (@raw_action_list, [ '/ui/update-relation/RID.html', 'GET', \&do_document, 'database/ui', 'update-relation-xxx.html' ]);
-push (@raw_action_list, [ '/ui/update-relation/RID.html', 'POST', \&ui_update_relation, 'RID' ]);
-push (@raw_action_list, [ '/ui/update-tag/TID.html', 'GET', \&do_document, 'database/ui', 'update-tag-xxx.html' ]);
-push (@raw_action_list, [ '/ui/update-tag/TID.html', 'POST', \&ui_update_tag, 'TID' ]);
+
+sub ui_show_tags {
+}
+
+##################################################################
+
+# ui_update_config --
+push (@raw_action_list, [ '/ui/update-config.html', 'GET', \&ui_update_config ]);
+
+sub ui_update_config {
+}
+
+##################################################################
+
+# ui_update_data_oid --
+push (@raw_action_list, [ '/ui/update-data/OID.html', 'GET', \&ui_update_data_oid, 'database/ui', 'update-data-xxx.html' ]);
+
+sub ui_update_data_oid {
+}
+
+##################################################################
+
+# ui_update_object_oid --
+push (@raw_action_list, [ '/ui/update-object/OID.html', 'GET', \&ui_update_object_oid, 'database/ui', 'update-object-xxx.html' ]);
+
+sub ui_update_object_oid {
+}
+
+##################################################################
+
+# ui_update_relation_rid --
+push (@raw_action_list, [ '/ui/update-relation/RID.html', 'GET', \&ui_update_relation_rid, 'database/ui', 'update-relation-xxx.html' ]);
+
+sub ui_update_relation_rid {
+}
+
+##################################################################
+
+# ui_update_tag_tid --
+push (@raw_action_list, [ '/ui/update-tag/TID.html', 'GET', \&ui_update_tag_tid, 'database/ui', 'update-tag-xxx.html' ]);
+
+sub ui_update_tag_tid {
+}
+
+##################################################################
+
+# ui_version --
 push (@raw_action_list, [ '/ui/version.html', 'GET', \&ui_version ]);
+
+sub ui_version {
+}
+
 
 ##################################################################
 

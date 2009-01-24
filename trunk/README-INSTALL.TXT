@@ -1,4 +1,34 @@
+General installation: (ALL PLATFORMS)
+
+Protomine requires the Perl JSON::XS and HTML::Template modules, which
+are probably most easily installed by performing the following as
+root:
+
+	sudo perl -MCPAN -e 'install JSON::XS'
+	sudo perl -MCPAN -e 'install HTML::Template'
+
+(Use "su" and skip using "sudo" on platforms where that's inappropriate)
+
+On OSX I had to go repermission some of the contents of
+/Library/Perl/5.8.8/ (and subdirectories) because the CPAN build set
+up JSON::XS and HTML::Template set no group- or world read/execute
+permissions.  
+
+This bug manifested itself as protomine failing to run as an Apache
+CGI script, claiming that (eg:) JSON::XS did not exist / could not be
+found, when in fact it *was* installed but running as the "www" user
+(as a CGI script launched by Apache) it was unable to access
+
+  /Library/Perl/5.8.8/JSON/darwin-thread-multi-2level/JSON/XS
+
+...which was owned by "alecm" and mode 0700
+
+I presume other platforms risk the same problem.
+
+
 ------------------------------------------------------------------
+
+OSX installation:
 
 Administrator priviliges for your account *will* be required; this
 pokes the /etc/apache2/users/USERNAME.conf file to enable CGI to be
@@ -22,13 +52,21 @@ Commands:
 
 ------------------------------------------------------------------
 
-Ubuntu pre-requisites:
+Ubuntu installation:
 
-	Subversion
-	GNU Make
-	curl
-	perl
-	apache2
+Subversion
+GNU Make
+curl
+perl
+apache2
 
-	apt-get install subversion make curl perl apache2
+apt-get install subversion make curl perl apache2
+
+------------------------------------------------------------------
+
+OpenSolaris installation:
+
+to be written up
+
+------------------------------------------------------------------
 
