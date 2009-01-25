@@ -234,25 +234,26 @@ sub addFileContent {            # add the contents of a file to the page
     my $arg = shift;
 
     open(ADDFILECONTENT, $arg) or die "addFileContent: open: $arg: $!\n";
-
     push(@{$self->{DATA}}, <ADDFILECONTENT>);
-
     close(ADDFILECONTENT) or die "addFileContent: close: $arg: $!\n";
 }
 
 sub addFileTemplate {           # add the contents of a template to the page, substituted
     my $self = shift;
-    my $arg = shift;
-    my $pageref = $self->{DATA};
+    my $filename = shift;
+    my $paramref = shift;
 
-    open(ADDFILETEMPLATE, $arg) or die "addFileTemplate: open: $arg: $!\n";
+    my $template = HTML::Template->new(filename => "database/ui/$filename", 
+				       die_on_bad_params => 1,
+				       strict => 1,
+				       case_sensitive => 1,
+				       loop_context_vars => 1,
+				       no_includes => 1,
+				       default_escape => 'HTML');
 
-    while (my $line = <ADDFILETEMPLATE>) {
-	# TODO: MATCH AND SUBSTITUTE HERE
-	push(@{$pageref}, $line);
-    }
+    $template->param($paramref);
 
-    close(ADDFILETEMPLATE) or die "addFileTemplate: close: $arg: $!\n";
+    push(@{$self->{DATA}}, $template->output());
 }
 
 sub addDirectoryHash {		# format a directory hash

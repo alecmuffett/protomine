@@ -80,6 +80,16 @@ clean: permissions
 	-rm *.tmp
 
 ###
+# production mode: less likely to blow away database accidentally
+###
+
+safe:
+	touch $(PRODUCTION_LOCKFILE) 
+
+unsafe:
+	rm -f $(PRODUCTION_LOCKFILE) 
+
+###
 # coersce the permissions to plausible values for development; we are
 # flexible about the files/644 since logfiles may be owned by the
 # webserver and therefore may not be chmod-able

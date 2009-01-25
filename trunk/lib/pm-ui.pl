@@ -331,6 +331,18 @@ sub ui_update_tag_tid {
 push (@raw_action_list, [ '/ui/version.html', 'GET', \&ui_version ]);
 
 sub ui_version {
+    my $p = Page->newHTML("ui/");
+
+    my $paramref = {
+	THIS_LOOP => [
+	    { WORD => 'foo', NUMBER => 1 },
+	    { WORD => 'bar', NUMBER => 2 },
+	    { WORD => 'baz', NUMBER => 3 },
+	    ]
+    };
+
+    $p->addFileTemplate('version.html', $paramref);
+    return $p;
 }
 
 
