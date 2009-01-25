@@ -71,22 +71,22 @@ __END__;
 }
 
 { objects
-+ show-objects.html show objects
++ list-objects.html list objects
 + create-object.html create object
 }
 
 { relationships
-+ show-relations.html show relationships
++ list-relations.html list relationships
 + create-relation.html create relationships
 }
 
 { tags
-+ show-tags.html show tags
++ list-tags.html list tags
 + create-tag.html create tag
 }
 
 { management
-+ version.html version information
++ version.html software version information
 + show-config.html show configuration
 + update-config.html update configuration
 }

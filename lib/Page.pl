@@ -255,7 +255,10 @@ sub addFileTemplate {           # add the contents of a template to the page, su
 
     my $pageref = $self->{DATA};
 
+
     push(@{$pageref}, "<!-- begin template $filename -->\n");
+    my @debug = keys %{$paramref};
+    push(@{$pageref}, "<!-- debug @debug -->\n");
     push(@{$pageref}, $template->output());
     push(@{$pageref}, "<!-- end template $filename -->\n");
 }
