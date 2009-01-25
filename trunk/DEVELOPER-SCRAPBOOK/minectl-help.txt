@@ -1,0 +1,92 @@
+usage:
+  ./minectl [options] command [cmdoptions] [args ... ]
+
+options:
+  -e # print error-page upon HTTP error (side effect: sets exit status to 0)
+  -h # help mode; use also "help" command
+  -j # JSON output, if possible
+  -q # do NOT quit upon curl returning an error code
+  -t # TEXT output, if possible (currently gets XML as text/plain)
+  -u [username:password] # use curl with digest authentication
+  -v # verbose; -vv, -vvv = more verbose
+
+commands:
+
+* help [keyword]
+
+  list all commands matching [keyword] 
+
+* clone-object 42
+
+  clones object 42, returns new objectId
+
+* create-object data=@filename.txt objectKey=value ...
+
+  uploads filename.txt, setting objectName=whatever and so forth
+
+* create-relation relationKey=value ...
+
+  creates a relation with key=value pairs 
+
+* create-tag tagKey=value ...
+
+  
+
+* delete-object 42 17 23 ...
+
+* delete-object-key 42 objectKey ...
+
+* delete-relation 42 17 23 ...
+
+* delete-relation-key 42 relationKey ...
+
+* delete-tag 42 17 23 ...
+
+* delete-tag-key 42 tagKey ...
+
+* get minekey
+
+* get-config 
+
+* get-data 42
+
+* get-object 42
+
+* get-object-key 42 objectKey
+
+* get-relation 42
+
+* get-relation-key 42 relationKey
+
+* get-tag 42
+
+* get-tag-key 42 tagKey
+
+* list-clones 42
+
+* list-objects 
+
+* list-relations 
+
+* list-tags 
+
+* mime-type filename.ext ...
+
+* new-relation name vers desc tag ...
+
+* new-tags tag1 tag2 tag3:implies1 tag4:implies1,implies2[,more...] ...
+
+* update-config key=value ...
+
+* update-data 42 data=@filename.txt
+
+* update-object 42 objectKey=value ...
+
+* update-relation 42 relationKey=value ...
+
+* update-tag 42 tagKey=value ...
+
+* upload [-t "tag ..."] [-s status] file ...
+
+* version 
+

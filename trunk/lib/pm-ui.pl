@@ -190,19 +190,25 @@ sub ui_delete_tag_tid {
 }
 
 # ui_read_object_oid --
-push (@raw_action_list, [ '/ui/read-object/OID.html', 'GET', \&ui_read_object_oid, 'OID' ]);
+push (@raw_action_list, [ '/ui/get-object/OID.html', 'GET', \&ui_read_object_oid, 'OID' ]);
 
 sub ui_read_object_oid {
+    my ($ctx, $info, $phr, $oid) = @_;
+
+    my $p = Page->newHTML("ui/");
+    my $wrapper = &api_read_oid($ctx, $info, $phr, $oid);
+    $p->addFileTemplate('tmpl-get-object.html', $wrapper->{object});
+    return $p;
 }
 
 # ui_read_relation_rid --
-push (@raw_action_list, [ '/ui/read-relation/RID.html', 'GET', \&ui_read_relation_rid, 'RID' ]);
+push (@raw_action_list, [ '/ui/get-relation/RID.html', 'GET', \&ui_read_relation_rid, 'RID' ]);
 
 sub ui_read_relation_rid {
 }
 
 # ui_read_tag_tid --
-push (@raw_action_list, [ '/ui/read-tag/TID.html', 'GET', \&ui_read_tag_tid, 'TID' ]);
+push (@raw_action_list, [ '/ui/get-tag/TID.html', 'GET', \&ui_read_tag_tid, 'TID' ]);
 
 sub ui_read_tag_tid {
 }
@@ -255,37 +261,39 @@ push (@raw_action_list, [ '/ui/share/url/RID/OID.html', 'GET', \&ui_share_url_ri
 sub ui_share_url_rid_oid {
 }
 
-# ui_show_clones_oid --
-push (@raw_action_list, [ '/ui/show-clones/OID.html', 'GET', \&ui_show_clones_oid, 'OID' ]);
+##################################################################
 
-sub ui_show_clones_oid {
+# ui_list_clones_oid --
+push (@raw_action_list, [ '/ui/list-clones/OID.html', 'GET', \&ui_list_clones_oid, 'OID' ]);
+
+sub ui_list_clones_oid {
 }
+
+# ui_list_objects --
+push (@raw_action_list, [ '/ui/list-objects.html', 'GET', \&ui_list_objects ]);
+
+sub ui_list_objects {
+}
+
+# ui_list_relations --
+push (@raw_action_list, [ '/ui/list-relations.html', 'GET', \&ui_list_relations ]);
+
+sub ui_list_relations {
+}
+
+# ui_list_tags --
+push (@raw_action_list, [ '/ui/list-tags.html', 'GET', \&ui_list_tags ]);
+
+sub ui_list_tags {
+}
+
+##################################################################
 
 # ui_show_config --
 push (@raw_action_list, [ '/ui/show-config.html', 'GET', \&ui_show_config ]);
 
 sub ui_show_config {
 }
-
-# ui_show_objects --
-push (@raw_action_list, [ '/ui/show-objects.html', 'GET', \&ui_show_objects ]);
-
-sub ui_show_objects {
-}
-
-# ui_show_relations --
-push (@raw_action_list, [ '/ui/show-relations.html', 'GET', \&ui_show_relations ]);
-
-sub ui_show_relations {
-}
-
-# ui_show_tags --
-push (@raw_action_list, [ '/ui/show-tags.html', 'GET', \&ui_show_tags ]);
-
-sub ui_show_tags {
-}
-
-##################################################################
 
 # ui_update_config --
 push (@raw_action_list, [ '/ui/update-config.html', 'GET', \&ui_update_config ]);
@@ -332,10 +340,7 @@ push (@raw_action_list, [ '/ui/version.html', 'GET', \&ui_version ]);
 
 sub ui_version {
     my $p = Page->newHTML("ui/");
-
-    my $wrapper = &api_version;	
-
-    # remove the outer wrapper and pass into the templater
+    my $wrapper = &api_version(@_); # fast way to send args
     $p->addFileTemplate('tmpl-version.html', $wrapper->{version});
     return $p;
 }
