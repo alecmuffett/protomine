@@ -474,9 +474,14 @@ sub api_delete_key_tid_key {
 push (@raw_action_list, [ '/api/version.FMT', 'READ', \&do_fmt, 'FMT', \&api_version ]);
 sub api_version {
     my ($ctx, $info, $phr) = @_;
-    return { version =>
-	     { api => '1.001',
-	       mine => '1.001' } };
+    return { 
+	version =>
+	{ 
+	    software => 'protomine', # this software
+	    revision => '140',	 # software revision (use SVN number?)
+	    api => '1.100',	 # api revision
+	}
+    };
 }
 
 ##################################################################

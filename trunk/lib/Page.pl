@@ -253,7 +253,11 @@ sub addFileTemplate {           # add the contents of a template to the page, su
 
     $template->param($paramref);
 
-    push(@{$self->{DATA}}, $template->output());
+    my $pageref = $self->{DATA};
+
+    push(@{$pageref}, "<!-- begin template $filename -->\n");
+    push(@{$pageref}, $template->output());
+    push(@{$pageref}, "<!-- end template $filename -->\n");
 }
 
 sub addDirectoryHash {		# format a directory hash
