@@ -194,7 +194,6 @@ push (@raw_action_list, [ '/ui/get-object/OID.html', 'GET', \&ui_read_object_oid
 
 sub ui_read_object_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-
     my $p = Page->newHTML("ui/");
     my $wrapper = &api_read_oid($ctx, $info, $phr, $oid);
     $p->addFileTemplate('tmpl-get-object.html', $wrapper->{object});
@@ -205,12 +204,22 @@ sub ui_read_object_oid {
 push (@raw_action_list, [ '/ui/get-relation/RID.html', 'GET', \&ui_read_relation_rid, 'RID' ]);
 
 sub ui_read_relation_rid {
+    my ($ctx, $info, $phr, $rid) = @_;
+    my $p = Page->newHTML("ui/");
+    my $wrapper = &api_read_rid($ctx, $info, $phr, $rid);
+    $p->addFileTemplate('tmpl-get-relation.html', $wrapper->{relation});
+    return $p;
 }
 
 # ui_read_tag_tid --
 push (@raw_action_list, [ '/ui/get-tag/TID.html', 'GET', \&ui_read_tag_tid, 'TID' ]);
 
 sub ui_read_tag_tid {
+    my ($ctx, $info, $phr, $tid) = @_;
+    my $p = Page->newHTML("ui/");
+    my $wrapper = &api_read_tid($ctx, $info, $phr, $tid);
+    $p->addFileTemplate('tmpl-get-tag.html', $wrapper->{tag});
+    return $p;
 }
 
 # ui_select_object --

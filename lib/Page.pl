@@ -249,7 +249,8 @@ sub addFileTemplate {           # add the contents of a template to the page, su
 				       case_sensitive => 1,
 				       loop_context_vars => 1,
 				       no_includes => 1,
-				       default_escape => 'HTML');
+				       default_escape => 'HTML', 
+				       @_); # any other inherited args, eg: caching
 
     $template->param($paramref);
 
@@ -258,7 +259,7 @@ sub addFileTemplate {           # add the contents of a template to the page, su
 
     push(@{$pageref}, "<!-- begin template $filename -->\n");
     my @debug = keys %{$paramref};
-    push(@{$pageref}, "<!-- debug @debug -->\n");
+    push(@{$pageref}, "<!-- debug keys='@debug' -->\n");
     push(@{$pageref}, $template->output());
     push(@{$pageref}, "<!-- end template $filename -->\n");
 }
