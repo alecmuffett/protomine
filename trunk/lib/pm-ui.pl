@@ -144,6 +144,55 @@ sub XXui_show_tags {
 
 ##################################################################
 ##################################################################
+
+my %form_size_table = 
+    (
+     objectStatus => 'OBJECTSTATUS',
+     objectDescription => 'BOX1',
+     objectType => 'LINE3',
+     objectId => 'SKIP',
+     commentId => 'SKIP',
+     tagId => 'SKIP',
+     relationId => 'SKIP',
+    );
+
+sub form_size {
+    my $key = shift;
+    return $form_size_table{$key} || 'LINE2';
+}
+
+sub loopify {			# TODO: put CSS class into arg, embed in template
+    my $hashref = shift;
+    my %opts = @_;
+
+    my $retval = {};
+    my @vector;
+
+    foreach my $key (sort { &form_size($a) cmp &form_size($b) } keys %{$hashref}) {
+	# would love to cache key/value too, but die_on_bad_params forbids
+	# $retval->{$key} = $value;
+
+       	my $element = {};
+	$element->{KEY} = $key;
+	$element->{VALUE} = $hashref->{$key};
+
+	if ($opts{'dosize'}) {
+	    my $size = &form_size($key);
+	    next if ($size eq 'SKIP');
+	    $element->{$size} = 1;
+	}
+
+	push(@vector, $element);
+    }
+
+    $retval->{LOOP} = \@vector;
+
+    return $retval;
+}
+
+sub formify {
+}
+
 ##################################################################
 ##################################################################
 
@@ -196,7 +245,7 @@ sub ui_read_object_oid {
     my ($ctx, $info, $phr, $oid) = @_;
     my $p = Page->newHTML("ui/");
     my $wrapper = &api_read_oid($ctx, $info, $phr, $oid);
-    $p->addFileTemplate('tmpl-get-object.html', $wrapper->{object});
+    $p->addFileTemplate('tmpl-get-thing.html', &loopify($wrapper->{object}));
     return $p;
 }
 
@@ -207,7 +256,7 @@ sub ui_read_relation_rid {
     my ($ctx, $info, $phr, $rid) = @_;
     my $p = Page->newHTML("ui/");
     my $wrapper = &api_read_rid($ctx, $info, $phr, $rid);
-    $p->addFileTemplate('tmpl-get-relation.html', $wrapper->{relation});
+    $p->addFileTemplate('tmpl-get-thing.html', &loopify($wrapper->{relation}));
     return $p;
 }
 
@@ -218,7 +267,7 @@ sub ui_read_tag_tid {
     my ($ctx, $info, $phr, $tid) = @_;
     my $p = Page->newHTML("ui/");
     my $wrapper = &api_read_tid($ctx, $info, $phr, $tid);
-    $p->addFileTemplate('tmpl-get-tag.html', $wrapper->{tag});
+    $p->addFileTemplate('tmpl-get-thing.html', &loopify($wrapper->{tag}));
     return $p;
 }
 
@@ -313,31 +362,42 @@ sub ui_update_config {
 ##################################################################
 
 # ui_update_data_oid --
-push (@raw_action_list, [ '/ui/update-data/OID.html', 'GET', \&ui_update_data_oid, 'database/ui', 'update-data-xxx.html' ]);
+push (@raw_action_list, [ '/ui/update-data/OID.html', 'GET', \&ui_update_data_oid, 'OID' ]);
 
 sub ui_update_data_oid {
 }
 
-##################################################################
-
 # ui_update_object_oid --
-push (@raw_action_list, [ '/ui/update-object/OID.html', 'GET', \&ui_update_object_oid, 'database/ui', 'update-object-xxx.html' ]);
+push (@raw_action_list, [ '/ui/update-object/OID.html', 'GET', \&ui_update_object_oid, 'OID' ]);
 
 sub ui_update_object_oid {
+    my ($ctx, $info, $phr, $oid) = @_;
+
+    my $p = Page->newHTML("ui/");
+
+    my $wrapper = &api_read_oid($ctx, $info, $phr, $oid);
+    my $template = &loopify($wrapper->{object}, dosize => 1);
+
+    $template->{LINK} = "../api/object/$oid.txt";
+    $template->{TITLE} = "object $oid";
+
+    $template->{AUXLINK} = "../api/object/$oid";
+    $template->{AUXTITLE} = "(data)";
+
+    $template->{ACTION} = "../api/object/$oid/key.txt";
+
+    $p->addFileTemplate('tmpl-update-thing.html', $template);
+    return $p;
 }
 
-##################################################################
-
 # ui_update_relation_rid --
-push (@raw_action_list, [ '/ui/update-relation/RID.html', 'GET', \&ui_update_relation_rid, 'database/ui', 'update-relation-xxx.html' ]);
+push (@raw_action_list, [ '/ui/update-relation/RID.html', 'GET', \&ui_update_relation_rid, 'RID' ]);
 
 sub ui_update_relation_rid {
 }
 
-##################################################################
-
 # ui_update_tag_tid --
-push (@raw_action_list, [ '/ui/update-tag/TID.html', 'GET', \&ui_update_tag_tid, 'database/ui', 'update-tag-xxx.html' ]);
+push (@raw_action_list, [ '/ui/update-tag/TID.html', 'GET', \&ui_update_tag_tid, 'TID' ]);
 
 sub ui_update_tag_tid {
 }
