@@ -5,14 +5,14 @@
 <dl>
 <TMPL_LOOP NAME="LOOP">
 <dt>
-<TMPL_VAR NAME="ID">
-<A HREF="<TMPL_VAR NAME="LINKREAD">">[read]</A>
-<A HREF="<TMPL_VAR NAME="LINKUPDATE">">[update]</A>
-<A HREF="<TMPL_VAR NAME="LINKDELETE">">[delete]</A>
+<TMPL_VAR NAME="NAME"> 
+<A HREF="<TMPL_VAR NAME="LINKREAD">"><button>read</button></A>
+<A HREF="<TMPL_VAR NAME="LINKUPDATE">"><button>update</button></A>
+<A HREF="<TMPL_VAR NAME="LINKDELETE">"><button>delete</button></A>
 </dt>
 <dd>
-name: <TMPL_VAR NAME="NAME"> <br/>
-<TMPL_IF NAME="TAGS">implied tags: <TMPL_VAR NAME="TAGS"> <br/></TMPL_IF>
+<TMPL_IF NAME="TAGS">implies: <TMPL_VAR NAME="TAGS"><br/></TMPL_IF>
+id: <TMPL_VAR NAME="ID">
 </dd>
 <p/>
 </TMPL_LOOP>
