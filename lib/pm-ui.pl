@@ -320,7 +320,7 @@ sub ui_list_objects {
 
     my $template = {
 	LOOP => \@thingvec,
-	LINKPAGE => 'list-object.html',
+	LINKPAGE => 'list-objects.html',
 	TITLE => 'list objects',
     };
 
