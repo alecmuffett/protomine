@@ -22,8 +22,6 @@ use strict;
 use warnings;
 
 my $MINEKEY_MAGIC = "mine";
-my $CRYPTFMT = "%H*";
-my $HASHFMT = "%C*";
 my $METHODRX = qr!(read|post)!;
 
 ##################################################################
@@ -44,17 +42,23 @@ sub resetPrivateKey {
 
 sub encrypt {
     my ($class, $plaintext) = @_;
-    return unpack($CRYPTFMT, $plaintext);
+    my $ciphertext = unpack("H*", $plaintext); # coersce scalar context
+    # warn "encrypt $plaintext -> $ciphertext\n";
+    return $ciphertext;
 }
 
 sub decrypt {
     my ($class, $ciphertext) = @_;
-    return pack($CRYPTFMT, $ciphertext);
+    my $plaintext = pack("H*", $ciphertext); # coersce scalar context
+    # warn "decrypt $ciphertext -> $plaintext\n";
+    return $plaintext;
 }
 
 sub hashify {
     my ($class, $plaintext) = @_;
-    return unpack($HASHFMT, $plaintext);
+    my $hashify = unpack("%C*", $plaintext);
+    # warn "hash $plaintext -> $hashify\n";
+    return $hashify;
 }
 
 ##################################################################
@@ -70,6 +74,7 @@ sub encodeMineKey {
     my $prefix = "$MINEKEY_MAGIC,$method,$rid,$rvsn,$oid";
     my $crc = Crypto->hashify($prefix);
     my $plaintext = "$prefix,$crc";
+
     my $minekey = Crypto->encrypt($plaintext);
 
     return $minekey;
