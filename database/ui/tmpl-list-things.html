@@ -6,13 +6,19 @@
 <TMPL_LOOP NAME="LOOP">
 <dt>
 <TMPL_VAR NAME="ID">
+<A HREF="<TMPL_VAR NAME="LINKGET">"><TMPL_VAR NAME="GETTEXT"></A>
 <A HREF="<TMPL_VAR NAME="LINKREAD">">[read]</A>
 <A HREF="<TMPL_VAR NAME="LINKUPDATE">">[update]</A>
 <A HREF="<TMPL_VAR NAME="LINKDELETE">">[delete]</A>
 </dt>
 <dd>
 name: <TMPL_VAR NAME="NAME"> <br/>
-<TMPL_IF NAME="TAGS">implied tags: <TMPL_VAR NAME="TAGS"> <br/></TMPL_IF>
+type: <TMPL_VAR NAME="TYPE"> <br/>
+tags: <TMPL_VAR NAME="TAGS"> <br/>
+description: 
+<BLOCKQUOTE>
+<TMPL_VAR NAME="DESCRIPTION">
+</BLOCKQUOTE>
 </dd>
 <p/>
 </TMPL_LOOP>
