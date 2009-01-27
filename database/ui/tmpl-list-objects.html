@@ -1,27 +1,27 @@
-<H1>
+<h2>
 <A HREF="<TMPL_VAR NAME="LINKPAGE">"><TMPL_VAR NAME="TITLE"></A>
-</H1>
+</h2>
 <p/>
 <dl>
 <TMPL_LOOP NAME="LOOP">
 <dt>
-id: <TMPL_VAR NAME="ID"> 
-type: <TMPL_VAR NAME="TYPE">
+<TMPL_VAR NAME="NAME"> 
+</dt>
+<dd>
 <A HREF="<TMPL_VAR NAME="LINKGET">"><button>download</button></A>
 <A HREF="<TMPL_VAR NAME="LINKREAD">"><button>read</button></A>
 <A HREF="<TMPL_VAR NAME="LINKUPDATE">"><button>update</button></A>
 <A HREF="<TMPL_VAR NAME="LINKDELETE">"><button>delete</button></A>
-</dt>
-
-<dd>
-name: <TMPL_VAR NAME="NAME"> 
 <br/>
 <TMPL_IF NAME="TAGS">
+id: <TMPL_VAR NAME="ID"> 
+type: <TMPL_VAR NAME="TYPE">
+<br/>
 tags: <TMPL_VAR NAME="TAGS">
 <br/>
 </TMPL_IF>
 <TMPL_IF NAME="DESCRIPTION">
-description: <TMPL_VAR NAME="DESCRIPTION">
+<TMPL_VAR NAME="DESCRIPTION">
 </TMPL_IF>
 </dd>
 <p/>
