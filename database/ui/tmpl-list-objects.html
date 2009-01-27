@@ -14,11 +14,13 @@
 <dd>
 name: <TMPL_VAR NAME="NAME"> <br/>
 type: <TMPL_VAR NAME="TYPE"> <br/>
-tags: <TMPL_VAR NAME="TAGS"> <br/>
+<TMPL_IF NAME="TAGS">tags: <TMPL_VAR NAME="TAGS"> <br/></TMPL_IF>
+<TMPL_IF NAME="DESCRIPTION">
 description: 
 <BLOCKQUOTE>
 <TMPL_VAR NAME="DESCRIPTION">
 </BLOCKQUOTE>
+</TMPL_IF>
 </dd>
 <p/>
 </TMPL_LOOP>
