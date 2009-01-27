@@ -200,7 +200,7 @@ sub get {
     my ($self, $key) = @_;
     my $value = $self->SUPER::get($key);
 
-    if ($key eq 'objectTags') {
+    if (($key eq 'objectTags') and (defined($value))) {
 	my @srcs = split(" ", $value);
 	my @dsts;
 
