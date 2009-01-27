@@ -1,3 +1,7 @@
+random nonce in minekey
+
+------------------------------------------------------------------
+
 matchInterestBlob has to become aware of tags being deleted, since it
 uses the raw get() to the implicit tags
 

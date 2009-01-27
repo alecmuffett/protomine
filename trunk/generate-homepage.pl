@@ -67,27 +67,27 @@ __END__;
 
 : welcome to protomine!
 
-{ objects
+{ my objects
 + list-objects.html list objects
 + create-object.html create object
 }
 
-{ relationships
+{ my relationships
 + list-relations.html list relationships
 + create-relation.html create relationships
 }
 
-{ tags
+{ my tags
 + list-tags.html list tags
 + create-tag.html create tag
 }
 
-{ management
+{ mine management
 + show-config.html show configuration
 + update-config.html update configuration
 }
 
-{ documentation 
+{ mine documentation 
 + version.html software version
 + ../doc/ local
 }
