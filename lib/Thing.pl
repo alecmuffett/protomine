@@ -86,6 +86,11 @@ sub boot {
 ##################################################################
 ##################################################################
 
+sub sortCompare {
+    my ($self, $a, $b) = @_;
+    return $b <=> $a;
+}
+
 ## list -- returns list of integers, id's of valid things
 
 sub list {
@@ -99,7 +104,7 @@ sub list {
     my $dir = $self->directory;
 
     opendir(DIR, $dir) or die "list: opendir: $dir: $!\n";
-    my @numberlist = sort {$b <=> $a} grep(/^\d+$/o, readdir(DIR));
+    my @numberlist = sort { $self->sortCompare($a, $b) } grep(/^\d+$/o, readdir(DIR));
     closedir(DIR);
 
     return @numberlist;
@@ -383,7 +388,9 @@ sub load {
 
     my $file = $self->filepath($id);
 
-    open(INPUT, $file) or die "load: open: $file: $!\n";
+    unless (open(INPUT, $file)) {
+	die "load: open: $file: $!\n";
+    }
 
     while (<INPUT>) {
 	# reject blank lines or ones leading with '#' character
