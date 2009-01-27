@@ -109,7 +109,7 @@ sub ui_create_object {
 
     my $template = &loopify($thing, dosize => 1);
 
-    $template->{LINK} = "create-object.html";
+    $template->{LINKPAGE} = "create-object.html";
     $template->{TITLE} = "creating a new object";
 
     $template->{ACTION} = "../api/object.txt";
@@ -137,7 +137,7 @@ sub ui_create_relation {
 
     my $template = &loopify($thing, dosize => 1);
 
-    $template->{LINK} = "create-relation.html";
+    $template->{LINKPAGE} = "create-relation.html";
     $template->{TITLE} = "creating a new relation";
 
     $template->{ACTION} = "../api/relation.txt";
@@ -163,7 +163,7 @@ sub ui_create_tag {
 
     my $template = &loopify($thing, dosize => 1);
 
-    $template->{LINK} = "create-tag.html";
+    $template->{LINKPAGE} = "create-tag.html";
     $template->{TITLE} = "creating a new tag";
 
     $template->{ACTION} = "../api/tag.txt";
@@ -298,18 +298,102 @@ sub ui_list_clones_oid {
 push (@raw_action_list, [ '/ui/list-objects.html', 'GET', \&ui_list_objects ]);
 
 sub ui_list_objects {
+    my ($ctx, $info, $phr) = @_;
+
+    my @thingvec;
+
+    foreach my $oid (Object->list) {
+	my $o = Object->new($oid);
+	push(@thingvec,
+	     {
+		 ID => $oid,
+		 NAME => $o->get('objectName'),
+		 TYPE => $o->get('objectType'),
+		 TAGS => $o->get('objectTags'),
+		 DESCRIPTION => $o->get('objectDescription'),
+		 LINKREAD => "read-object/$oid.html",
+		 LINKUPDATE => "update-object/$oid.html",
+		 LINKDELETE => "delete-object/$oid.html",
+		 LINKGET => "../api/object/$oid",
+	     });
+    }
+
+    my $template = {
+	LOOP => \@thingvec,
+	LINKPAGE => 'list-object.html',
+	TITLE => 'list objects',
+    };
+
+    my $p = Page->newHTML("ui/");
+    $p->addFileTemplate('tmpl-list-objects.html', $template);
+    return $p;
 }
+
 
 # ui_list_relations --
 push (@raw_action_list, [ '/ui/list-relations.html', 'GET', \&ui_list_relations ]);
 
 sub ui_list_relations {
+    my ($ctx, $info, $phr) = @_;
+
+    my @thingvec;
+
+    foreach my $oid (Relation->list) {
+	my $o = Relation->new($oid);
+	push(@thingvec,
+	     {
+		 ID => $oid,
+		 NAME => $o->get('relationName'),
+		 TAGS => $o->get('relationInterests'),
+		 LINKFEED => "feed url goes here",
+		 DESCRIPTION => $o->get('relationDescription'),
+		 LINKREAD => "read-relation/$oid.html",
+		 LINKUPDATE => "update-relation/$oid.html",
+		 LINKDELETE => "delete-relation/$oid.html",
+	     });
+    }
+
+    my $template = {
+	LOOP => \@thingvec,
+	LINKPAGE => 'list-relations.html',
+	TITLE => 'list relations',
+    };
+
+    my $p = Page->newHTML("ui/");
+    $p->addFileTemplate('tmpl-list-relations.html', $template);
+    return $p;
 }
 
 # ui_list_tags --
 push (@raw_action_list, [ '/ui/list-tags.html', 'GET', \&ui_list_tags ]);
 
 sub ui_list_tags {
+    my ($ctx, $info, $phr) = @_;
+
+    my @thingvec;
+
+    foreach my $oid (Tag->list) {
+	my $o = Tag->new($oid);
+	push(@thingvec,
+	     {
+		 ID => $oid,
+		 NAME => $o->get('tagName'),
+		 TAGS => $o->get('tagImplies'),
+		 LINKREAD => "read-tag/$oid.html",
+		 LINKUPDATE => "update-tag/$oid.html",
+		 LINKDELETE => "delete-tag/$oid.html",
+	     });
+    }
+
+    my $template = {
+	LOOP => \@thingvec,
+	LINKPAGE => 'list-tags.html',
+	TITLE => 'list tags',
+    };
+
+    my $p = Page->newHTML("ui/");
+    $p->addFileTemplate('tmpl-list-tags.html', $template);
+    return $p;
 }
 
 ##################################################################
@@ -349,10 +433,10 @@ sub ui_update_object_oid {
 
     my $template = &loopify($thing, dosize => 1);
 
-    $template->{LINK} = "../api/object/$oid.txt";
+    $template->{LINKPAGE} = "../api/object/$oid.txt";
     $template->{TITLE} = "editing object $oid";
 
-    $template->{AUXLINK} = "../api/object/$oid";
+    $template->{LINKAUX} = "../api/object/$oid";
     $template->{AUXTITLE} = "(data)";
 
     $template->{ACTION} = "../api/object/$oid/key.txt";
@@ -376,7 +460,7 @@ sub ui_update_relation_rid {
 
     my $template = &loopify($thing, dosize => 1);
 
-    $template->{LINK} = "../api/relation/$rid.txt";
+    $template->{LINKPAGE} = "../api/relation/$rid.txt";
     $template->{TITLE} = "editing relation $rid";
 
     $template->{ACTION} = "../api/relation/$rid/key.txt";
@@ -400,7 +484,7 @@ sub ui_update_tag_tid {
 
     my $template = &loopify($thing, dosize => 1);
 
-    $template->{LINK} = "../api/tag/$tid.txt";
+    $template->{LINKPAGE} = "../api/tag/$tid.txt";
     $template->{TITLE} = "editing tag $tid";
 
     $template->{ACTION} = "../api/tag/$tid/key.txt";
