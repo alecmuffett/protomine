@@ -21,6 +21,23 @@ use warnings;
 
 our @raw_action_list;
 
+sub postwrapper {
+    my ($ctx, $info, $phr, $apifunc, $root, $retlink, @rest) = @_;
+
+    my $hashref = &{$apifunc}($ctx, $info, $phr, @rest);
+
+    die "postwrapper: undef hashref\n" unless (defined($hashref));
+
+    my $template = {
+	DUMP => &dumpify($hashref, ROOT => $root),
+	RETURN => $retlink,
+    };
+
+    my $p = Page->newHTML("ui/");
+    $p->addFileTemplate('tmpl-status.html', $template);
+    return $p;
+}
+
 ##################################################################
 ##################################################################
 ##################################################################
@@ -58,7 +75,7 @@ sub dumpify {
     }
 
     # mugtrap
-    die "loopify: undef hashref\n" unless (defined($hashref));
+    die "dumpify: undef hashref\n" unless (defined($hashref));
 
     my @vector;
 
@@ -137,7 +154,6 @@ push (@raw_action_list, [ '/ui/create-object.html', 'GET', \&ui_create_object ])
 sub ui_create_object {
     my ($ctx, $info, $phr) = @_;
 
-    my $p = Page->newHTML("ui/");
     my $thing = {
 	objectName => 'required',
 	objectStatus => 'required',
@@ -154,6 +170,7 @@ sub ui_create_object {
     $template->{TITLE} = "creating a new object";
     $template->{ACTION} = "../api/object.txt";
 
+    my $p = Page->newHTML("ui/");
     $p->addFileTemplate('tmpl-update-thing.html', $template);
     return $p;
 }
@@ -165,7 +182,6 @@ push (@raw_action_list, [ '/ui/create-relation.html', 'GET', \&ui_create_relatio
 sub ui_create_relation {
     my ($ctx, $info, $phr) = @_;
 
-    my $p = Page->newHTML("ui/");
     my $thing = {
 	relationName => 'required',
 	relationVersion => '1',
@@ -181,6 +197,7 @@ sub ui_create_relation {
     $template->{TITLE} = "creating a new relation";
     $template->{ACTION} = "../api/relation.txt";
 
+    my $p = Page->newHTML("ui/");
     $p->addFileTemplate('tmpl-update-thing.html', $template);
     return $p;
 }
@@ -191,7 +208,6 @@ push (@raw_action_list, [ '/ui/create-tag.html', 'GET', \&ui_create_tag ]);
 sub ui_create_tag {
     my ($ctx, $info, $phr) = @_;
 
-    my $p = Page->newHTML("ui/");
     my $thing = {
 	tagName => 'required',
     };
@@ -206,6 +222,7 @@ sub ui_create_tag {
     $template->{TITLE} = "creating a new tag";
     $template->{ACTION} = "../api/tag.txt";
 
+    my $p = Page->newHTML("ui/");
     $p->addFileTemplate('tmpl-update-thing.html', $template);
     return $p;
 }
@@ -215,8 +232,8 @@ push (@raw_action_list, [ '/ui/delete-object/OID.html', 'GET', \&ui_delete_objec
 
 sub ui_delete_object_oid {
     my ($ctx, $info, $phr, $oid) = @_;
-    my $p = Page->newHTML("ui/");
     my $rval = &api_delete_oid(@_);
+    my $p = Page->newHTML("ui/");
     $p->addFileTemplate('tmpl-status.html',
 			&statusify($rval,
 				   NAME => 'status',
@@ -229,8 +246,8 @@ push (@raw_action_list, [ '/ui/delete-relation/RID.html', 'GET', \&ui_delete_rel
 
 sub ui_delete_relation_rid {
     my ($ctx, $info, $phr, $rid) = @_;
-    my $p = Page->newHTML("ui/");
     my $rval = &api_delete_rid(@_);
+    my $p = Page->newHTML("ui/");
     $p->addFileTemplate('tmpl-status.html',
 			&statusify($rval,
 				   NAME => 'status',
@@ -243,8 +260,8 @@ push (@raw_action_list, [ '/ui/delete-tag/TID.html', 'GET', \&ui_delete_tag_tid,
 
 sub ui_delete_tag_tid {
     my ($ctx, $info, $phr, $tid) = @_;
-    my $p = Page->newHTML("ui/");
     my $rval = &api_delete_tid(@_);
+    my $p = Page->newHTML("ui/");
     $p->addFileTemplate('tmpl-status.html',
 			&statusify($rval,
 				   NAME => 'status',
@@ -257,10 +274,10 @@ push (@raw_action_list, [ '/ui/get-object/OID.html', 'GET', \&ui_read_object_oid
 
 sub ui_read_object_oid {
     my ($ctx, $info, $phr, $oid) = @_;
+    my $hashref = &api_read_oid($ctx, $info, $phr, $oid);
     my $p = Page->newHTML("ui/");
-    my $wrapper = &api_read_oid($ctx, $info, $phr, $oid);
     $p->addFileTemplate('tmpl-get-thing.html',
-			&loopify($wrapper, ROOT => 'object'));
+			&loopify($hashref, ROOT => 'object'));
     return $p;
 }
 
@@ -269,10 +286,10 @@ push (@raw_action_list, [ '/ui/get-relation/RID.html', 'GET', \&ui_read_relation
 
 sub ui_read_relation_rid {
     my ($ctx, $info, $phr, $rid) = @_;
+    my $hashref = &api_read_rid($ctx, $info, $phr, $rid);
     my $p = Page->newHTML("ui/");
-    my $wrapper = &api_read_rid($ctx, $info, $phr, $rid);
     $p->addFileTemplate('tmpl-get-thing.html',
-			&loopify($wrapper, ROOT => 'relation'));
+			&loopify($hashref, ROOT => 'relation'));
     return $p;
 }
 
@@ -281,12 +298,14 @@ push (@raw_action_list, [ '/ui/get-tag/TID.html', 'GET', \&ui_read_tag_tid, 'TID
 
 sub ui_read_tag_tid {
     my ($ctx, $info, $phr, $tid) = @_;
+    my $hashref = &api_read_tid($ctx, $info, $phr, $tid);
     my $p = Page->newHTML("ui/");
-    my $wrapper = &api_read_tid($ctx, $info, $phr, $tid);
     $p->addFileTemplate('tmpl-get-thing.html',
-			&loopify($wrapper, ROOT => 'tag'));
+			&loopify($hashref, ROOT => 'tag'));
     return $p;
 }
+
+##################################################################
 
 # ui_select_object --
 push (@raw_action_list, [ '/ui/select/object.html', 'GET', \&ui_select_object ]);
@@ -467,11 +486,14 @@ sub ui_update_data_oid {
 
 # ui_update_object_oid --
 push (@raw_action_list, [ '/ui/update-object/OID.html', 'GET', \&ui_update_object_oid, 'OID' ]);
+push (@raw_action_list, [ '/ui/update-object/OID.html', 
+			  'POST', \&postwrapper, 
+			  \&api_create_keys_oid, undef, 'list-objects.html', 
+			  'OID']);
 
 sub ui_update_object_oid {
     my ($ctx, $info, $phr, $oid) = @_;
 
-    my $p = Page->newHTML("ui/");
     my $thing = (&api_read_oid($ctx, $info, $phr, $oid))->{object};
 
     foreach my $key (Object->new->keysWritable) {
@@ -480,25 +502,28 @@ sub ui_update_object_oid {
 
     my $template = &loopify($thing, FORM => 1);
 
-    $template->{LINKPAGE} = "../api/object/$oid.txt";
     $template->{TITLE} = "editing object $oid";
+    $template->{LINKPAGE} = "get-object/$oid.html";
+    $template->{ACTION} = "update-object/$oid.html";
 
     $template->{LINKAUX} = "../api/object/$oid";
     $template->{AUXTITLE} = "(data)";
 
-    $template->{ACTION} = "../api/object/$oid/key.txt";
-
+    my $p = Page->newHTML("ui/");
     $p->addFileTemplate('tmpl-update-thing.html', $template);
     return $p;
 }
 
 # ui_update_relation_rid --
 push (@raw_action_list, [ '/ui/update-relation/RID.html', 'GET', \&ui_update_relation_rid, 'RID' ]);
+push (@raw_action_list, [ '/ui/update-relation/RID.html', 
+			  'POST', \&postwrapper, 
+			  \&api_create_keys_rid, undef, 'list-relations.html', 
+			  'RID']);
 
 sub ui_update_relation_rid {
     my ($ctx, $info, $phr, $rid) = @_;
 
-    my $p = Page->newHTML("ui/");
     my $thing = (&api_read_rid($ctx, $info, $phr, $rid))->{relation};
 
     foreach my $key (Relation->new->keysWritable) {
@@ -507,22 +532,25 @@ sub ui_update_relation_rid {
 
     my $template = &loopify($thing, FORM => 1);
 
-    $template->{LINKPAGE} = "../api/relation/$rid.txt";
     $template->{TITLE} = "editing relation $rid";
+    $template->{LINKPAGE} = "get-relation/$rid.html";
+    $template->{ACTION} = "update-relation/$rid.html";
 
-    $template->{ACTION} = "../api/relation/$rid/key.txt";
-
+    my $p = Page->newHTML("ui/");
     $p->addFileTemplate('tmpl-update-thing.html', $template);
     return $p;
 }
 
 # ui_update_tag_tid --
 push (@raw_action_list, [ '/ui/update-tag/TID.html', 'GET', \&ui_update_tag_tid, 'TID' ]);
+push (@raw_action_list, [ '/ui/update-tag/TID.html', 
+			  'POST', \&postwrapper, 
+			  \&api_create_keys_tid, undef, 'list-tags.html', 
+			  'TID']);
 
 sub ui_update_tag_tid {
     my ($ctx, $info, $phr, $tid) = @_;
 
-    my $p = Page->newHTML("ui/");
     my $thing = (&api_read_tid($ctx, $info, $phr, $tid))->{tag};
 
     foreach my $key (Tag->new->keysWritable) {
@@ -531,11 +559,11 @@ sub ui_update_tag_tid {
 
     my $template = &loopify($thing, FORM => 1);
 
-    $template->{LINKPAGE} = "../api/tag/$tid.txt";
     $template->{TITLE} = "editing tag $tid";
+    $template->{LINKPAGE} = "get-tag/$tid.html";
+    $template->{ACTION} = "update-tag/$tid.html";
 
-    $template->{ACTION} = "../api/tag/$tid/key.txt";
-
+    my $p = Page->newHTML("ui/");
     $p->addFileTemplate('tmpl-update-thing.html', $template);
     return $p;
 }
@@ -546,9 +574,9 @@ sub ui_update_tag_tid {
 push (@raw_action_list, [ '/ui/version.html', 'GET', \&ui_version ]);
 
 sub ui_version {
+    my $hashref = &api_version(@_); # fast way to send args
     my $p = Page->newHTML("ui/");
-    my $wrapper = &api_version(@_); # fast way to send args
-    $p->addFileTemplate('tmpl-version.html', $wrapper->{version});
+    $p->addFileTemplate('tmpl-version.html', $hashref->{version});
     return $p;
 }
 

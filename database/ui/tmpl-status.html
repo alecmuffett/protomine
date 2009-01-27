@@ -1,3 +1,7 @@
-this action returned:
-<TMPL_VAR NAME="NAME">=<TMPL_VAR NAME="STATUS">
+<TMPL_IF NAME="NAME">
+<TMPL_VAR NAME="NAME">=<TMPL_VAR NAME="STATUS"> # archaic status message, please upgrade UI<br/>
+</TMPL_IF>
+<TMPL_LOOP NAME="DUMP">
+<TMPL_VAR NAME="A">: <TMPL_VAR NAME="B"><br/>
+</TMPL_LOOP>
 <A HREF="<TMPL_VAR NAME="RETURN">"><button>return</button></A>
