@@ -25,7 +25,7 @@ our @raw_action_list;
 ##################################################################
 ##################################################################
 
-my %form_size_table = 
+my %form_size_table =
     (
      commentBody => 'BOX1',
      commentId => 'SKIP',
@@ -48,36 +48,77 @@ sub form_size {
     return $form_size_table{$key} || 'LINE2';
 }
 
-sub loopify {			# TODO: put CSS class into arg, embed in template
+sub dumpify {
     my $hashref = shift;
     my %opts = @_;
 
-    my $retval = {};
+    # if the actual data structure is rooted in a leaf
+    if (defined($opts{'ROOT'})) {
+	$hashref = $hashref->{$opts{'ROOT'}};
+    }
+
+    # mugtrap
+    die "loopify: undef hashref\n" unless (defined($hashref));
+
     my @vector;
 
-    foreach my $key (sort { (&form_size($a) cmp &form_size($b)) || ( $a cmp $b ) } keys %{$hashref}) {
-	# would love to cache key/value too, but die_on_bad_params forbids
-	# $retval->{$key} = $value;
+    foreach my $key (sort keys %{$hashref}) {
+	push(@vector, { A => $key, B => $hashref->{$key} });
+    }
 
-       	my $element = {};
+    return \@vector;
+}
+
+sub loopify {
+    my $hashref = shift;
+    my %opts = @_;
+
+    # if the actual data structure is rooted in a leaf
+    if (defined($opts{'ROOT'})) {
+	$hashref = $hashref->{$opts{'ROOT'}};
+    }
+
+    # mugtrap
+    die "loopify: undef hashref\n" unless (defined($hashref));
+
+    my @vector;
+
+    # sort the form objects
+    foreach my $key (sort { (&form_size($a) cmp &form_size($b)) || ( $a cmp $b ) } keys %{$hashref}) {
+	my $element = {};
 	$element->{KEY} = $key;
 	$element->{VALUE} = $hashref->{$key};
 
-	if ($opts{'dosize'}) {
+	if ($opts{'FORM'}) {
 	    my $size = &form_size($key);
-	    next if ($size eq 'SKIP');
+	    next if ($size eq 'SKIP'); # skip stuff that is unwritable
 	    $element->{$size} = 1;
 	}
 
+	# push into the form data structure
 	push(@vector, $element);
     }
 
-    $retval->{LOOP} = \@vector;
-
-    return $retval;
+    return { LOOP => \@vector };
 }
 
-sub formify {
+sub statusify {
+    my $hashref = shift;
+    my %opts = @_;
+
+    if (defined($opts{'ROOT'})) {
+	$hashref = $hashref->{$opts{'ROOT'}};
+    }
+
+    die "statusify: undef hashref\n" unless (defined($hashref));
+
+    my $retval = {};
+
+    $retval->{RETURN} = $opts{RETURN};
+    $retval->{NAME} = $opts{'NAME'};
+    $retval->{STATUS} = $hashref->{$retval->{NAME}};
+
+    return $retval;
 }
 
 ##################################################################
@@ -98,20 +139,19 @@ sub ui_create_object {
 
     my $p = Page->newHTML("ui/");
     my $thing = {
-        objectName => 'required',
-        objectStatus => 'required',
-        objectType => 'required',
+	objectName => 'required',
+	objectStatus => 'required',
+	objectType => 'required',
     };
-    
+
     foreach my $key (Object->new->keysWritable) {
 	$thing->{$key} = '' unless defined($thing->{$key});
     }
 
-    my $template = &loopify($thing, dosize => 1);
+    my $template = &loopify($thing, FORM => 1);
 
     $template->{LINKPAGE} = "create-object.html";
     $template->{TITLE} = "creating a new object";
-
     $template->{ACTION} = "../api/object.txt";
 
     $p->addFileTemplate('tmpl-update-thing.html', $template);
@@ -128,18 +168,17 @@ sub ui_create_relation {
     my $p = Page->newHTML("ui/");
     my $thing = {
 	relationName => 'required',
-        relationVersion => '1',
+	relationVersion => '1',
     };
-    
+
     foreach my $key (Relation->new->keysWritable) {
 	$thing->{$key} = '' unless defined($thing->{$key});
     }
 
-    my $template = &loopify($thing, dosize => 1);
+    my $template = &loopify($thing, FORM => 1);
 
     $template->{LINKPAGE} = "create-relation.html";
     $template->{TITLE} = "creating a new relation";
-
     $template->{ACTION} = "../api/relation.txt";
 
     $p->addFileTemplate('tmpl-update-thing.html', $template);
@@ -156,16 +195,15 @@ sub ui_create_tag {
     my $thing = {
 	tagName => 'required',
     };
-    
+
     foreach my $key (Tag->new->keysWritable) {
 	$thing->{$key} = '' unless defined($thing->{$key});
     }
 
-    my $template = &loopify($thing, dosize => 1);
+    my $template = &loopify($thing, FORM => 1);
 
     $template->{LINKPAGE} = "create-tag.html";
     $template->{TITLE} = "creating a new tag";
-
     $template->{ACTION} = "../api/tag.txt";
 
     $p->addFileTemplate('tmpl-update-thing.html', $template);
@@ -178,8 +216,11 @@ push (@raw_action_list, [ '/ui/delete-object/OID.html', 'GET', \&ui_delete_objec
 sub ui_delete_object_oid {
     my ($ctx, $info, $phr, $oid) = @_;
     my $p = Page->newHTML("ui/");
-    my $status = &api_delete_oid(@_);
-    $p->addFileTemplate('tmpl-status.html', $status);
+    my $rval = &api_delete_oid(@_);
+    $p->addFileTemplate('tmpl-status.html',
+			&statusify($rval,
+				   NAME => 'status',
+				   RETURN => 'list-objects.html'));
     return $p;
 }
 
@@ -189,8 +230,11 @@ push (@raw_action_list, [ '/ui/delete-relation/RID.html', 'GET', \&ui_delete_rel
 sub ui_delete_relation_rid {
     my ($ctx, $info, $phr, $rid) = @_;
     my $p = Page->newHTML("ui/");
-    my $status = &api_delete_rid(@_);
-    $p->addFileTemplate('tmpl-status.html', $status);
+    my $rval = &api_delete_rid(@_);
+    $p->addFileTemplate('tmpl-status.html',
+			&statusify($rval,
+				   NAME => 'status',
+				   RETURN => 'list-relations.html'));
     return $p;
 }
 
@@ -200,8 +244,11 @@ push (@raw_action_list, [ '/ui/delete-tag/TID.html', 'GET', \&ui_delete_tag_tid,
 sub ui_delete_tag_tid {
     my ($ctx, $info, $phr, $tid) = @_;
     my $p = Page->newHTML("ui/");
-    my $status = &api_delete_tid(@_);
-    $p->addFileTemplate('tmpl-status.html', $status);
+    my $rval = &api_delete_tid(@_);
+    $p->addFileTemplate('tmpl-status.html',
+			&statusify($rval,
+				   NAME => 'status',
+				   RETURN => 'list-tags.html'));
     return $p;
 }
 
@@ -212,7 +259,8 @@ sub ui_read_object_oid {
     my ($ctx, $info, $phr, $oid) = @_;
     my $p = Page->newHTML("ui/");
     my $wrapper = &api_read_oid($ctx, $info, $phr, $oid);
-    $p->addFileTemplate('tmpl-get-thing.html', &loopify($wrapper->{object}));
+    $p->addFileTemplate('tmpl-get-thing.html',
+			&loopify($wrapper, ROOT => 'object'));
     return $p;
 }
 
@@ -223,7 +271,8 @@ sub ui_read_relation_rid {
     my ($ctx, $info, $phr, $rid) = @_;
     my $p = Page->newHTML("ui/");
     my $wrapper = &api_read_rid($ctx, $info, $phr, $rid);
-    $p->addFileTemplate('tmpl-get-thing.html', &loopify($wrapper->{relation}));
+    $p->addFileTemplate('tmpl-get-thing.html',
+			&loopify($wrapper, ROOT => 'relation'));
     return $p;
 }
 
@@ -234,7 +283,8 @@ sub ui_read_tag_tid {
     my ($ctx, $info, $phr, $tid) = @_;
     my $p = Page->newHTML("ui/");
     my $wrapper = &api_read_tid($ctx, $info, $phr, $tid);
-    $p->addFileTemplate('tmpl-get-thing.html', &loopify($wrapper->{tag}));
+    $p->addFileTemplate('tmpl-get-thing.html',
+			&loopify($wrapper, ROOT => 'tag'));
     return $p;
 }
 
@@ -338,18 +388,16 @@ sub ui_list_relations {
 
     my @thingvec;
 
-    foreach my $oid (Relation->list) {
-	my $o = Relation->new($oid);
+    foreach my $rid (Relation->list) {
+	my $r = Relation->new($rid);
 	push(@thingvec,
 	     {
-		 ID => $oid,
-		 NAME => $o->get('relationName'),
-		 TAGS => $o->get('relationInterests'),
+		 NAME => $r->get('relationName'),
+		 DUMP => &dumpify($r->toDataStructure),
 		 LINKFEED => "feed url goes here",
-		 DESCRIPTION => $o->get('relationDescription'),
-		 LINKREAD => "get-relation/$oid.html",
-		 LINKUPDATE => "update-relation/$oid.html",
-		 LINKDELETE => "delete-relation/$oid.html",
+		 LINKREAD => "get-relation/$rid.html",
+		 LINKUPDATE => "update-relation/$rid.html",
+		 LINKDELETE => "delete-relation/$rid.html",
 	     });
     }
 
@@ -372,16 +420,15 @@ sub ui_list_tags {
 
     my @thingvec;
 
-    foreach my $oid (Tag->list) {
-	my $o = Tag->new($oid);
+    foreach my $tid (Tag->list) {
+	my $t = Tag->new($tid);
 	push(@thingvec,
 	     {
-		 ID => $oid,
-		 NAME => $o->get('tagName'),
-		 TAGS => $o->get('tagImplies'),
-		 LINKREAD => "get-tag/$oid.html",
-		 LINKUPDATE => "update-tag/$oid.html",
-		 LINKDELETE => "delete-tag/$oid.html",
+		 NAME => $t->get('tagName'),
+		 DUMP => &dumpify($t->toDataStructure),
+		 LINKREAD => "get-tag/$tid.html",
+		 LINKUPDATE => "update-tag/$tid.html",
+		 LINKDELETE => "delete-tag/$tid.html",
 	     });
     }
 
@@ -431,7 +478,7 @@ sub ui_update_object_oid {
 	$thing->{$key} = '' unless defined($thing->{$key});
     }
 
-    my $template = &loopify($thing, dosize => 1);
+    my $template = &loopify($thing, FORM => 1);
 
     $template->{LINKPAGE} = "../api/object/$oid.txt";
     $template->{TITLE} = "editing object $oid";
@@ -458,7 +505,7 @@ sub ui_update_relation_rid {
 	$thing->{$key} = '' unless defined($thing->{$key});
     }
 
-    my $template = &loopify($thing, dosize => 1);
+    my $template = &loopify($thing, FORM => 1);
 
     $template->{LINKPAGE} = "../api/relation/$rid.txt";
     $template->{TITLE} = "editing relation $rid";
@@ -482,7 +529,7 @@ sub ui_update_tag_tid {
 	$thing->{$key} = '' unless defined($thing->{$key});
     }
 
-    my $template = &loopify($thing, dosize => 1);
+    my $template = &loopify($thing, FORM => 1);
 
     $template->{LINKPAGE} = "../api/tag/$tid.txt";
     $template->{TITLE} = "editing tag $tid";

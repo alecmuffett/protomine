@@ -11,8 +11,9 @@
 <A HREF="<TMPL_VAR NAME="LINKDELETE">"><button>delete</button></A>
 </dt>
 <dd>
-<TMPL_IF NAME="TAGS">implies: <TMPL_VAR NAME="TAGS"><br/></TMPL_IF>
-id: <TMPL_VAR NAME="ID">
+<TMPL_LOOP NAME="DUMP">
+<TMPL_VAR NAME="A">: <TMPL_VAR NAME="B"><br/>
+</TMPL_LOOP>
 </dd>
 <p/>
 </TMPL_LOOP>

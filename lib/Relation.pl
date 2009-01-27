@@ -132,7 +132,7 @@ sub get {
     my ($self, $key) = @_;
     my $value = $self->SUPER::get($key);
 
-    if ($key eq 'relationInterests') {
+    if (($key eq 'relationInterests') and defined($value)){
 	my @srcs = split(" ", $value);
 	my @dsts;
 

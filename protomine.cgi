@@ -391,16 +391,6 @@ sub smart_token {
 
 ##################################################################
 
-# this is the dummy no-op handler, use it as a template for other
-# handlers; it just dumps information to the browser
-
-sub do_noop {
-    my ($ctx, $info, $phr, @args) = @_;
-    return Page->newText("do_noop @args");
-}
-
-##################################################################
-
 # redirect whatever url to $target
 
 sub do_redirect {

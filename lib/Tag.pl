@@ -94,7 +94,7 @@ sub get {
     my ($self, $key) = @_;
     my $value = $self->SUPER::get($key);
 
-    if ($key eq 'tagImplies') { 
+    if (($key eq 'tagImplies') and defined($value)) { 
 	my @srcs = split(" ", $value);
 	my @dsts;
 
@@ -103,9 +103,16 @@ sub get {
 		die "Tag: bad format for elements of $key: '$src'\n";
 	    }
 
+	    unless (Tag->existsId($src)) {
+		my $tid = $self->id;
+		warn "Tag: eliding access to (deleted?) tag $src in tag $tid\n";
+		next;
+	    }
+
 	    my $tag = Tag->new($src);
 	    push(@dsts, $tag->name);
 	}
+
 	$value = join(" ", @dsts);
     }
     return $value;
