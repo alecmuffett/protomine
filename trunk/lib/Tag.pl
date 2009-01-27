@@ -80,7 +80,7 @@ sub set {
 		die "Tag: multiply-defined parent tags of $key: '$src'\n";
 	    }
 	    elsif ($id == 0) {
-		die "Tag: unknown parent tags of $key: '$src'\n";
+		die "Tag: unknown tags in $key: '$src'\n";
 	    }
 
 	    push(@dsts, $id);
@@ -92,6 +92,7 @@ sub set {
 
 sub get {
     my ($self, $key) = @_;
+
     my $value = $self->SUPER::get($key);
 
     if (($key eq 'tagImplies') and defined($value)) { 
@@ -116,6 +117,13 @@ sub get {
 	$value = join(" ", @dsts);
     }
     return $value;
+}
+
+##################################################################
+
+sub allImplications {
+    my $self = shift;
+    return undef;
 }
 
 ##################################################################

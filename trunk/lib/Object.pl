@@ -445,4 +445,11 @@ sub toAtom {
     return \@atom;
 }
 
+##################################################################
+
+sub sortCompare {
+    my ($self, $a, $b) = @_;
+    return $self->new($b)->lastModified cmp $self->new($a)->lastModified;
+}
+
 1;

@@ -216,8 +216,7 @@ sub filepath {
 
 sub keysRequired {
     my $self = shift ;
-    my @klist = keys %{$self->{REQUIRED_KEYS}};
-    return @klist;
+    return keys %{$self->{REQUIRED_KEYS}};
 }
 
 ## requiredKey (key) -- returns scalar, whether argument is a required
@@ -235,8 +234,7 @@ sub requiredKey {
 
 sub keysValid {
     my $self = shift ;
-    my @klist = keys %{$self->{VALID_KEYS}};
-    return @klist;
+    return keys %{$self->{VALID_KEYS}};
 }
 
 ## validKey (key) -- returns scalar, whether argument is a valid key;
@@ -255,8 +253,7 @@ sub validKey {
 
 sub keysWritable {
     my $self = shift ;
-    my @klist = keys %{$self->{WRITABLE_KEYS}};
-    return @klist;
+    return keys %{$self->{WRITABLE_KEYS}};
 }
 
 ## writableKey (key) -- returns scalar, whether argument is a writable
@@ -269,20 +266,21 @@ sub writableKey {
 }
 
 ##################################################################
+
+## keysUsed -- returns list, sorted list of data keys
+
+sub keysUsed {
+    my $self = shift ;
+    return sort keys %{$self->{DATA}};
+}
+
+##################################################################
 ##################################################################
 ##################################################################
 # ACCESSOR METHODS
 ##################################################################
 ##################################################################
 ##################################################################
-
-## listDataKeys -- returns list, sorted list of data keys
-
-sub listDataKeys {
-    my $self = shift ;
-    my @klist = sort keys %{$self->{DATA}};
-    return @klist;
-}
 
 ## get (key) -- returns scalar
 
@@ -499,7 +497,7 @@ sub toDataStructure {
     my $self = shift;
     my %ds;
 
-    foreach my $key ($self->listDataKeys) {
+    foreach my $key ($self->keysUsed) {
 	my $value = $self->get($key);
 	$ds{$key} = $value;
     }
@@ -516,7 +514,7 @@ sub toString {
     my $self = shift;
     my @page;
 
-    foreach my $key ($self->listDataKeys) {
+    foreach my $key ($self->keysUsed) {
 	my $value = $self->{DATA}->{$key};
 
 	unless ($self->writableKey($key)) {
@@ -556,7 +554,7 @@ sub toSavedForm {
     }
 
     # print them all...
-    foreach my $key ($self->listDataKeys) {
+    foreach my $key ($self->keysUsed) {
 	# this one is
 	my $value = $self->{DATA}->{$key};
 

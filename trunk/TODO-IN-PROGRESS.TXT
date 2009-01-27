@@ -1,9 +1,15 @@
+matchInterestBlob has to become aware of tags being deleted, since it
+uses the raw get() to the implicit tags
+
+------------------------------------------------------------------
 
 add allImplications() to Tag, doing a full tag expansion of implications
 
+------------------------------------------------------------------
+
 make UI url space reflect minectl more closely
 
-
+------------------------------------------------------------------
 
 add access control for documents which are not public or final or draft
 
@@ -58,10 +64,6 @@ minectl to have an option to abort-on-error
 ------------------------------------------------------------------
 
 add caching to Thing->load ($self->{CACHE$ID}?) with appropriate purging
-
-------------------------------------------------------------------
-
-add "sub __sort_method" to thing, pertinent to list(), overridable by subclass?
 
 ------------------------------------------------------------------
 
