@@ -83,12 +83,12 @@ __END__;
 }
 
 { management
-+ version.html software version information
 + show-config.html show configuration
 + update-config.html update configuration
 }
 
 { documentation 
++ version.html software version
 + ../doc/ local
 }
 -
