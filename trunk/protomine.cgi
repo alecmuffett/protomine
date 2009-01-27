@@ -480,7 +480,7 @@ sub do_remote_get {
 	    $r->name, 
 	    $r->get('relationInterests');
 
-	my $feed_link = &get_permalink("read", $r);
+	my $feed_link = &get_permalink('read', $r);
 	my $feed_updated = &atom_format(time);
 	my $feed_author_name = $feed_owner;
 	my $feed_id = $feed_link;
@@ -501,7 +501,7 @@ sub do_remote_get {
 
 	    next unless ($o->matchInterestsBlob($ib));
 
-	    my $obj_link = &get_permalink($r, $o);
+	    my $obj_link = &get_permalink('read', $r, $o);
 
 	    $page->add($o->toAtom($obj_link));
 	}

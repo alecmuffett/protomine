@@ -58,6 +58,7 @@ my %form_size_table =
      relationVersion => 'LINE3',
      tagId => 'SKIP',
      tagImplies => 'LINE1',
+     data => 'UPLOAD',
     );
 
 sub form_size {
@@ -150,6 +151,9 @@ sub ui_clone_object_oid {
 
 # ui_create_object --
 push (@raw_action_list, [ '/ui/create-object.html', 'GET', \&ui_create_object ]);
+push (@raw_action_list, [ '/ui/create-object.html', 
+			  'POST', \&postwrapper, 
+			  \&api_create_object, undef, 'list-objects.html' ]);
 
 sub ui_create_object {
     my ($ctx, $info, $phr) = @_;
@@ -164,11 +168,13 @@ sub ui_create_object {
 	$thing->{$key} = '' unless defined($thing->{$key});
     }
 
+    $thing->{data} = '';
+
     my $template = &loopify($thing, FORM => 1);
 
     $template->{LINKPAGE} = "create-object.html";
     $template->{TITLE} = "creating a new object";
-    $template->{ACTION} = "../api/object.txt";
+    $template->{ACTION} = "create-object.html";
 
     my $p = Page->newHTML("ui/");
     $p->addFileTemplate('tmpl-update-thing.html', $template);
@@ -178,6 +184,9 @@ sub ui_create_object {
 
 # ui_create_relation --
 push (@raw_action_list, [ '/ui/create-relation.html', 'GET', \&ui_create_relation ]);
+push (@raw_action_list, [ '/ui/create-relation.html', 
+			  'POST', \&postwrapper, 
+			  \&api_create_relation, undef, 'list-relations.html' ]);
 
 sub ui_create_relation {
     my ($ctx, $info, $phr) = @_;
@@ -195,7 +204,7 @@ sub ui_create_relation {
 
     $template->{LINKPAGE} = "create-relation.html";
     $template->{TITLE} = "creating a new relation";
-    $template->{ACTION} = "../api/relation.txt";
+    $template->{ACTION} = "create-relation.html";
 
     my $p = Page->newHTML("ui/");
     $p->addFileTemplate('tmpl-update-thing.html', $template);
@@ -204,6 +213,9 @@ sub ui_create_relation {
 
 # ui_create_tag --
 push (@raw_action_list, [ '/ui/create-tag.html', 'GET', \&ui_create_tag ]);
+push (@raw_action_list, [ '/ui/create-tag.html', 
+			  'POST', \&postwrapper, 
+			  \&api_create_tag, undef, 'list-tags.html' ]);
 
 sub ui_create_tag {
     my ($ctx, $info, $phr) = @_;
@@ -220,7 +232,7 @@ sub ui_create_tag {
 
     $template->{LINKPAGE} = "create-tag.html";
     $template->{TITLE} = "creating a new tag";
-    $template->{ACTION} = "../api/tag.txt";
+    $template->{ACTION} = "create-tag.html";
 
     my $p = Page->newHTML("ui/");
     $p->addFileTemplate('tmpl-update-thing.html', $template);
@@ -413,7 +425,7 @@ sub ui_list_relations {
 	     {
 		 NAME => $r->get('relationName'),
 		 DUMP => &dumpify($r->toDataStructure),
-		 LINKFEED => "feed url goes here",
+		 LINKFEED => &get_permalink("read", $r),
 		 LINKREAD => "get-relation/$rid.html",
 		 LINKUPDATE => "update-relation/$rid.html",
 		 LINKDELETE => "delete-relation/$rid.html",

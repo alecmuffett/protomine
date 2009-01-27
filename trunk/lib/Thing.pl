@@ -289,7 +289,8 @@ sub get {
     my $key = shift;
 
     unless ($self->validKey($key)) {
-	die "get($key) however key $key is not valid for this thing\n";
+	my @diag = $self->keysValid;
+	die "get($key) however key $key is not amongst @diag\n";
     }
 
     return $self->{DATA}->{$key};
