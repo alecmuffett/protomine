@@ -25,135 +25,22 @@ our @raw_action_list;
 ##################################################################
 ##################################################################
 
-sub XXui_create_object {
-    my ($ctx, $info, $phr) = @_;
-
-    my $result = &api_create_object(@_);
-    my $oid = $result->{objectId};
-
-    my $p = Page->newHTML("ui/");
-    $p->add("created object $oid");
-    return $p;
-}
-
-sub XXui_create_relation {
-    my ($ctx, $info, $phr) = @_;
-
-    my $result = &api_create_relation(@_);
-    my $rid = $result->{relationId};
-
-    my $p = Page->newHTML("ui/");
-    $p->add("created relation $rid");
-    return $p;
-}
-
-sub XXui_create_tag {
-    my ($ctx, $info, $phr) = @_;
-
-    my $result = &api_create_tag(@_);
-    my $tid = $result->{tagId};
-
-    my $p = Page->newHTML("ui/");
-    $p->add("created tag $tid");
-    return $p;
-}
-
-sub XXui_show_objects {
-    my ($ctx, $info, $phr) = @_;
-
-    my @oids = Object->list;
-
-    my $p = Page->newHTML("ui/");
-    $p->add("<dl>");
-    foreach my $oid (@oids) {
-	my $object = Object->new($oid);
-	my $name = $object->name;
-
-	$p->add("<dt>object $oid: $name</dt>\n");
-	$p->add("<dd>");
-	$p->addCloud({
-	    "delete-object/$oid.html", "[delete]",
-	    "../api/object/$oid", "[view]",
-	    "read-object/$oid.html", "[info]",
-	    "update-data/$oid.html", "[update]",
-	    "update-object/$oid.html", "[update info]",
-		     });
-	$p->add("<br/>\n");
-	$p->add($object);
-	$p->add("</dd>\n");
-	$p->add("<p/>\n");
-    }
-    $p->add("</dl>\n");
-    return $p;
-}
-
-sub XXui_show_relations {
-    my ($ctx, $info, $phr) = @_;
-
-    my @rids = Relation->list;
-
-    my $p = Page->newHTML("ui/");
-    $p->add("<dl>");
-    foreach my $rid (@rids) {
-	my $relation = Relation->new($rid);
-	my $name = $relation->name;
-
-	$p->add("<dt>relation $rid: $name</dt>\n");
-	$p->add("<dd>");
-	$p->addCloud({
-		 &get_permalink("read", $relation), "[feed]",
-		 "delete-relation/$rid.html", "[delete]",
-		 "read-relation/$rid.html", "[info]",
-		 "update-relation/$rid.html", "[update info]",
-		     });
-	$p->add("<br/>\n");
-	$p->add($relation);
-	$p->add("</dd>\n");
-	$p->add("<p/>\n");
-    }
-    $p->add("</dl>\n");
-    return $p;
-}
-
-sub XXui_show_tags {
-    my ($ctx, $info, $phr) = @_;
-
-    my @tids = Tag->list;
-
-    my $p = Page->newHTML("ui/");
-    $p->add("<dl>");
-    foreach my $tid (@tids) {
-	my $tag = Tag->new($tid);
-	my $name = $tag->name;
-
-	$p->add("<dt>tag $tid: $name</dt>\n");
-	$p->add("<dd>");
-	$p->addCloud({
-	    "delete-tag/$tid.html", "[delete]",
-	    "read-tag/$tid.html", "[info]",
-	    "update-tag/$tid.html", "[update info]",
-		     });
-	$p->add("<br/>\n");
-	$p->add($tag);
-	$p->add("</dd>\n");
-	$p->add("<p/>\n");
-    }
-    $p->add("</dl>\n");
-    return $p;
-}
-
-##################################################################
-##################################################################
-
 my %form_size_table = 
     (
-     objectStatus => 'OBJECTSTATUS',
-     objectDescription => 'BOX1',
-     objectType => 'LINE3',
-     objectId => 'SKIP',
+     commentBody => 'BOX1',
      commentId => 'SKIP',
-     tagId => 'SKIP',
+     commentSubject => 'LINE1',
+     objectDescription => 'BOX1',
+     objectId => 'SKIP',
+     objectStatus => 'OBJECTSTATUS',
+     objectType => 'LINE3',
+     relationDescription => 'BOX1',
      relationId => 'SKIP',
+     relationInterests => 'LINE1',
+     relationURL => 'LINE1',
+     relationVersion => 'LINE3',
+     tagId => 'SKIP',
+     tagImplies => 'LINE1',
     );
 
 sub form_size {
@@ -168,7 +55,7 @@ sub loopify {			# TODO: put CSS class into arg, embed in template
     my $retval = {};
     my @vector;
 
-    foreach my $key (sort { &form_size($a) cmp &form_size($b) } keys %{$hashref}) {
+    foreach my $key (sort { (&form_size($a) cmp &form_size($b)) || ( $a cmp $b ) } keys %{$hashref}) {
 	# would love to cache key/value too, but die_on_bad_params forbids
 	# $retval->{$key} = $value;
 
@@ -195,6 +82,7 @@ sub formify {
 
 ##################################################################
 ##################################################################
+##################################################################
 
 # ui_clone_object_oid --
 push (@raw_action_list, [ '/ui/clone-object/OID.html', 'GET', \&ui_clone_object_oid, 'OID' ]);
@@ -203,39 +91,118 @@ sub ui_clone_object_oid {
 }
 
 # ui_create_object --
-push (@raw_action_list, [ '/ui/create-object.html', 'POST', \&ui_create_object ]);
+push (@raw_action_list, [ '/ui/create-object.html', 'GET', \&ui_create_object ]);
 
 sub ui_create_object {
+    my ($ctx, $info, $phr) = @_;
+
+    my $p = Page->newHTML("ui/");
+    my $thing = {
+        objectName => 'required',
+        objectStatus => 'required',
+        objectType => 'required',
+    };
+    
+    foreach my $key (Object->new->keysWritable) {
+	$thing->{$key} = '' unless defined($thing->{$key});
+    }
+
+    my $template = &loopify($thing, dosize => 1);
+
+    $template->{LINK} = "create-object.html";
+    $template->{TITLE} = "creating a new object";
+
+    $template->{ACTION} = "../api/object.txt";
+
+    $p->addFileTemplate('tmpl-update-thing.html', $template);
+    return $p;
 }
 
+
 # ui_create_relation --
-push (@raw_action_list, [ '/ui/create-relation.html', 'POST', \&ui_create_relation ]);
+push (@raw_action_list, [ '/ui/create-relation.html', 'GET', \&ui_create_relation ]);
 
 sub ui_create_relation {
+    my ($ctx, $info, $phr) = @_;
+
+    my $p = Page->newHTML("ui/");
+    my $thing = {
+	relationName => 'required',
+        relationVersion => '1',
+    };
+    
+    foreach my $key (Relation->new->keysWritable) {
+	$thing->{$key} = '' unless defined($thing->{$key});
+    }
+
+    my $template = &loopify($thing, dosize => 1);
+
+    $template->{LINK} = "create-relation.html";
+    $template->{TITLE} = "creating a new relation";
+
+    $template->{ACTION} = "../api/relation.txt";
+
+    $p->addFileTemplate('tmpl-update-thing.html', $template);
+    return $p;
 }
 
 # ui_create_tag --
-push (@raw_action_list, [ '/ui/create-tag.html', 'POST', \&ui_create_tag ]);
+push (@raw_action_list, [ '/ui/create-tag.html', 'GET', \&ui_create_tag ]);
 
 sub ui_create_tag {
+    my ($ctx, $info, $phr) = @_;
+
+    my $p = Page->newHTML("ui/");
+    my $thing = {
+	tagName => 'required',
+    };
+    
+    foreach my $key (Tag->new->keysWritable) {
+	$thing->{$key} = '' unless defined($thing->{$key});
+    }
+
+    my $template = &loopify($thing, dosize => 1);
+
+    $template->{LINK} = "create-tag.html";
+    $template->{TITLE} = "creating a new tag";
+
+    $template->{ACTION} = "../api/tag.txt";
+
+    $p->addFileTemplate('tmpl-update-thing.html', $template);
+    return $p;
 }
 
 # ui_delete_object_oid --
 push (@raw_action_list, [ '/ui/delete-object/OID.html', 'GET', \&ui_delete_object_oid, 'OID' ]);
 
 sub ui_delete_object_oid {
+    my ($ctx, $info, $phr, $oid) = @_;
+    my $p = Page->newHTML("ui/");
+    my $status = &api_delete_oid(@_);
+    $p->addFileTemplate('tmpl-status.html', $status);
+    return $p;
 }
 
 # ui_delete_relation_rid --
 push (@raw_action_list, [ '/ui/delete-relation/RID.html', 'GET', \&ui_delete_relation_rid, 'RID' ]);
 
 sub ui_delete_relation_rid {
+    my ($ctx, $info, $phr, $rid) = @_;
+    my $p = Page->newHTML("ui/");
+    my $status = &api_delete_rid(@_);
+    $p->addFileTemplate('tmpl-status.html', $status);
+    return $p;
 }
 
 # ui_delete_tag_tid --
 push (@raw_action_list, [ '/ui/delete-tag/TID.html', 'GET', \&ui_delete_tag_tid, 'TID' ]);
 
 sub ui_delete_tag_tid {
+    my ($ctx, $info, $phr, $tid) = @_;
+    my $p = Page->newHTML("ui/");
+    my $status = &api_delete_tid(@_);
+    $p->addFileTemplate('tmpl-status.html', $status);
+    return $p;
 }
 
 # ui_read_object_oid --
@@ -374,12 +341,16 @@ sub ui_update_object_oid {
     my ($ctx, $info, $phr, $oid) = @_;
 
     my $p = Page->newHTML("ui/");
+    my $thing = (&api_read_oid($ctx, $info, $phr, $oid))->{object};
 
-    my $wrapper = &api_read_oid($ctx, $info, $phr, $oid);
-    my $template = &loopify($wrapper->{object}, dosize => 1);
+    foreach my $key (Object->new->keysWritable) {
+	$thing->{$key} = '' unless defined($thing->{$key});
+    }
+
+    my $template = &loopify($thing, dosize => 1);
 
     $template->{LINK} = "../api/object/$oid.txt";
-    $template->{TITLE} = "object $oid";
+    $template->{TITLE} = "editing object $oid";
 
     $template->{AUXLINK} = "../api/object/$oid";
     $template->{AUXTITLE} = "(data)";
@@ -394,12 +365,48 @@ sub ui_update_object_oid {
 push (@raw_action_list, [ '/ui/update-relation/RID.html', 'GET', \&ui_update_relation_rid, 'RID' ]);
 
 sub ui_update_relation_rid {
+    my ($ctx, $info, $phr, $rid) = @_;
+
+    my $p = Page->newHTML("ui/");
+    my $thing = (&api_read_rid($ctx, $info, $phr, $rid))->{relation};
+
+    foreach my $key (Relation->new->keysWritable) {
+	$thing->{$key} = '' unless defined($thing->{$key});
+    }
+
+    my $template = &loopify($thing, dosize => 1);
+
+    $template->{LINK} = "../api/relation/$rid.txt";
+    $template->{TITLE} = "editing relation $rid";
+
+    $template->{ACTION} = "../api/relation/$rid/key.txt";
+
+    $p->addFileTemplate('tmpl-update-thing.html', $template);
+    return $p;
 }
 
 # ui_update_tag_tid --
 push (@raw_action_list, [ '/ui/update-tag/TID.html', 'GET', \&ui_update_tag_tid, 'TID' ]);
 
 sub ui_update_tag_tid {
+    my ($ctx, $info, $phr, $tid) = @_;
+
+    my $p = Page->newHTML("ui/");
+    my $thing = (&api_read_tid($ctx, $info, $phr, $tid))->{tag};
+
+    foreach my $key (Tag->new->keysWritable) {
+	$thing->{$key} = '' unless defined($thing->{$key});
+    }
+
+    my $template = &loopify($thing, dosize => 1);
+
+    $template->{LINK} = "../api/tag/$tid.txt";
+    $template->{TITLE} = "editing tag $tid";
+
+    $template->{ACTION} = "../api/tag/$tid/key.txt";
+
+    $p->addFileTemplate('tmpl-update-thing.html', $template);
+    return $p;
 }
 
 ##################################################################

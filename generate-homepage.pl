@@ -66,9 +66,6 @@ __END__;
 ' <p/>
 
 : welcome to protomine!
-{ documentation 
-+ ../doc/ local
-}
 
 { objects
 + list-objects.html list objects
@@ -89,6 +86,10 @@ __END__;
 + version.html software version information
 + show-config.html show configuration
 + update-config.html update configuration
+}
+
+{ documentation 
++ ../doc/ local
 }
 -
 
