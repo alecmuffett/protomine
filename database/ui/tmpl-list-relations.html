@@ -5,16 +5,16 @@
 <dl>
 <TMPL_LOOP NAME="LOOP">
 <dt>
-<TMPL_VAR NAME="ID">
-<A HREF="<TMPL_VAR NAME="LINKREAD">">[read]</A>
-<A HREF="<TMPL_VAR NAME="LINKFEED">">[feed]</A>
-<A HREF="<TMPL_VAR NAME="LINKUPDATE">">[update]</A>
-<A HREF="<TMPL_VAR NAME="LINKDELETE">">[delete]</A>
+<TMPL_VAR NAME="NAME">
+<A HREF="<TMPL_VAR NAME="LINKFEED">"><button>feed</button></A>
+<A HREF="<TMPL_VAR NAME="LINKREAD">"><button>read</button></A>
+<A HREF="<TMPL_VAR NAME="LINKUPDATE">"><button>update</button></A>
+<A HREF="<TMPL_VAR NAME="LINKDELETE">"><button>delete</button></A>
 </dt>
 <dd>
-name: <TMPL_VAR NAME="NAME"> <br/>
-description: <TMPL_VAR NAME="DESCRIPTION"> <br/>
 tags: <TMPL_VAR NAME="TAGS"> <br/>
+description: <TMPL_VAR NAME="DESCRIPTION"> <br/>
+id: <TMPL_VAR NAME="ID"> <br/>
 </dd>
 <p/>
 </TMPL_LOOP>

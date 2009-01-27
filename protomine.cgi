@@ -26,6 +26,7 @@
 #  $LINT  external  encode          json::xs     method
 #  $LINT  external  end_html        cgi::method
 #  $LINT  external  header          cgi::method
+#  $LINT  external  output          html::template
 #  $LINT  external  param           cgi::method
 #  $LINT  external  pretty          json::xs     method
 #  $LINT  external  redirect        cgi::method

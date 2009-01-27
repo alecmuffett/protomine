@@ -27,6 +27,7 @@ use HTML::Template;
 # for the C-programmer in me, and you
 my $BUFSIZ = 1024 * 64;
 my $DIRMAGIC = '[directory]';
+my $ENCODING = 'UTF-8';
 
 # enumeration for speed, later
 my $STATIC_FILE = -1;
@@ -243,13 +244,13 @@ sub addFileTemplate {           # add the contents of a template to the page, su
     my $filename = shift;
     my $paramref = shift;
 
-    my $template = HTML::Template->new(filename => "database/ui/$filename", 
+    my $template = HTML::Template->new(filename => "database/ui/$filename",
 				       die_on_bad_params => 1,
 				       strict => 1,
 				       case_sensitive => 1,
 				       loop_context_vars => 1,
 				       no_includes => 1,
-				       default_escape => 'HTML', 
+				       default_escape => 'HTML',
 				       @_); # any other inherited args, eg: caching
 
     $template->param($paramref);
@@ -375,7 +376,7 @@ sub printFile {
 
 sub printUsing {
     my $self = shift;
-    my $ctx = shift;             # takes Context as argument
+    my $ctx = shift;		# takes Context as argument
 
     # extract the CGI object
     my $q = $ctx->cgi;
@@ -398,7 +399,9 @@ sub printUsing {
     }
 
     # print the HTTP header
-    print $q->header(-status => $self->{STATUS}, -type => $self->{TYPE});
+    print $q->header(-status => $self->{STATUS},
+		     -type => $self->{TYPE},
+		     -charset => $ENCODING);
 
     # print HTML header, if appropriate
     if ($self->{STYLE} == $DYNAMIC_HTML) {
@@ -406,10 +409,9 @@ sub printUsing {
 
         my $title = sprintf "%s %s", $ctx->method, $ctx->path;
 
-        push(@meta, -title => $title);
-
-        push(@meta, -style => { -src => $ctx->{URL_CSS} });
-
+	push(@meta, -encoding => $ENCODING);
+	push(@meta, -title => $title);
+	push(@meta, -style => { -src => $ctx->{URL_CSS} });
 	if (defined($self->{XBASE})) {
 	    push(@meta, -xbase => $ctx->{URL_BASE} . $ctx->{URL_DECLARED} . '/' .  $self->{XBASE});
 	}
@@ -470,7 +472,7 @@ sub printBodyXML {
 	elsif ($argtype eq 'SCALAR') { # if ref of primitive, print THAT
 	    print ${$arg};
 	}
-	elsif ($argtype eq 'ARRAY') { # 
+	elsif ($argtype eq 'ARRAY') { #
 	    $self->printBodyXML(@{$arg});
 	}
 	elsif ($argtype eq 'HASH') {
@@ -510,7 +512,7 @@ sub printBodyHTML {
 	elsif ($argtype eq 'SCALAR') { # if ref of primitive, print THAT
 	    print ${$arg};
 	}
-	elsif ($argtype eq 'ARRAY') { # 
+	elsif ($argtype eq 'ARRAY') { #
 	    # print "<ul>\n";
 	    # foreach my $li (@{$arg}) {
 	    # print "<li>";

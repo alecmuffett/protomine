@@ -5,20 +5,23 @@
 <dl>
 <TMPL_LOOP NAME="LOOP">
 <dt>
-<TMPL_VAR NAME="ID">
-<A HREF="<TMPL_VAR NAME="LINKGET">">[view object]</A>
-<A HREF="<TMPL_VAR NAME="LINKREAD">">[read]</A>
-<A HREF="<TMPL_VAR NAME="LINKUPDATE">">[update]</A>
-<A HREF="<TMPL_VAR NAME="LINKDELETE">">[delete]</A>
+id: <TMPL_VAR NAME="ID"> 
+type: <TMPL_VAR NAME="TYPE">
+<A HREF="<TMPL_VAR NAME="LINKGET">"><button>download</button></A>
+<A HREF="<TMPL_VAR NAME="LINKREAD">"><button>read</button></A>
+<A HREF="<TMPL_VAR NAME="LINKUPDATE">"><button>update</button></A>
+<A HREF="<TMPL_VAR NAME="LINKDELETE">"><button>delete</button></A>
 </dt>
+
 <dd>
-<TMPL_VAR NAME="NAME"> (<TMPL_VAR NAME="TYPE">) <br/>
-<TMPL_IF NAME="TAGS">tags: <TMPL_VAR NAME="TAGS"> <br/></TMPL_IF>
+name: <TMPL_VAR NAME="NAME"> 
+<br/>
+<TMPL_IF NAME="TAGS">
+tags: <TMPL_VAR NAME="TAGS">
+<br/>
+</TMPL_IF>
 <TMPL_IF NAME="DESCRIPTION">
-description: 
-<BLOCKQUOTE>
-<TMPL_VAR NAME="DESCRIPTION">
-</BLOCKQUOTE>
+description: <TMPL_VAR NAME="DESCRIPTION">
 </TMPL_IF>
 </dd>
 <p/>
