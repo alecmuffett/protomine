@@ -475,7 +475,7 @@ sub do_remote_get {
 	my $feed_owner = "alec";
 
 	my $feed_title = 
-	    sprintf "%s for %s (%s)", 
+	    sprintf "%s's feed for %s (%s)", 
 	    $feed_owner, 
 	    $r->name, 
 	    $r->get('relationInterests');
