@@ -1,35 +1,43 @@
-<H1>editing 
+<H1>
 <A HREF="<TMPL_VAR NAME="LINK">"><TMPL_VAR NAME="TITLE"></A>
 <A HREF="<TMPL_VAR NAME="AUXLINK">"><TMPL_VAR NAME="AUXTITLE"></A>
 </H1>
 <p/>
+
 <form method="post" enctype="multipart/form-data" action="<TMPL_VAR NAME="ACTION">">
 <!-- i could nest these, but frankly it makes it unreadable, so let's assume they are mutex -->
-<TMPL_LOOP NAME=LOOP>
+<TMPL_LOOP NAME="LOOP">
+
 <TMPL_IF NAME="LINE3">
 <em><TMPL_VAR NAME="KEY"></em> <br/>
-<input type="text" size="20" name="<TMPL_VAR NAME="KEY">" value="<TMPL_VAR NAME="VALUE">"/> <br/>
+<input type="text" size="10" name="<TMPL_VAR NAME="KEY">" value="<TMPL_VAR NAME="VALUE">"/> <br/>
 </TMPL_IF>
+
 <TMPL_IF NAME="LINE2">
 <em><TMPL_VAR NAME="KEY"></em> <br/>
-<input type="text" size="40" name="<TMPL_VAR NAME="KEY">" value="<TMPL_VAR NAME="VALUE">"/> <br/>
+<input type="text" size="30" name="<TMPL_VAR NAME="KEY">" value="<TMPL_VAR NAME="VALUE">"/> <br/>
 </TMPL_IF>
+
 <TMPL_IF NAME="LINE1">
 <em><TMPL_VAR NAME="KEY"></em> <br/>
 <input type="text" size="60" name="<TMPL_VAR NAME="KEY">" value="<TMPL_VAR NAME="VALUE">"/> <br/>
 </TMPL_IF>
+
 <TMPL_IF NAME="BOX3">
 <em><TMPL_VAR NAME="KEY"></em> <br/>
-<textarea cols="40" rows="5" name="<TMPL_VAR NAME="KEY">" value="<TMPL_VAR NAME="VALUE">"><TMPL_VAR NAME="VALUE"></textarea> <br/>
+<textarea cols="40" rows="6" name="<TMPL_VAR NAME="KEY">" value="<TMPL_VAR NAME="VALUE">"><TMPL_VAR NAME="VALUE"></textarea> <br/>
 </TMPL_IF>
+
 <TMPL_IF NAME="BOX2">
 <em><TMPL_VAR NAME="KEY"></em> <br/>
-<textarea cols="40" rows="10" name="<TMPL_VAR NAME="KEY">" value="<TMPL_VAR NAME="VALUE">"><TMPL_VAR NAME="VALUE"></textarea> <br/>
+<textarea cols="40" rows="12" name="<TMPL_VAR NAME="KEY">" value="<TMPL_VAR NAME="VALUE">"><TMPL_VAR NAME="VALUE"></textarea> <br/>
 </TMPL_IF>
+
 <TMPL_IF NAME="BOX1">
 <em><TMPL_VAR NAME="KEY"></em> <br/>
 <textarea cols="80" rows="12" name="<TMPL_VAR NAME="KEY">" value="<TMPL_VAR NAME="VALUE">"><TMPL_VAR NAME="VALUE"></textarea> <br/>
 </TMPL_IF>
+
 <TMPL_IF NAME="OBJECTSTATUS">
 <em><TMPL_VAR NAME="KEY"></em> <br/>
 <input type="radio" name="<TMPL_VAR NAME="KEY">" value="draft"/ checked> draft
@@ -37,8 +45,11 @@
 <input type="radio" name="<TMPL_VAR NAME="KEY">" value="public"/> public
 <br/>
 </TMPL_IF>
+
 <p/>
 </TMPL_LOOP>
-<input type="reset" value="reset"/>
-<input type="submit" value="commit"/> <br/>
+
+<input type="submit" value="commit changes"/>
+<input type="reset" value="reset to previous"/>
+<br/>
 </form>
