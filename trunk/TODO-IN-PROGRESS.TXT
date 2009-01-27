@@ -1,4 +1,6 @@
 
+add allImplications() to Tag, doing a full tag expansion of implications
+
 make UI url space reflect minectl more closely
 
 
