@@ -311,7 +311,7 @@ sub ui_list_objects {
 		 TYPE => $o->get('objectType'),
 		 TAGS => $o->get('objectTags'),
 		 DESCRIPTION => $o->get('objectDescription'),
-		 LINKREAD => "read-object/$oid.html",
+		 LINKREAD => "get-object/$oid.html",
 		 LINKUPDATE => "update-object/$oid.html",
 		 LINKDELETE => "delete-object/$oid.html",
 		 LINKGET => "../api/object/$oid",
@@ -347,7 +347,7 @@ sub ui_list_relations {
 		 TAGS => $o->get('relationInterests'),
 		 LINKFEED => "feed url goes here",
 		 DESCRIPTION => $o->get('relationDescription'),
-		 LINKREAD => "read-relation/$oid.html",
+		 LINKREAD => "get-relation/$oid.html",
 		 LINKUPDATE => "update-relation/$oid.html",
 		 LINKDELETE => "delete-relation/$oid.html",
 	     });
@@ -379,7 +379,7 @@ sub ui_list_tags {
 		 ID => $oid,
 		 NAME => $o->get('tagName'),
 		 TAGS => $o->get('tagImplies'),
-		 LINKREAD => "read-tag/$oid.html",
+		 LINKREAD => "get-tag/$oid.html",
 		 LINKUPDATE => "update-tag/$oid.html",
 		 LINKDELETE => "delete-tag/$oid.html",
 	     });
