@@ -211,4 +211,9 @@ sub relationVersion {
 
 ##################################################################
 
+sub sortCompare {
+    my ($self, $a, $b) = @_;
+    return $self->new($a)->name cmp $self->new($b)->name;
+}
+
 1;
