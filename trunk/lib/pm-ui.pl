@@ -34,7 +34,7 @@ sub postwrapper {
     };
 
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-status.html', $template);
+    $p->addFileTemplate('template/status.html', $template);
     return $p;
 }
 
@@ -177,7 +177,7 @@ sub ui_create_object {
     $template->{ACTION} = "create-object.html";
 
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-update-thing.html', $template);
+    $p->addFileTemplate('template/update-thing.html', $template);
     return $p;
 }
 
@@ -207,7 +207,7 @@ sub ui_create_relation {
     $template->{ACTION} = "create-relation.html";
 
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-update-thing.html', $template);
+    $p->addFileTemplate('template/update-thing.html', $template);
     return $p;
 }
 
@@ -235,7 +235,7 @@ sub ui_create_tag {
     $template->{ACTION} = "create-tag.html";
 
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-update-thing.html', $template);
+    $p->addFileTemplate('template/update-thing.html', $template);
     return $p;
 }
 
@@ -246,7 +246,7 @@ sub ui_delete_object_oid {
     my ($ctx, $info, $phr, $oid) = @_;
     my $rval = &api_delete_oid(@_);
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-status.html',
+    $p->addFileTemplate('template/status.html',
 			&statusify($rval,
 				   NAME => 'status',
 				   RETURN => 'list-objects.html'));
@@ -260,7 +260,7 @@ sub ui_delete_relation_rid {
     my ($ctx, $info, $phr, $rid) = @_;
     my $rval = &api_delete_rid(@_);
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-status.html',
+    $p->addFileTemplate('template/status.html',
 			&statusify($rval,
 				   NAME => 'status',
 				   RETURN => 'list-relations.html'));
@@ -274,7 +274,7 @@ sub ui_delete_tag_tid {
     my ($ctx, $info, $phr, $tid) = @_;
     my $rval = &api_delete_tid(@_);
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-status.html',
+    $p->addFileTemplate('template/status.html',
 			&statusify($rval,
 				   NAME => 'status',
 				   RETURN => 'list-tags.html'));
@@ -288,7 +288,7 @@ sub ui_read_object_oid {
     my ($ctx, $info, $phr, $oid) = @_;
     my $hashref = &api_read_oid($ctx, $info, $phr, $oid);
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-get-thing.html',
+    $p->addFileTemplate('template/get-thing.html',
 			&loopify($hashref, ROOT => 'object'));
     return $p;
 }
@@ -300,7 +300,7 @@ sub ui_read_relation_rid {
     my ($ctx, $info, $phr, $rid) = @_;
     my $hashref = &api_read_rid($ctx, $info, $phr, $rid);
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-get-thing.html',
+    $p->addFileTemplate('template/get-thing.html',
 			&loopify($hashref, ROOT => 'relation'));
     return $p;
 }
@@ -312,7 +312,7 @@ sub ui_read_tag_tid {
     my ($ctx, $info, $phr, $tid) = @_;
     my $hashref = &api_read_tid($ctx, $info, $phr, $tid);
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-get-thing.html',
+    $p->addFileTemplate('template/get-thing.html',
 			&loopify($hashref, ROOT => 'tag'));
     return $p;
 }
@@ -406,7 +406,7 @@ sub ui_list_objects {
     };
 
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-list-objects.html', $template);
+    $p->addFileTemplate('template/list-objects.html', $template);
     return $p;
 }
 
@@ -439,7 +439,7 @@ sub ui_list_relations {
     };
 
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-list-relations.html', $template);
+    $p->addFileTemplate('template/list-relations.html', $template);
     return $p;
 }
 
@@ -470,7 +470,7 @@ sub ui_list_tags {
     };
 
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-list-tags.html', $template);
+    $p->addFileTemplate('template/list-tags.html', $template);
     return $p;
 }
 
@@ -522,7 +522,7 @@ sub ui_update_object_oid {
     $template->{AUXTITLE} = "(data)";
 
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-update-thing.html', $template);
+    $p->addFileTemplate('template/update-thing.html', $template);
     return $p;
 }
 
@@ -549,7 +549,7 @@ sub ui_update_relation_rid {
     $template->{ACTION} = "update-relation/$rid.html";
 
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-update-thing.html', $template);
+    $p->addFileTemplate('template/update-thing.html', $template);
     return $p;
 }
 
@@ -576,7 +576,7 @@ sub ui_update_tag_tid {
     $template->{ACTION} = "update-tag/$tid.html";
 
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-update-thing.html', $template);
+    $p->addFileTemplate('template/update-thing.html', $template);
     return $p;
 }
 
@@ -588,7 +588,7 @@ push (@raw_action_list, [ '/ui/version.html', 'GET', \&ui_version ]);
 sub ui_version {
     my $hashref = &api_version(@_); # fast way to send args
     my $p = Page->newHTML("ui/");
-    $p->addFileTemplate('tmpl-version.html', $hashref->{version});
+    $p->addFileTemplate('template/version.html', $hashref->{version});
     return $p;
 }
 
