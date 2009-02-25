@@ -58,6 +58,9 @@ while ($ARGV[0] =~ m!^-(\w+)!o) {
 	elsif ($switch eq 'j') {
 	    $FLAG{'json'} = 1;
 	}
+	elsif ($switch eq 'P') {
+	    $FLAG{'perlxx'} = 1;
+	}
 	elsif ($switch eq 'h') {
 	    $FLAG{'help'} = 1;
 	}
@@ -81,7 +84,7 @@ while ($ARGV[0] =~ m!^-(\w+)!o) {
     shift;
 }
 
-if (($FLAG{'json'} + $FLAG{'text'}) > 1) {
+if (($FLAG{'json'} + $FLAG{'text'} + $FLAG{'perlxx'}) > 1) {
     die "$0: sorry, json/text options are mutually exclusive (fatal)\n";
 }
 
@@ -381,6 +384,12 @@ sub Mine {
 	# only swap to .text if was .xml beforehand
 	unless ($api =~ s!\.xml$!.txt!o) {
 	    die "$0: API $api cannot be coersced to TEXT format output (fatal)\n";
+	}
+    }
+
+    if ($FLAG{'perlxx'}) {
+	unless ($api =~ s!\.xml$!.pl!o) {
+	    die "$0: API $api cannot be coersced to JSON format output (fatal)\n";
 	}
     }
 

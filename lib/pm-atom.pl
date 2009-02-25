@@ -16,8 +16,6 @@
 ## permissions and limitations under the License.
 ##
 
-our $MINE_HTTP_FULLPATH;
-
 ##################################################################
 
 # atomFormat: converts a Unix timestamp into Atom format based on
@@ -43,29 +41,6 @@ sub yyyy_format {
     return 
         sprintf "%04d%02d%02d%02%d%02d%02d",
         $year + 1900, $mon+1, $mday, $hour, $min, $sec;
-}
-
-##################################################################
-
-sub get_permalink {
-    my ($method, $r, $o) = @_;
-
-    my $rid = 0;
-    my $rvsn = 0;
-    my $oid = 0;
-
-    if (defined($r)) {
-	$rid = $r->id;
-	$rvsn = $r->get('relationVersion');
-
-	if (defined($o)) {
-	    $oid = $o->id;
-	}
-    }
-
-    my $key = Crypto->encodeMineKey($method, $rid, $rvsn, $oid);
-
-    return $MINE_HTTP_FULLPATH . "/get?key=$key";
 }
 
 ##################################################################

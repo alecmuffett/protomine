@@ -37,6 +37,9 @@ sub do_fmt {
     elsif ($fmt eq 'txt') {
 	return Page->newText(&{$fn}($ctx, $info, $phr, @rest));
     }
+    elsif ($fmt eq 'pl') {	# not for public consumption
+	return Page->newPerl(&{$fn}($ctx, $info, $phr, @rest));
+    }
     else {
 	die "do_fmt: this can't happen: fmt=$fmt";
     }

@@ -17,18 +17,22 @@
 ##
 
 #  $LINT  external  Carp            cgi::module
-#  $LINT  external  Pretty          cgi::module
+#  $LINT  external  Dump            data::dumper
+#  $LINT  external  Dumper          data::dumper
+#  $LINT  external  Indent          data::dumper
 #  $LINT  external  POST_MAX        cgi::scalar
-#  $LINT  external  Template        html::template
+#  $LINT  external  Pretty          cgi::module
+#  $LINT  external  Purity          data::dumper
 #  $LINT  external  SUPER           superclass
+#  $LINT  external  Template        html::template
 #  $LINT  external  XS              module
 #  $LINT  external  cgi_error       cgi::method
-#  $LINT  external  encode          json::xs     method
+#  $LINT  external  encode          json::xs        method
 #  $LINT  external  end_html        cgi::method
 #  $LINT  external  header          cgi::method
 #  $LINT  external  output          html::template
 #  $LINT  external  param           cgi::method
-#  $LINT  external  pretty          json::xs     method
+#  $LINT  external  pretty          json::xs        method
 #  $LINT  external  redirect        cgi::method
 #  $LINT  external  request_method  cgi::method
 #  $LINT  external  start_html      cgi::method
@@ -123,6 +127,7 @@ push (@raw_action_list,
 require 'Context.pl';
 require 'Crypto.pl';
 require 'Log.pl';
+require 'MineKey.pl';
 require 'Object.pl';
 require 'Page.pl';
 require 'Relation.pl';
@@ -375,7 +380,7 @@ sub compile_action_list {
 
 sub smart_token {
     my $token = shift;
-    return '(xml|json|txt)' if ($token eq 'FMT');
+    return '(xml|json|txt|pl)' if ($token eq 'FMT');
     return '\d+' if ($token eq 'OID');
     return '\d+' if ($token eq 'RID');
     return '\d+' if ($token eq 'TID');
@@ -432,55 +437,65 @@ sub do_remote_get {
     my $key = $q->param('key');
 
     # decrypt the key
-    # TBD: better security audit trail here
-
-    my ($meth, $rid, $rvsn, $oid) = Crypto->decodeMineKey($key);
+    my $reqmk = MineKey->newFromEncoded($key);
 
     # load the relation
-    # TBD: trap this better so you log a security exception
+    my $r = Relation->new($reqmk->{rid}); # will abort if not exist; better log security exception
 
-    my $r = Relation->new($rid); # will abort if not exist
+    # check the relationship validity: embargoes
+    # XXX TBD
 
-    # check the relationship validity 
-    # (rvsn, date, time-of-day, ipaddress, ...)
-    # TBD: replace this with a Relation method call
+    # check the relationship validity: ip address
+    # XXX TBD
 
-    my $rvsn2 = $r->relationVersion;
+    # check the relationship validity: time of day
+    # XXX TBD
 
-    unless ($rvsn eq $rvsn2) {		    
-	die "do_remote_get: bad rvsn $key; supplied=$rvsn real=$rvsn2";
+    # check the relationship validity: relation version
+    unless ($r->relationVersion eq $reqmk->{rvsn}) {		    
+	my $reqrv = $reqmk->{rvsn};
+	my $currv = $r->relationVersion;
+	die "do_remote_get: security bad rvsn $key; cur=$currv req=$reqrv\n";
+    }
+
+    # check the request depth
+    unless ($reqmk->{depth} > 0) {
+	die "do_remote_get: you've strayed too far from your feed\n";
     }
 
     # get his interests blob
-    
     my $ib = $r->getInterestsBlob;
 
     # analyse the request
 
-    if ($oid > 0) {		    # it's an object-get 
+    if ($reqmk->{oid} > 0) {		    # it's an object-get 
 	# pull in the object metadata
-	my $o = Object->new($oid) ; # will abort if not exist
+	my $o = Object->new($reqmk->{oid}) ; # will abort if not exist
 
 	# check if the object wants to be seen by him
 	unless ($o->matchInterestsBlob($ib)) {
-	    die "do_remote_get: bad object-get oid=$oid rid=$rid failed matchInterestsBlob";
+	    die "do_remote_get: bad object-get oid=$reqmk->{oid} rid=$reqmk->{rid} failed matchInterestsBlob\n";
 	}
 
+	# HOOK THE REWRITER IN HERE FOR HTML AND XML OBJECTS
+
 	# punt to api_read_aux_oid
-	return &api_read_aux_oid($ctx, $info, $phr, $oid);
+	return &api_read_aux_oid($ctx, $info, $phr, $reqmk->{oid});
     }
-    elsif ($oid == 0) {		# it's a feed-get
+    elsif ($reqmk->{oid} == 0) {		# it's a feed-get
 	my $page = Page->newAtom;
 
 	my $feed_owner = "alec";
 
 	my $feed_title = 
 	    sprintf "%s's feed for %s (%s)", 
-	    $feed_owner, 
+	    $feed_owner,
 	    $r->name, 
 	    $r->get('relationInterests');
 
-	my $feed_link = &get_permalink('read', $r);
+	my $feedmk = MineKey->newFromRelation($r);
+
+	my $feed_link = $feedmk->permalink;
 	my $feed_updated = &atom_format(time);
 	my $feed_author_name = $feed_owner;
 	my $feed_id = $feed_link;
@@ -496,12 +511,12 @@ sub do_remote_get {
 	# consider each object in the mine; TBD: this should be the
 	# latest 50 in most-recently-modified order
 
-	foreach $oid (Object->list) {
+	foreach my $oid (Object->list) {
 	    my $o = Object->new($oid);
 
 	    next unless ($o->matchInterestsBlob($ib));
 
-	    my $obj_link = &get_permalink('read', $r, $o);
+	    my $obj_link = $feedmk->spawnObject($o)->permalink;
 
 	    $page->add($o->toAtom($obj_link));
 	}
