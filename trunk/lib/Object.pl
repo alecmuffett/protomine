@@ -450,7 +450,7 @@ sub toAtom {
     push(@atom, "<id>$id</id>\n");
     push(@atom, "<updated>$updated</updated>\n");
     push(@atom, "<summary>$summary</summary>\n");
-    push(@atom, "<content>$content</content>\n");
+    push(@atom, "<content type=\"html\">\n$content\n</content>\n");
     push(@atom, "</entry>\n");
 
     return \@atom;
