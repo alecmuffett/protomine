@@ -387,6 +387,7 @@ sub matchInterestsBlob {
 sub toAtom {
     my $self = shift;
     my $permalink = shift; # how the recipient of this feed will refer to this object
+    my $commentlink = shift; # how the recipient of this feed will comment on this object
 
     # <entry>
     # <title>Atom-Powered Robots Run Amok</title>
@@ -424,15 +425,24 @@ sub toAtom {
 
     $content = $objectDescription . "\n";
 
-    if ($objectType eq 'text/html') { # include verbatim
+    $content .= "<A HREF=\"$commentlink\">[link to submit feedback upon this object]</A><p/>\n";
+
+    if ($objectType eq 'text/html') {
 	$content .= "[html content of object $oid]";
     }
-    elsif ($objectType eq 'text/plain') { # do HTML escaping
+    elsif ($objectType eq 'text/plain') {
 	$content .= "[html-escaped plain text content of object $oid]";
     }
-    else {			# generate a stub
-	$content .= "[synthetic stub for object of type $objectType]";
+    elsif ($objectType =~ m!^image/(gif|png|jpeg)$!o) {
+	$content .= "[embed image for object of type $objectType]";
     }
+    else {
+	$content .= "[boring link stub for object of type $objectType]";
+    }
+
+    $content =~ s!&!&amp;!go;
+    $content =~ s!>!&gt;!go;
+    $content =~ s!<!&lt;!go;
 
     push(@atom, "<entry xml:base='$main::MINE_HTTP_FULLPATH'>\n");
     push(@atom, "<title>$title</title>\n");

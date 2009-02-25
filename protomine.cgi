@@ -516,9 +516,11 @@ sub do_remote_get {
 
 	    next unless ($o->matchInterestsBlob($ib));
 
-	    my $obj_link = $feedmk->spawnObject($o)->permalink;
+	    my $objmk = $feedmk->spawnObject($o);
+	    my $obj_permalink = $objmk->permalink;
+	    my $obj_submit_comment = $objmk->spawnSubmit->permalink;
 
-	    $page->add($o->toAtom($obj_link));
+	    $page->add($o->toAtom($obj_permalink, $obj_submit_comment));
 	}
 
 	$page->add("</feed>\n");
