@@ -423,23 +423,37 @@ sub toAtom {
 
     my $content;
 
-    $content = $objectDescription . "\n";
+    $content = $objectDescription . "<p/><hr/><p/>\n";
 
-    $content .= "<A HREF=\"$commentlink\">[link to submit feedback upon this object]</A><p/>\n";
+    $content .= qq(<A HREF="$commentlink">[submit feedback about this object]</A>\n);
 
     if ($objectType eq 'text/html') {
-	$content .= "[html content of object $oid]";
+	$content .= "[html content of object $oid]<p/>";
+	my $blob = $self->auxGetBlob;
+	$content .= $blob;
     }
     elsif ($objectType eq 'text/plain') {
-	$content .= "[html-escaped plain text content of object $oid]";
+	$content .= "[html-escaped plain text content of object $oid]<p/>";
+	my $blob = $self->auxGetBlob;
+	$blob =~ s!&!&amp;!go;
+	$blob =~ s!>!&gt;!go;
+	$blob =~ s!<!&lt;!go;
+	$content .= $blob;
     }
     elsif ($objectType =~ m!^image/(gif|png|jpeg)$!o) {
-	$content .= "[embed image for object of type $objectType]";
+	$content .= "[embed image for object of type $objectType]<p/>";
+	my $blob = qq(<img src="$permalink" alt="image of type $objectType" />);
+	$content .= $blob;
     }
     else {
-	$content .= "[boring link stub for object of type $objectType]";
+	$content .= "[boring link stub for object of type $objectType]<p/>";
+	my $blob = qq(<A HREF="$permalink">[click here for object of type $objectType]</A>);
+	$content .= $blob;
     }
 
+    $content .= "<p/>\n";
+
+    # hide the HTML from ATOM
     $content =~ s!&!&amp;!go;
     $content =~ s!>!&gt;!go;
     $content =~ s!<!&lt;!go;
