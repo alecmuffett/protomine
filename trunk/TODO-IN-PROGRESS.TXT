@@ -1,4 +1,25 @@
-random nonce in minekey
+make sure /pub and other directories are hung off home page.
+
+round out the UI pages, for comments, etc.
+
+splash page lists ten most recent accesses?
+
+control panel on splash page, more typical wireframes for relation management
+
+fuller auditing on a named-user basis for all retreivals
+
+add $depth to minekey and generator, must be >1 to be accessible
+
+rewrite minekey using r/w not read/post; shorter keys
+
+add crypto algorithm
+
+random nonce in feed minekeys? 
+
+need invariant GUID for ATOM; create GUID generator
+
+bust /get handler out to pm-get.pl
+
 
 ------------------------------------------------------------------
 
@@ -11,22 +32,7 @@ add allImplications() to Tag, doing a full tag expansion of implications
 
 ------------------------------------------------------------------
 
-make UI url space reflect minectl more closely
-
-------------------------------------------------------------------
-
 add access control for documents which are not public or final or draft
-
-------------------------------------------------------------------
-
-redo argument parsing for minectl
-
-	minectl [opts] command [cmdopts] arg ...
-	minectl upload -t "tags ..." -s status arg arg arg
-
-------------------------------------------------------------------
-
-break raw_action_table into chunks, install in relevant pm-* files
 
 ------------------------------------------------------------------
 
@@ -63,22 +69,9 @@ or maybe as getGUID method on each Object?
 
 ------------------------------------------------------------------
 
-minectl to have an option to abort-on-error
-
-------------------------------------------------------------------
-
 add caching to Thing->load ($self->{CACHE$ID}?) with appropriate purging
 
 ------------------------------------------------------------------
 
-use HTML::Template
-
-------------------------------------------------------------------
-
 create a perl output type for debugging?  :-)
-
-------------------------------------------------------------------
-
-mv the require JSON::XS into Page.pl
-
 

@@ -425,7 +425,7 @@ sub ui_list_relations {
 	     {
 		 NAME => $r->get('relationName'),
 		 DUMP => &dumpify($r->toDataStructure),
-		 LINKFEED => &get_permalink("read", $r),
+		 LINKFEED => MineKey->newFromRelation($r)->permalink,
 		 LINKREAD => "get-relation/$rid.html",
 		 LINKUPDATE => "update-relation/$rid.html",
 		 LINKDELETE => "delete-relation/$rid.html",

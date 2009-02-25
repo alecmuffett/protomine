@@ -22,6 +22,7 @@ use strict;
 use warnings;
 
 use JSON::XS;
+use Data::Dumper;
 use HTML::Template;
 
 # for the C-programmer in me, and you
@@ -35,6 +36,7 @@ my $DYNAMIC_PLAIN = 1;
 my $DYNAMIC_XML = 2;
 my $DYNAMIC_HTML = 3;
 my $DYNAMIC_JSON = 4;
+my $DYNAMIC_PERL = 5;		# not for public use
 
 ##################################################################
 
@@ -109,7 +111,7 @@ sub newDirectory {              # handler for real dirs, or those with 'index.ht
     return $p;
 }
 
-sub newHTML {                   # HTML page
+sub newHTML {                   # HTML page: DIFFERENT !!! HTML Constructor takes XBASE as 1st argument !!!
     my $class = shift;
     my $xbase = shift;
 
@@ -135,6 +137,13 @@ sub newXML {                    # XML page
 sub newJSON {                   # JSON page
     my $class = shift;
     my $p = $class->__new('application/json', $DYNAMIC_JSON);
+    $p->add(@_) if ($#_ >= 0);
+    return $p;
+}
+
+sub newPerl {                   # Perl page
+    my $class = shift;
+    my $p = $class->__new('text/plain', $DYNAMIC_PERL);
     $p->add(@_) if ($#_ >= 0);
     return $p;
 }
@@ -356,7 +365,6 @@ sub printUsing {
         $self->printBodyHTML($self->{DATA});
     }
     elsif ($self->{STYLE} == $DYNAMIC_JSON) {
-	my $json = new JSON::XS;
 	my $root;
 
 	if ($#{$self->{DATA}} == 0) {
@@ -365,7 +373,24 @@ sub printUsing {
 	else {
 	    $root = $self->{DATA};
 	}
+	my $json = new JSON::XS;
 	print $json->encode($root);
+	print "\n";
+    }
+    elsif ($self->{STYLE} == $DYNAMIC_PERL) {
+	my $root;
+
+	if ($#{$self->{DATA}} == 0) {
+	    $root = $self->{DATA}->[0];
+	}
+	else {
+	    $root = $self->{DATA};
+	}
+
+	my $d = Data::Dumper->new( [ $root ] );
+	$d->Purity(1);
+	$d->Indent(1);
+	print $d->Dump; 
 	print "\n";
     }
     else {
