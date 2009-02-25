@@ -421,11 +421,18 @@ sub toAtom {
     my $objectType = $self->get('objectType');
     my $objectDescription = $self->get('objectDescription');
 
-    my $content;
+    my $content = "";
 
-    $content = $objectDescription . "<p/><hr/><p/>\n";
+    # content format:
+    # feedback link
+    # object description
+    # rule
+    # object body
 
-    $content .= qq(<A HREF="$commentlink">[submit feedback about this object]</A>\n);
+    $content .= qq(<A HREF="$commentlink">[submit feedback about this object]</A><p/>\n);
+    $content .= qq(object $oid is of type $objectType and has the following description:<br/>\n);
+    $content .= $objectDescription;
+    $content .= "<p/>\n<hr/>\n<p/>\n";
 
     if ($objectType eq 'text/html') {
 	$content .= "[html content of object $oid]<p/>";
