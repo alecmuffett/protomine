@@ -428,10 +428,10 @@ sub toAtom {
     # rule
     # object body
 
-    my $content = qq(<em>details:</em> - <A HREF="$commentlink">[submit a comment]</A><br/>\n);
-    $content .= qq(<em>objectId:</em> $oid <br/>\n);
-    $content .= qq(<em>objectType</em> $objectType<br/>\n);
-    $content .= qq(<em>objectDescription</em><br/>\n);
+    my $content = qq(<A HREF="$commentlink">[submit a comment regarding this object]</A><br/>\n);
+    $content .= qq(objectId: $oid <br/>\n);
+    $content .= qq(objectType: $objectType<br/>\n);
+    $content .= qq(objectDescription:<br/>\n);
     $content .= $objectDescription;
     $content .= "<p/>\n<hr/>\n<p/>\n";
 
