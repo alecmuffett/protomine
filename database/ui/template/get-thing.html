@@ -1,29 +1,26 @@
 <TMPL_LOOP NAME="LOOP">
 <TMPL_VAR NAME="KEY">: <TMPL_VAR NAME="VALUE"><br/>
 </TMPL_LOOP>
+<TMPL_IF NAME="IS_OBJECT">
+<!-- begin object processing -->
 <p/>
 <hr/>
 <p/>
-<!-- i could nest these, but frankly it makes it unreadable, so let's assume they are mutex -->
-
 <TMPL_IF NAME="BODY_TEXT_PLAIN">
 <pre><TMPL_VAR NAME="BODY"></pre>
 </TMPL_IF>
-
 <TMPL_IF NAME="BODY_TEXT_HTML">
 <TMPL_VAR NAME="BODY">
 </TMPL_IF>
-
 <TMPL_IF NAME="BODY_IMAGE">
 <IMG SRC="<TMPL_VAR NAME=LINK ESCAPE=URL>" ALT="<TMPL_VAR NAME=LINK>">
 </TMPL_IF>
-
 <TMPL_IF NAME="BODY_VIDEO_FLASH">
 <A  HREF="<TMPL_VAR NAME=LINK ESCAPE=URL>">click here</A>
 </TMPL_IF>
-
 <TMPL_IF NAME="BODY_OTHER">
 <A  HREF="<TMPL_VAR NAME=LINK ESCAPE=URL>">click here</A>
 </TMPL_IF>
-
 <p/>
+<!-- end object processing -->
+</TMPL_IF>

@@ -288,8 +288,22 @@ sub ui_read_object_oid {
     my ($ctx, $info, $phr, $oid) = @_;
     my $hashref = &api_read_oid($ctx, $info, $phr, $oid);
     my $p = Page->newHTML("ui/");
+
+    my $body;
+    my $link;
+    my $selector;
+
+    $body = "foo";
+    $link = "/bar/";
+    $selector = "BODY_TEXT_PLAIN";
+
     $p->addFileTemplate('template/get-thing.html',
-			&loopify($hashref, ROOT => 'object'));
+			&loopify($hashref, 
+				 ROOT => 'object',
+				 IS_OBJECT => 1,
+				 BODY => $body,
+				 LINK => $link,
+				 $selector, 1));
     return $p;
 }
 
