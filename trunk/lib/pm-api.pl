@@ -127,6 +127,10 @@ sub api_create_object {
     foreach my $key (@import_list) {
 	my $value = $q->param($key);
 
+	if (($key eq 'objectType') and ($value !~ m!^\w+/\w!o)) {
+	    $value = &main::mime_type($value);
+	}
+
 	if (defined($value)) {
 	    $o->set($key, $value);
 	}
