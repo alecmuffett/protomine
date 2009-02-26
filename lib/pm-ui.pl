@@ -70,7 +70,7 @@ sub dumpify {
     my $hashref = shift;
     my %opts = @_;
 
-    # if the actual data structure is rooted in a leaf
+    # if the actual data structure is rooted in a element of the hash
     if (defined($opts{'ROOT'})) {
 	$hashref = $hashref->{$opts{'ROOT'}};
     }
@@ -87,11 +87,30 @@ sub dumpify {
     return \@vector;
 }
 
+sub statusify {
+    my $hashref = shift;
+    my %opts = @_;
+
+    if (defined($opts{'ROOT'})) {
+	$hashref = $hashref->{$opts{'ROOT'}};
+    }
+
+    die "statusify: undef hashref\n" unless (defined($hashref));
+
+    my $retval = {};
+
+    $retval->{RETURN} = $opts{RETURN};
+    $retval->{NAME} = $opts{'NAME'};
+    $retval->{STATUS} = $hashref->{$retval->{NAME}};
+
+    return $retval;
+}
+
 sub loopify {
     my $hashref = shift;
     my %opts = @_;
 
-    # if the actual data structure is rooted in a leaf
+    # if the actual data structure is rooted in a element of the hash
     if (defined($opts{'ROOT'})) {
 	$hashref = $hashref->{$opts{'ROOT'}};
     }
@@ -117,26 +136,10 @@ sub loopify {
 	push(@vector, $element);
     }
 
-    return { LOOP => \@vector };
-}
-
-sub statusify {
-    my $hashref = shift;
-    my %opts = @_;
-
-    if (defined($opts{'ROOT'})) {
-	$hashref = $hashref->{$opts{'ROOT'}};
-    }
-
-    die "statusify: undef hashref\n" unless (defined($hashref));
-
-    my $retval = {};
-
-    $retval->{RETURN} = $opts{RETURN};
-    $retval->{NAME} = $opts{'NAME'};
-    $retval->{STATUS} = $hashref->{$retval->{NAME}};
-
-    return $retval;
+    my @tmpl_list = ( LOOP => \@vector );
+    push(@tmpl_list, @{$opts{'EXTRA'}}) if (defined($opts{'EXTRA'}));
+    my %tmpl_hash = @tmpl_list;
+    return \%tmpl_hash;
 }
 
 ##################################################################
@@ -300,10 +303,10 @@ sub ui_read_object_oid {
     $p->addFileTemplate('template/get-thing.html',
 			&loopify($hashref, 
 				 ROOT => 'object',
-				 IS_OBJECT => 1,
-				 BODY => $body,
-				 LINK => $link,
-				 $selector, 1));
+				 EXTRA => [ IS_OBJECT => 1,
+					    BODY => $body,
+					    LINK => $link,
+					    $selector, 1 ]));
     return $p;
 }
 
