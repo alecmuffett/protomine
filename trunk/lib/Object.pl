@@ -405,22 +405,15 @@ sub toAtom {
     # fake something up.
 
     my $rid = shift;            # on behalf of whom this is being prepared
-
     my $oid = $self->id;        # the object number
-
     my @atom;                   # where the results are stored
 
     my $title = $self->get('objectName') || "(title undefined)";
-
     my $id = $permalink;        # this needs to be generated/permanent?
-
     my $updated = &main::atom_format($self->lastModified);
-
     my $summary = $self->get('objectDescription') || "(summary undefined)";
-
     my $objectType = $self->get('objectType');
     my $objectDescription = $self->get('objectDescription');
-
 
     # content format:
     # feedback link
@@ -448,11 +441,11 @@ sub toAtom {
 	$content .= $blob;
     }
     elsif ($objectType =~ m!^image/(gif|png|jpeg)$!o) {
-	my $blob = qq(<img src="$permalink" alt="image of type $objectType" />);
+	my $blob = qq(<img src="$permalink" alt="image" />);
 	$content .= $blob;
     }
     else {
-	my $blob = qq(<A HREF="$permalink">[click here to access object of type $objectType]</A>);
+	my $blob = qq(<A HREF="$permalink">$title</A>);
 	$content .= $blob;
     }
 

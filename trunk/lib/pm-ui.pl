@@ -295,10 +295,29 @@ sub ui_read_object_oid {
     my $body;
     my $link;
     my $selector;
+    my $type = $hashref->{object}->{objectType};
 
-    $body = "foo";
-    $link = "/bar/";
-    $selector = "BODY_TEXT_PLAIN";
+    $link = "../api/object/$oid"; # invariant
+
+    if ($type eq 'text/plain') {
+	$selector = 'BODY_TEXT_PLAIN';
+	$body = Object->new($oid)->auxGetBlob;
+	$body =~ s!&!&amp;!go;
+	$body =~ s!>!&gt;!go;
+	$body =~ s!<!&lt;!go;
+    }
+    elsif ($type eq 'text/html') {
+	$selector = 'BODY_TEXT_HTML';
+	$body = Object->new($oid)->auxGetBlob;
+    }
+    elsif ($type =~ m!^image/(gif|png|jpeg)$!o) {
+	$selector = 'BODY_TEXT_PLAIN';
+	$body = $hashref->{object}->{objectName} || "unnamed image";
+    }
+    else {
+	$selector = 'BODY_OTHER';
+	$body = $hashref->{object}->{objectName} || "unnamed object";
+    }
 
     $p->addFileTemplate('template/get-thing.html',
 			&loopify($hashref, 
