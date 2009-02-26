@@ -317,6 +317,7 @@ sub ui_read_object_oid {
     else {
 	$selector = 'BODY_OTHER';
 	$body = $hashref->{object}->{objectName} || "unnamed object";
+	$body .= "(don't know how to embed object where objectType = '$type')"
     }
 
     $p->addFileTemplate('template/get-thing.html',
