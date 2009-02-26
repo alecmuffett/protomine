@@ -494,7 +494,7 @@ sub do_remote_get {
 	my $feed_mk = MineKey->newFromRelation($r);
 	my $feed_link = $feed_mk->permalink;
 	my $feed_updated = &atom_format(time);
-	my $feed_author_name = $feed_owner;
+	my $feed_author_name = "some.body";
 	my $feed_id = $feed_link;
 
 	$page->add("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
