@@ -437,12 +437,29 @@ sub do_remote_get {
     my $key = $q->param('key');
 
     # decrypt the key
-    my $reqmk = MineKey->newFromEncoded($key);
+    my $req_mk = MineKey->newFromEncoded($key);
+
+    # check for posting
+    if ($req_mk->{method} == 1) {
+	die "posting not supported yet, sorry";
+    }
+
+    # check the request depth
+    unless ($req_mk->{depth} > 0) {
+	die "do_remote_get: you've strayed too far from your feed\n";
+    }
 
     # load the relation
-    my $r = Relation->new($reqmk->{rid}); # will abort if not exist; better log security exception
+    my $r = Relation->new($req_mk->{rid}); # will abort if not exist; better log security exception
 
-    # check the relationship validity: embargoes
+    # check the relationship validity: relation version
+    unless ($r->relationVersion eq $req_mk->{rvsn}) {		    
+	my $reqrv = $req_mk->{rvsn};
+	my $currv = $r->relationVersion;
+	die "do_remote_get: security bad rvsn $key; cur=$currv req=$reqrv\n";
+    }
+
+    # check the relationship validity: embargos
     # XXX TBD
 
     # check the relationship validity: ip address
@@ -451,51 +468,31 @@ sub do_remote_get {
     # check the relationship validity: time of day
     # XXX TBD
 
-    # check the relationship validity: relation version
-    unless ($r->relationVersion eq $reqmk->{rvsn}) {		    
-	my $reqrv = $reqmk->{rvsn};
-	my $currv = $r->relationVersion;
-	die "do_remote_get: security bad rvsn $key; cur=$currv req=$reqrv\n";
-    }
-
-    # check the request depth
-    unless ($reqmk->{depth} > 0) {
-	die "do_remote_get: you've strayed too far from your feed\n";
-    }
-
     # get his interests blob
     my $ib = $r->getInterestsBlob;
 
     # analyse the request
-
-    if ($reqmk->{oid} > 0) {		    # it's an object-get 
+    if ($req_mk->{oid} > 0) {		    # it's an object-get 
 	# pull in the object metadata
-	my $o = Object->new($reqmk->{oid}) ; # will abort if not exist
+	my $o = Object->new($req_mk->{oid}) ; # will abort if not exist
 
 	# check if the object wants to be seen by him
 	unless ($o->matchInterestsBlob($ib)) {
-	    die "do_remote_get: bad object-get oid=$reqmk->{oid} rid=$reqmk->{rid} failed matchInterestsBlob\n";
+	    die "do_remote_get: bad object-get oid=$req_mk->{oid} rid=$req_mk->{rid} failed matchInterestsBlob\n";
 	}
 
 	# HOOK THE REWRITER IN HERE FOR HTML AND XML OBJECTS
 
 	# punt to api_read_aux_oid
-	return &api_read_aux_oid($ctx, $info, $phr, $reqmk->{oid});
+	return &api_read_aux_oid($ctx, $info, $phr, $req_mk->{oid});
     }
-    elsif ($reqmk->{oid} == 0) {		# it's a feed-get
+    elsif ($req_mk->{oid} == 0) {		# it's a feed-get
 	my $page = Page->newAtom;
 
-	my $feed_owner = "alec";
 
-	my $feed_title = 
-	    sprintf "%s's feed for %s (%s)", 
-	    $feed_owner,
-	    $r->name, 
-	    $r->get('relationInterests');
-
-	my $feedmk = MineKey->newFromRelation($r);
-
-	my $feed_link = $feedmk->permalink;
+	my $feed_title = sprintf "feed for %s (%s)", $r->name, $r->get('relationInterests');
+	my $feed_mk = MineKey->newFromRelation($r);
+	my $feed_link = $feed_mk->permalink;
 	my $feed_updated = &atom_format(time);
 	my $feed_author_name = $feed_owner;
 	my $feed_id = $feed_link;
@@ -516,9 +513,9 @@ sub do_remote_get {
 
 	    next unless ($o->matchInterestsBlob($ib));
 
-	    my $objmk = $feedmk->spawnObject($o);
-	    my $obj_permalink = $objmk->permalink;
-	    my $obj_submit_comment = $objmk->spawnSubmit->permalink;
+	    my $obj_mk = $feed_mk->spawnObject($o);
+	    my $obj_permalink = $obj_mk->permalink;
+	    my $obj_submit_comment = $obj_mk->spawnSubmit->permalink;
 
 	    $page->add($o->toAtom($obj_permalink, $obj_submit_comment));
 	}
