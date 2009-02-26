@@ -149,7 +149,10 @@ sub auxGetBlob {
 sub set {
     my ($self, $key, $value) = @_;
 
-    if ($key eq 'objectTags') {
+    if (($key eq 'objectType') and ($value !~ m!^\w+/\w!o)) {
+	$value = &main::mime_type($value);
+    }
+    elsif ($key eq 'objectTags') {
 	my @srcs = split(" ", $value);
 	my @dsts;
 
@@ -192,6 +195,7 @@ sub set {
 	}
 	$value = join(" ", @dsts);
     }
+
     return $self->SUPER::set($key, $value);
 }
 
