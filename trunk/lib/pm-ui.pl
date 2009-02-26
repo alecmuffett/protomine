@@ -311,7 +311,7 @@ sub ui_read_object_oid {
 	$body = Object->new($oid)->auxGetBlob;
     }
     elsif ($type =~ m!^image/(gif|png|jpeg)$!o) {
-	$selector = 'BODY_TEXT_PLAIN';
+	$selector = 'BODY_IMAGE';
 	$body = $hashref->{object}->{objectName} || "unnamed image";
     }
     else {
