@@ -441,7 +441,7 @@ sub do_remote_get {
 
     # check for posting
     if ($req_mk->{method} == 1) {
-	die "posting not supported yet, sorry";
+	die "cannot submit POST mine key via a GET method\n";
     }
 
     # check the request depth

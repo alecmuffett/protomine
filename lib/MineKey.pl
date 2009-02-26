@@ -64,29 +64,37 @@ sub new {
 sub validate {
     my ($self, $diag) = @_;
 
+    my $field;
+
     # validate allows depth=0, you need to test that elsewhere
 
-    unless ($self->{keyversion} == 1) {
-	die "validate($diag): bad keyversion $self->{keyversion}\n";
-    }
-    unless (($self->{method} >= 0) and ($self->{method} <= 1)) {
-	die "validate($diag): bad method $self->{method}\n";
-    }
-    unless ($self->{depth} >= 0) {
-	die "validate($diag): bad depth $self->{depth}\n";
-    }
-    unless ($self->{rid} > 0) {
-	die "validate($diag): bad rid $self->{rid}\n";
-    }
-    unless ($self->{rvsn} > 0) {
-	die "validate($diag): bad rvsn $self->{rvsn}\n";
-    }
-    unless ($self->{oid} >= 0) {
-	die "validate($diag): bad oid $self->{oid}\n";
-    }
-    unless ($self->{opt} >= 0) {
-	die "validate($diag): bad opt $self->{opt}\n";
-    }
+    $field = $self->{keyversion};
+    die "validate($diag): bad keyversion $field\n"
+	unless (($field =~ m!^\d+$!o) and ($field == 1));
+
+    $field = $self->{method};
+    die "validate($diag): bad method $field\n"
+	unless (($field =~ m!^\d+$!o) and ($field >= 0) and ($field <= 1));
+
+    $field = $self->{depth};
+    die "validate($diag): bad depth $field\n"
+	unless (($field =~ m!^\d+$!o) and ($field >= 0));
+
+    $field = $self->{rid};
+    die "validate($diag): bad rid $field\n"
+	unless (($field =~ m!^\d+$!o) and ($field > 0));
+
+    $field = $self->{rvsn};
+    die "validate($diag): bad rvsn $field\n"
+	unless (($field =~ m!^\d+$!o) and ($field > 0));
+
+    $field = $self->{oid};
+    die "validate($diag): bad oid $field\n"
+	unless (($field =~ m!^\d+$!o) and ($field >= 0));
+
+    $field = $self->{opt};
+    die "validate($diag): bad opt $field\n"
+	unless (($field =~ m!^\d+$!o) and ($field >= 0));
 }
 
 ##################################################################
@@ -101,8 +109,9 @@ sub newFromEncoded {
     my ($csum, $minekey) = split(/,/, $plaintext, 2);
 
     # first check pre-parse
-    my $check1 = Crypto->hashify($minekey);
-    die "newFromEncoded($ciphertext): security pre-parse checksum failed\n" if ($check1 != $csum);
+    my $computed = Crypto->hashify($minekey);
+    die "newFromEncoded($ciphertext): security pre-parse checksum not numeric\n" if ($csum !~ m!^\d+$!o);
+    die "newFromEncoded($ciphertext): security pre-parse checksum failed\n" if ($computed != $csum);
 
     # the parse
     my ($cookie, $keyversion, $method, $depth, $rid, $rvsn, $oid, $opt) = split(/,/, $minekey);
@@ -123,11 +132,11 @@ sub newFromEncoded {
 sub newFromRelation {
     my ($class, $r) = @_;
 
-    my $depth = 3;		# HARDCODED !!!
+    my $depth = 3;              # HARDCODED !!!
 
     return $class->new(0,
 		       $depth,
-		       $r->id,		  
+		       $r->id,
 		       $r->relationVersion,
 		       0,
 		       0);
@@ -178,12 +187,12 @@ sub spawnOid {
     my $self = shift;
     my $oid = shift;
 
-    return MineKey->new(0,		    # get
+    return MineKey->new(0,                  # get
 			$self->{depth} - 1, # decrement
-			$self->{rid},	    # inherit
-			$self->{rvsn},	    # inherit
-			$oid,		    # argument
-			0);		    # empty
+			$self->{rid},       # inherit
+			$self->{rvsn},      # inherit
+			$oid,               # argument
+			0);                 # empty
 }
 
 sub spawnObject {
@@ -195,12 +204,12 @@ sub spawnObject {
 sub spawnSubmit {
     my $self = shift;
 
-    return MineKey->new(1,		    # post
+    return MineKey->new(1,                  # post
 			$self->{depth} - 1, # decrement
-			$self->{rid},	    # inherit
-			$self->{rvsn},	    # inherit
-			$self->{oid},	    # inherit
-			0);		    # empty
+			$self->{rid},       # inherit
+			$self->{rvsn},      # inherit
+			$self->{oid},       # inherit
+			0);                 # empty
 }
 
 ##################################################################
