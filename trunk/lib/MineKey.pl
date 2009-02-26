@@ -110,18 +110,21 @@ sub newFromEncoded {
 
     # first check pre-parse
     my $computed = Crypto->hashify($minekey);
-    die "newFromEncoded($ciphertext): security pre-parse checksum not numeric\n" if ($csum !~ m!^\d+$!o);
-    die "newFromEncoded($ciphertext): security pre-parse checksum failed\n" if ($computed != $csum);
+    die "newFromEncoded: security pre-parse checksum not numeric\n" if ($csum !~ m!^\d+$!o);
+    die "newFromEncoded: security pre-parse checksum failed\n" if ($computed != $csum);
 
     # the parse
     my ($cookie, $keyversion, $method, $depth, $rid, $rvsn, $oid, $opt) = split(/,/, $minekey);
 
-    # check the field that validate does not cover
-    die "newFromEncoded($ciphertext): security bad cookie in $plaintext\n" unless ($cookie eq 'mine');
+    # check that it's a mine key
+    die "newFromEncoded: security bad cookie in $plaintext\n" unless ($cookie eq 'mine');
 
-    # the reconstruct
-    my $check2 = Crypto->hashify("mine,$keyversion,$method,$depth,$rid,$rvsn,$oid,$opt");
-    die "newFromEncoded($ciphertext): security post-parse checksum failed\n" if ($check2 != $csum);
+    # check that it is version 1
+    die "newFromEncoded: security bad keyversion in $plaintext\n" unless ($keyversion == 1);
+
+    # check the reconstruct (defeats trimming bugs)
+    my $computed2 = Crypto->hashify("mine,$keyversion,$method,$depth,$rid,$rvsn,$oid,$opt");
+    die "newFromEncoded: security post-parse checksum failed\n" if ($computed2 != $csum);
 
     # the instantition (will reflash keyversion to current)
     return $class->new($method, $depth, $rid, $rvsn, $oid, $opt);

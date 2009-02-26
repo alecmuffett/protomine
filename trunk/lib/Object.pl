@@ -428,9 +428,10 @@ sub toAtom {
     # rule
     # object body
 
-    my $content = qq(<A HREF="$commentlink">[submit a comment regarding this object]</A><br/>\n);
+    my $content = "";
     $content .= qq(objectId: $oid <br/>\n);
     $content .= qq(objectType: $objectType<br/>\n);
+    $content .= qq(<A HREF="$commentlink">[submit a response regarding this object]</A><p/>\n);
     $content .= qq(objectDescription:<br/>\n);
     $content .= $objectDescription;
     $content .= "<p/>\n<hr/>\n<p/>\n";
