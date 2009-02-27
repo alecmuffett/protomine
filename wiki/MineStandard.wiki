@@ -41,14 +41,18 @@ Separate mines _must_ have separate global crypto keys for separate minekey prot
 
 The data it stores _should_ be under the user's physical control, or otherwise somehow kept beyond seizure.
 
+== Control of Data in Motion ==
+
+All user access to/from a Mine _must_ be authenticated, eg: passworded; this includes browser, uploader, scraper and backup applications.
+
+All data shared from a Mine to mine-subscribers, ie: feeds, _must_ be authenticated by MineKey.
+
 == Secrecy of Data at Rest ==
 
 All data stored in a Mine _must_ be private to the owner, unless the owner elects to share items to mine-subscribers.
 
 == Secrecy of Data in Motion ==
 
-All user access to/from a Mine _must_ be authenticated (eg: password) and encrypted (eg: SSL); this includes browser, uploader, scraper and backup applications.
+All user access to/from a Mine _must_ be encrypted (eg: SSL); this includes browser, uploader, scraper and backup applications.
 
-All data shared from a Mine to mine-subscribers (eg: feeds) _should_ be encrypted (eg: SSL).
-
-
+All data shared from a Mine to mine-subscribers, ie: feeds, _should_ be encrypted (eg: SSL). We expect this requirement to become a "_must_" by 2012.
