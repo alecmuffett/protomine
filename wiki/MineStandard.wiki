@@ -2,12 +2,53 @@
 
 = Introduction =
 
-Add your content here.
+A first stab at a list of structural and technical qualities that are necessary for a Mine to be called a Mine.
+
+= Mine Technical Requirements =
+
+== A Mine exists for the benefit of its owner, aka: user ==
+
+Rule zero.
+
+== If it's not yours, it's not a Mine ==
+
+This is the guiding principle of a Mine; a user's Mine _must_ be under his control for creation, reading, updating, deleting (in part or entirety), duplication, and access-management.  
+
+== The Mine root URL must be user-distinct ==
+
+Any given Mine _must_ have a distinct "root" URL to separate it from the mines of other users; eg: where _alec_ represents an individual user...
+
+  # GOOD 
+  * http://alec.domain.com/ 
+  * http://alec.domain.com/mine/ 
+  * http://www.alec.com/ 
+  * http://www.alec.com/mine/
+  * http://www.domain.com/alec/ 
+  * http://www.domain.com/alec/mine/ 
+  * http://www.domain.com/mine/alec/ 
+
+  # BAD
+  * http://www.domain.com/
+  * http://www.domain.com/mine/
+  * http://www.domain.com/mine/?user=alec
+  * _anything involving cookies for identity_
+
+== Mine Key Separation ==
+
+Separate mines _must_ have separate global crypto keys for separate minekey protection.
+
+== Control of Data at Rest ==
+
+The data it stores _should_ be under the user's physical control, or otherwise somehow kept beyond seizure.
+
+== Secrecy of Data at Rest ==
+
+All data stored in a Mine _must_ be private to the owner, unless the owner elects to share items to mine-subscribers.
+
+== Secrecy of Data in Motion ==
+
+All user access to/from a Mine _must_ be authenticated (eg: password) and encrypted (eg: SSL); this includes browser, uploader, scraper and backup applications.
+
+All data shared from a Mine to mine-subscribers (eg: feeds) _should_ be encrypted (eg: SSL).
 
 
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
