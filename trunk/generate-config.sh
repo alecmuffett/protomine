@@ -22,18 +22,24 @@ cd $thisdir
 
 thisdir=`pwd`
 
-http_server="http://127.0.0.1"
+if [ "x$mine_server" = x ]
+then
+    mine_server="http://127.0.0.1"
+fi
 
-http_path="/~$USER/mine" # no trailing slash
+if [ "x$mine_path" = x ]
+then
+    mine_path="/~$USER/mine" # no trailing slash
+fi
 
 cat <<EOF
 #!/usr/bin/perl
 
 # important: unambiguous, fully qualified hostname
-\$main::MINE_HTTP_SERVER     = "$http_server";
+\$main::MINE_HTTP_SERVER     = "$mine_server";
 
 # important: no trailing slash on this URL
-\$main::MINE_HTTP_PATH       = "$http_path";
+\$main::MINE_HTTP_PATH       = "$mine_path";
 
 # path to the mine installation directory
 \$main::MINE_DIRECTORY       = "$thisdir";
