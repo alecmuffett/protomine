@@ -1,3 +1,7 @@
+fast tag creation dialogue
+fast text-object creation dialogue
+
+
 make sure /pub and other directories are hung off home page.
 
 round out the UI pages, for comments, etc.
