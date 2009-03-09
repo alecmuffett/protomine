@@ -42,7 +42,7 @@ my %FLAGDESC = (
     j => '# JSON output, if possible',
     q => '# do NOT quit upon curl returning an error code',
     t => '# TEXT output, if possible (currently gets XML as text/plain)',
-    u => '[username:password] # use curl with digest authentication',
+    u => '[username:password] # authentication',
     v => '# verbose; -vv, -vvv = more verbose',
     );
 
@@ -50,6 +50,8 @@ my %FLAG;
 
 while ($ARGV[0] =~ m!^-(\w+)!o) {
     my $switches = $1;
+
+    warn "@ARGV\n";
 
     foreach my $switch (split(//o, $switches)) {
 	if ($switch eq 'v') {
@@ -74,7 +76,8 @@ while ($ARGV[0] =~ m!^-(\w+)!o) {
 	    $FLAG{'curlerrs'} = 1;
 	}
 	elsif ($switch eq 'u') {
-	    $FLAG{'userpass'} = shift(@ARGV);
+	    shift(@ARGV); # dump the -u
+	    $FLAG{'userpass'} = $ARGV[0];
 	}
 	else {
 	    die "$0: unknown option $switch (fatal)\n";
@@ -99,9 +102,8 @@ unless ($FLAG{'curlerrs'}) {
 
 if ($FLAG{'userpass'}) {
     # curl user and pw for authentication
-    push(@curlopts, '--user', FLAG{'userpass'});
-    # curl http digest authentication
-    push(@curlopts, '--digest');
+    push(@curlopts, '--user', $FLAG{'userpass'});
+    push(@curlopts, '--basic');
 }
 
 # verbal way to request help
