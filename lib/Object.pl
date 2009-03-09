@@ -261,7 +261,7 @@ sub matchInterestsBlob {
 
     # draft object -> fast fail
     if ($status eq 'draft') {
-	warn "FAIL: oid=$oid/rid=$rid object is draft/private\n" if ($mdebug & 0x01);
+	Log->msg("FAIL: oid=$oid/rid=$rid object is draft/private\n") if ($mdebug & 0x01);
 	return 0;
     }
 
@@ -274,7 +274,7 @@ sub matchInterestsBlob {
     # THIS CODE RESCINDED SINCE REWRITING AND DEPTH PERMITS ACCESS ON PUBLIC OBJECTS
     # no tags -> fast fail
     # unless (defined($rawtags)) {
-    #	warn "FAIL: oid=$oid/rid=$rid object has no tags\n" if ($mdebug & 0x01);
+    #	Log->msg("FAIL: oid=$oid/rid=$rid object has no tags\n") if ($mdebug & 0x01);
     #	return 0;
     # }
 
@@ -285,7 +285,7 @@ sub matchInterestsBlob {
     # first sweep: fail fast if "not:RELATION"
     foreach $tag (@tags) {
 	if ($tag eq "r-$rid") { # is marked not:RELATION
-	    warn "FAIL: oid=$oid/rid=$rid object is marked not:$rid\n" if ($mdebug & 0x01);
+	    Log->msg("FAIL: oid=$oid/rid=$rid object is marked not:$rid\n") if ($mdebug & 0x01);
 	    return 0;
 	}
     }
@@ -294,7 +294,7 @@ sub matchInterestsBlob {
 
     foreach $tag (@tags) {
 	if ($tag eq "r+$rid") { # is marked for:RELATION
-	    warn "PASS: oid=$oid/rid=$rid object is marked for:$rid\n" if ($mdebug & 0x02);
+	    Log->msg("PASS: oid=$oid/rid=$rid object is marked for:$rid\n") if ($mdebug & 0x02);
 	    return 1;
 	}
     }
@@ -355,7 +355,7 @@ sub matchInterestsBlob {
 
     foreach $tag (@expanded_tags) {
 	if ($user_excepts{$tag}) {
-	    warn "FAIL: oid=$oid/rid=$rid relation marked as except:$tag (in: @expanded_tags)\n" if ($mdebug & 0x01);
+	    Log->msg("FAIL: oid=$oid/rid=$rid relation marked as except:$tag (in: @expanded_tags)\n") if ($mdebug & 0x01);
 	    return 0;
 	}
     }
@@ -368,7 +368,7 @@ sub matchInterestsBlob {
 
     foreach my $user_requirement (@{$iblob->{require}}) {
 	unless (grep { $_ eq $user_requirement } @expanded_tags) {
-	    warn "FAIL: oid=$oid/rid=$rid object fails require:$user_requirement (in: @expanded_tags)\n" if ($mdebug & 0x01);
+	    Log->msg("FAIL: oid=$oid/rid=$rid object fails require:$user_requirement (in: @expanded_tags)\n") if ($mdebug & 0x01);
 	    return 0;
 	}
 
@@ -379,7 +379,7 @@ sub matchInterestsBlob {
     # there are more than zero) have been met
 
     if ($reqctr) {
-	warn "PASS: oid=$oid/rid=$rid object satisfies all require: tags (in: @expanded_tags)\n" if ($mdebug & 0x02);
+	Log->msg("PASS: oid=$oid/rid=$rid object satisfies all require: tags (in: @expanded_tags)\n") if ($mdebug & 0x02);
 	return 2;
     }
 
@@ -389,13 +389,13 @@ sub matchInterestsBlob {
     foreach my $interest (@{$iblob->{interests}}) {
 
 	if (grep { $_ eq $interest } @expanded_tags) {
-	    warn "PASS: oid=$oid/rid=$rid object $oid overlaps relation's interests (in: @expanded_tags)\n" if ($mdebug & 0x02);
+	    Log->msg("PASS: oid=$oid/rid=$rid object $oid overlaps relation's interests (in: @expanded_tags)\n") if ($mdebug & 0x02);
 	    return 3;
 	}
     }
 
     # we didnae find reason to share this one
-    warn "FAIL: oid=$oid/rid=$rid relation not interested in object\n" if ($mdebug & 0x01);
+    Log->msg("FAIL: oid=$oid/rid=$rid relation not interested in object\n") if ($mdebug & 0x01);
 
     return 0;
 }
