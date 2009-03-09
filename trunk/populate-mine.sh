@@ -79,7 +79,7 @@ $minectl new-tags \
 ###
 # upload a batch of objects without individual tagging
 
-$minectl upload $SAMPLES/* # wasn't that easy?
+$minectl upload -s public $SAMPLES/* # wasn't that easy?
 
 ###
 # set up some relations
@@ -94,7 +94,7 @@ $minectl new-relation perry 1 "Perry de Havilland" food drink except:white-wine
 # highly verbose special cases for tag testing
 while read file tags
 do
-    $minectl upload -t "$tags" $SAMPLES/$file
+    $minectl upload -s public -t "$tags" $SAMPLES/$file
 done <<EOF
 adriana.jpg themineproject
 alecm.png themineproject
