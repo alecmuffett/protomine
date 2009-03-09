@@ -67,7 +67,8 @@ sub do_remote_get {
 	my $o = Object->new($req_mk->{oid}) ; # will abort if not exist
 
 	# check if the object wants to be seen by him
-	unless ($o->matchInterestsBlob($ib)) {
+	# FALLTHRU PASS ON THIS, AS IS OBJECT-GET
+	unless ($o->matchInterestsBlob($ib, 1)) {
 	    die "do_remote_get: bad object-get oid=$req_mk->{oid} rid=$req_mk->{rid} failed matchInterestsBlob\n";
 	}
 
@@ -105,7 +106,8 @@ sub do_remote_get {
 	foreach my $oid (Object->list) {
 	    my $o = Object->new($oid);
 
-	    next unless ($o->matchInterestsBlob($ib));
+	    # FALLTHRU-FAIL ON THIS, AS IS FILTER
+	    next unless ($o->matchInterestsBlob($ib, 0));
 
 	    my $obj_mk = $feed_mk->spawnObject($o);
 
