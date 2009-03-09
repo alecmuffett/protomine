@@ -94,6 +94,26 @@ __END__;
 ' <hr/>
 ' <p/>
 
+: quick start
+' <form method="post" enctype="multipart/form-data" action="create-object.html">
+' <em>Title</em> <br/> <input type="text" size="40" name="objectName" value=""/> <p/>
+' <em>Content</em> <br/> <textarea cols="40" rows="12" name="data" value=""></textarea> <p/>
+' <em>Summary</em> <br/> <textarea cols="40" rows="1" name="objectDescription" value=""></textarea> <p/>
+' <em>Tags</em> <br/> <input type="text" size="40" name="objectTags" value=""/> <p/>
+' <em>Status</em><br/>
+' <input type="radio" name="objectStatus" value="draft"/ checked> draft
+' <input type="radio" name="objectStatus" value="final"/> final
+' <input type="radio" name="objectStatus" value="public"/> public
+' <p/>
+' <input type="hidden" name="objectType" value="text/html" />
+' <input type="submit" value="submit"/> <input type="reset" value="reset"/> 
+' </form>
+-
+
+' <p/>
+' <hr/>
+' <p/>
+
 : the mine! project
 . http://themineproject.org/index.php/about/ about
 . http://themineproject.org/ home page and blog

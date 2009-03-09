@@ -135,12 +135,21 @@ sub api_create_object {
     my $oid = $o->save;         # now it is in the database
 
     # install that which is uploaded
-    if (defined($q->param('data'))) {
+
+    my $dataparam = $q->param('data');
+    if (defined($dataparam)) {
+
+	# see if it's an upload
 	my $fh = $q->upload('data');
-	unless (defined($fh)) {
-	    die "api_create_object: bad fh passed back from cgi";
+
+	if (defined($fh)) {
+	    # there is a FH, so go with that
+	    $o->auxPutFH($fh);
 	}
-	$o->auxPutFH($fh);
+	else { 
+	    # assume parameter put
+	    $o->auxPutBlob($dataparam);
+	}
     }
 
     return { objectId => $oid };
@@ -477,9 +486,9 @@ sub api_delete_key_tid_key {
 push (@raw_action_list, [ '/api/version.FMT', 'READ', \&do_fmt, 'FMT', \&api_version ]);
 sub api_version {
     my ($ctx, $info, $phr) = @_;
-    return { 
+    return {
 	version =>
-	{ 
+	{
 	    software => 'protomine', # this software
 	    revision => '140',	 # software revision (use SVN number?)
 	    api => '1.100',	 # api revision
