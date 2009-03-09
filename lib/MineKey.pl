@@ -186,7 +186,7 @@ sub readable {
 		   $self->{keyversion},
 		   ($self->{method} == 0) ? "get" : "post",
 		   $self->{depth},
-		   Relation($self->{rid})->name,
+		   Relation->new($self->{rid})->name,
 		   $self->{rvsn},
 		   $self->{oid},
 		   $self->{opt});
