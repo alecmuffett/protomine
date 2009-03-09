@@ -215,6 +215,13 @@ sub spawnSubmit {
 			0);                 # empty
 }
 
+sub rewrite {
+    my ($self, $line) = @_;
+    1 while ($line =~ s!(SRC|HREF)\s*=\s*(['"]?(\d+)['"]?)!"$1='".$self->spawnOid($3)->permalink."'" !goie);
+
+    return $line;
+}
+
 ##################################################################
 
 1;

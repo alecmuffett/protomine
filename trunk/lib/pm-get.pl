@@ -71,10 +71,14 @@ sub do_remote_get {
 	    die "do_remote_get: bad object-get oid=$req_mk->{oid} rid=$req_mk->{rid} failed matchInterestsBlob\n";
 	}
 
-	# HOOK THE REWRITER IN HERE FOR HTML AND XML OBJECTS
+	my $otype = $o->get('objectType');
 
-	# punt to api_read_aux_oid
-	return &api_read_aux_oid($ctx, $info, $phr, $req_mk->{oid});
+	if ($otype eq 'text/html') {
+	    return Page->newFileRewrite($req_mk, $o->auxGetFile, $o->get('objectType'));
+	}
+	else {
+	    return Page->newFile($o->auxGetFile, $o->get('objectType'));
+	}
     }
     elsif ($req_mk->{oid} == 0) {		# it's a feed-get
 	my $page = Page->newAtom;
@@ -104,10 +108,8 @@ sub do_remote_get {
 	    next unless ($o->matchInterestsBlob($ib));
 
 	    my $obj_mk = $feed_mk->spawnObject($o);
-	    my $obj_permalink = $obj_mk->permalink;
-	    my $obj_submit_comment = $obj_mk->spawnSubmit->permalink;
 
-	    $page->add($o->toAtom($obj_permalink, $obj_submit_comment));
+	    $page->add($o->toAtom($obj_mk));
 	}
 
 	$page->add("</feed>\n");
