@@ -178,19 +178,24 @@ sub encode {
     return $ciphertext;
 }
 
+##################################################################
+
 sub readable {
     my $self = shift;
 
     # make the text
-    return sprintf("request: kv=%s m=%s d=%s rid=%s rvsn=%s oid=%s opt=%s",
+    return sprintf("request(%s) method=%s depth=%s relation=%s:%s(%s) oid=%s opt=%s",
 		   $self->{keyversion},
 		   ($self->{method} == 0) ? "get" : "post",
 		   $self->{depth},
-		   Relation->new($self->{rid})->name,
+		   $self->{rid},
 		   $self->{rvsn},
+		   Relation->new($self->{rid})->name,
 		   $self->{oid},
 		   $self->{opt});
 }
+
+##################################################################
 
 sub permalink {
     my $self = shift;
@@ -199,6 +204,8 @@ sub permalink {
 
     return $main::MINE_HTTP_FULLPATH . "/get?key=$encoded";
 }
+
+##################################################################
 
 sub spawnOid {
     my $self = shift;
@@ -212,11 +219,15 @@ sub spawnOid {
 			0);                 # empty
 }
 
+##################################################################
+
 sub spawnObject {
     my $self = shift;
     my $o = shift;
     return $self->spawnOid($o->id);
 }
+
+##################################################################
 
 sub spawnSubmit {
     my $self = shift;
@@ -228,6 +239,8 @@ sub spawnSubmit {
 			$self->{oid},       # inherit
 			0);                 # empty
 }
+
+##################################################################
 
 sub rewrite {
     my ($self, $line) = @_;
