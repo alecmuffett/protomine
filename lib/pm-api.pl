@@ -490,8 +490,8 @@ sub api_version {
 	version =>
 	{
 	    software => 'protomine', # this software
-	    revision => '140',	 # software revision (use SVN number?)
-	    api => '1.100',	 # api revision
+	    revision => '201',	 # software revision (use SVN number?)
+	    api => '1.200',	 # api revision
 	}
     };
 }
