@@ -46,7 +46,7 @@ while (<DATA>) {
     elsif ($cmd eq '+') {	# manual text
 	$url = shift(@rest);
 	push(@rest, $url) if ($#rest < 0);
-	print "<A HREF=\"$url\">[@rest]</A>\n";
+	print "<A HREF=\"$url\"><button>@rest</button></A>\n";
     }
     elsif ($cmd eq '.') {	# automatic LI
 	$url = shift(@rest);
@@ -65,27 +65,28 @@ __END__;
 : welcome to protomine!
 
 { my objects
-+ list-objects.html list objects
-+ create-object.html create object
++ #composenewpost compose new
++ create-object.html upload file
++ list-objects.html list
 }
 
 { my relationships
-+ list-relations.html list relationships
-+ create-relation.html create relationships
++ create-relation.html create
++ list-relations.html list
 }
 
 { my tags
-+ list-tags.html list tags
-+ create-tag.html create tag
++ create-tag.html create
++ list-tags.html list
 }
 
-{ mine management
-+ show-config.html show configuration
-+ update-config.html update configuration
+{ mine configuration
++ show-config.html show
++ update-config.html update
++ version.html version
 }
 
 { mine documentation 
-+ version.html software version
 + ../doc/ local
 }
 -
@@ -94,7 +95,7 @@ __END__;
 ' <hr/>
 ' <p/>
 
-: quick start
+: compose new post
 ' <form method="post" enctype="multipart/form-data" action="create-object.html">
 ' <em>Title</em> <br/> <input type="text" size="40" name="objectName" value=""/> <p/>
 ' <em>Content</em> <br/> <textarea cols="40" rows="12" name="data" value=""></textarea> <p/>
