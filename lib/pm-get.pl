@@ -29,6 +29,9 @@ sub do_remote_get {
     # decrypt the key
     my $req_mk = MineKey->newFromEncoded($key);
 
+    # debug
+    Log->msg($req_mk->readable);
+
     # check for posting
     if ($req_mk->{method} == 1) {
 	die "cannot submit POST mine key via a GET method\n";
