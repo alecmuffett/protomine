@@ -65,19 +65,19 @@ __END__;
 : welcome to protomine!
 
 { my objects
++ list-objects.html list
 + #composenewpost compose new
 + create-object.html upload file
-+ list-objects.html list
 }
 
 { my relationships
-+ create-relation.html create
 + list-relations.html list
++ create-relation.html create
 }
 
 { my tags
-+ create-tag.html create
 + list-tags.html list
++ create-tag.html create
 }
 
 { mine configuration
