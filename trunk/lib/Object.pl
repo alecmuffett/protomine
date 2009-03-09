@@ -249,20 +249,34 @@ sub matchInterestsBlob {
 
     # verbose debugging switch in this code
     # bitmask: 0x01 = debug FAILs, 0x02 = debug PASSes
-    my $mdebug = 0x02;
+    my $mdebug = 0x03;
 
     # upon whose we are checking
     my $rid = $iblob->{rid};
     my $oid = $self->id;
+    my $status = $self->get('objectStatus');
 
     # load the raw tags describing this object
     my $rawtags = $self->SUPER::get('objectTags');
 
-    # no tags -> fast fail
-    unless (defined($rawtags)) {
-	warn "FAIL: oid=$oid/rid=$rid object has no tags\n" if ($mdebug & 0x01);
+    # draft object -> fast fail
+    if ($status eq 'draft') {
+	warn "FAIL: oid=$oid/rid=$rid object is draft/private\n" if ($mdebug & 0x01);
 	return 0;
     }
+
+    # final status without for:USER -> fast fail
+    # final status with for:USER -> fast pass
+    if ($status eq 'final') {
+	die "TBD final permssion processing code to be done";  # <----------------------------- FIX THIS !!!!!!!!!!!!!!!!!!!!!!!
+    }
+
+    # THIS CODE RESCINDED SINCE REWRITING AND DEPTH PERMITS ACCESS ON PUBLIC OBJECTS
+    # no tags -> fast fail
+    # unless (defined($rawtags)) {
+    #	warn "FAIL: oid=$oid/rid=$rid object has no tags\n" if ($mdebug & 0x01);
+    #	return 0;
+    # }
 
     # split the raw tags on space
     my @tags = split(" ", $rawtags);
