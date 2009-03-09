@@ -390,8 +390,20 @@ sub matchInterestsBlob {
 
 sub toAtom {
     my $self = shift;
-    my $permalink = shift; # how the recipient of this feed will refer to this object
-    my $commentlink = shift; # how the recipient of this feed will comment on this object
+    my $obj_mk = shift;
+
+    my $permalink = $obj_mk->permalink;
+    my $commentlink = $obj_mk->spawnSubmit->permalink;
+    my $oid = $self->id;        # the object number
+
+    my @atom;                   # where the results are stored
+
+    my $title = $self->get('objectName') || "(title undefined)";
+    my $id = $permalink;        # this needs to be generated/permanent?
+    my $updated = &main::atom_format($self->lastModified);
+    my $summary = $self->get('objectDescription') || "(summary undefined)";
+    my $objectType = $self->get('objectType');
+    my $objectDescription = $self->get('objectDescription');
 
     # <entry>
     # <title>Atom-Powered Robots Run Amok</title>
@@ -407,17 +419,6 @@ sub toAtom {
     # probably HMAC the private permalink with a nonce which is NOT
     # the same as the mine's cryptokey.  For the moment, though, we'll
     # fake something up.
-
-    my $rid = shift;            # on behalf of whom this is being prepared
-    my $oid = $self->id;        # the object number
-    my @atom;                   # where the results are stored
-
-    my $title = $self->get('objectName') || "(title undefined)";
-    my $id = $permalink;        # this needs to be generated/permanent?
-    my $updated = &main::atom_format($self->lastModified);
-    my $summary = $self->get('objectDescription') || "(summary undefined)";
-    my $objectType = $self->get('objectType');
-    my $objectDescription = $self->get('objectDescription');
 
     # content format:
     # feedback link
@@ -435,7 +436,7 @@ sub toAtom {
 
     if ($objectType eq 'text/html') {
 	my $blob = $self->auxGetBlob;
-	$content .= $blob;
+	$content .= $obj_mk->rewrite($blob);
     }
     elsif ($objectType eq 'text/plain') {
 	my $blob = $self->auxGetBlob;

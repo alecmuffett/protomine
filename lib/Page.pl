@@ -31,6 +31,7 @@ my $DIRMAGIC = '[directory]';
 my $ENCODING = 'UTF-8';
 
 # enumeration for speed, later
+my $REWRITE_FILE = -2;
 my $STATIC_FILE = -1;
 my $DYNAMIC_PLAIN = 1;
 my $DYNAMIC_XML = 2;
@@ -98,6 +99,18 @@ sub newFile {                   # handler for actual on-disk files
 
     my $p = $class->__new($mimetype, $STATIC_FILE);
     $p->{PATH} = $filename;	# reading the file is deferred
+    return $p;
+}
+
+sub newFileRewrite {		# handler for actual on-disk files
+    my $class = shift;
+    my $minekey = shift;
+    my $filename = shift;
+    my $mimetype = shift || &main::mime_type($filename);
+
+    my $p = $class->__new($mimetype, $REWRITE_FILE);
+    $p->{PATH} = $filename;	# reading the file is deferred
+    $p->{MINEKEY} = $minekey;
     return $p;
 }
 
@@ -325,9 +338,30 @@ sub printUsing {
     if ($self->{STYLE} == $STATIC_FILE) {
 	my $file = $self->{PATH};
 	my $bytes = (-s $file);
+
 	print $q->header(-type => $self->{TYPE}, -Content_length => $bytes);
+
 	$self->printFile($file);
-	return;			# done fast-track of files
+
+	return;
+    }
+    elsif ($self->{STYLE} == $REWRITE_FILE) {
+	my $file = $self->{PATH};
+	my $mk = $self->{MINEKEY};
+
+	print $q->header(-type => $self->{TYPE});
+
+	open(REWRITEFILE, $file) or die "printUsing: rewrite_file: open: $file: $!\n";
+
+	my $buffer;
+
+	while ($buffer = <REWRITEFILE>) {
+	    print $mk->rewrite($buffer);
+	}
+
+	close(REWRITEFILE) or die "printUsing: rewritefile: close: $file: $!\n";
+
+	return;
     }
 
     # print the HTTP header
