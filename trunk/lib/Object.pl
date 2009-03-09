@@ -244,8 +244,7 @@ sub get {
 # returns non-zero on match, 0 on fail
 
 sub matchInterestsBlob {
-    my $self = shift;
-    my $iblob = shift;
+    my ($self, $iblob, $fallthru) = @_;
 
     # verbose debugging switch in this code
     # bitmask: 0x01 = debug FAILs, 0x02 = debug PASSes
@@ -387,17 +386,21 @@ sub matchInterestsBlob {
     # match it
 
     foreach my $interest (@{$iblob->{interests}}) {
-
 	if (grep { $_ eq $interest } @expanded_tags) {
 	    Log->msg("PASS: oid=$oid/rid=$rid object $oid overlaps relation's interests (in: @expanded_tags)\n") if ($mdebug & 0x02);
 	    return 3;
 	}
     }
 
-    # we didnae find reason to share this one
-    Log->msg("FAIL: oid=$oid/rid=$rid relation not interested in object\n") if ($mdebug & 0x01);
-
-    return 0;
+    # we didnae find reason to share this one; return the fallthru response
+    if ($fallthru) {
+	Log->msg("PASS: oid=$oid/rid=$rid FALLTHRU-PASS\n") if ($mdebug & 0x02);
+	return 4;
+    }
+    else {
+	Log->msg("FAIL: oid=$oid/rid=$rid FALLTHRU-FAIL\n") if ($mdebug & 0x01);
+	return 0;
+    }
 }
 
 ##################################################################
