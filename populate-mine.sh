@@ -16,6 +16,7 @@
 ## permissions and limitations under the License.
 ##
 
+
 exec 2>&1
 #set -x
 
@@ -24,7 +25,9 @@ exec 2>&1
 
 SAMPLES=database/doc/sample-data
 
-minectl=./minectl
+# pick up minectlopts from environment
+
+minectl="./minectl $minectlopts"
 
 ###
 # set up some very general tags
