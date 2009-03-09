@@ -184,9 +184,9 @@ sub readable {
     # make the text
     return sprintf("request: kv=%s m=%s d=%s rid=%s rvsn=%s oid=%s opt=%s",
 		   $self->{keyversion},
-		   $self->{method},
+		   ($self->{method} == 0) ? "get" : "post",
 		   $self->{depth},
-		   $self->{rid},
+		   Relation($self->{rid})->name,
 		   $self->{rvsn},
 		   $self->{oid},
 		   $self->{opt});
