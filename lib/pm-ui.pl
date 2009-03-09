@@ -44,14 +44,14 @@ sub postwrapper {
 
 my %form_size_table =
     (
-     commentBody => 'BOX1',
+     commentBody => 'BOX2',
      commentId => 'SKIP',
      commentSubject => 'LINE1',
-     objectDescription => 'BOX1',
+     objectDescription => 'BOX2',
      objectId => 'SKIP',
      objectStatus => 'OBJECTSTATUS',
      objectType => 'LINE3',
-     relationDescription => 'BOX3',
+     relationDescription => 'BOX2',
      relationId => 'SKIP',
      relationInterests => 'LINE1',
      relationURL => 'LINE1',
@@ -121,7 +121,7 @@ sub loopify {
     my @vector;
 
     # sort the form objects
-    foreach my $key (sort { (&form_size($a) cmp &form_size($b)) || ( $a cmp $b ) } keys %{$hashref}) {
+    foreach my $key (sort { (&form_size($b) cmp &form_size($a)) || ( $b cmp $a ) } keys %{$hashref}) {
 	my $element = {};
 	$element->{KEY} = $key;
 	$element->{VALUE} = $hashref->{$key};
