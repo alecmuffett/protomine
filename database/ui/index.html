@@ -7,14 +7,15 @@
 <A HREF="create-object.html"><button>upload file</button></A>
 </LI>
 <LI>
-<em>my relationships:</em>
-<A HREF="list-relations.html"><button>list</button></A>
-<A HREF="create-relation.html"><button>create</button></A>
-</LI>
-<LI>
 <em>my tags:</em>
 <A HREF="list-tags.html"><button>list</button></A>
 <A HREF="create-tag.html"><button>create</button></A>
+<A HREF="#addquicktags"><button>create quick</button></A>
+</LI>
+<LI>
+<em>my relationships:</em>
+<A HREF="list-relations.html"><button>list</button></A>
+<A HREF="create-relation.html"><button>create</button></A>
 </LI>
 <LI>
 <em>mine configuration:</em>
@@ -43,6 +44,13 @@
 <input type="radio" name="objectStatus" value="public"/> public
 <p/>
 <input type="hidden" name="objectType" value="text/html" />
+<input type="submit" value="submit"/> <input type="reset" value="reset"/>
+</form>
+</UL>
+<h2><A NAME="addquicktags" HREF="#addquicktags">add quick tags</a></h2>
+<UL>
+<form method="post" enctype="multipart/form-data" action="bulk-tags.html">
+<input type="text" size="80" name="bulktags" value=""/> <p/>
 <input type="submit" value="submit"/> <input type="reset" value="reset"/>
 </form>
 </UL>
