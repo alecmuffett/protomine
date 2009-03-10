@@ -89,6 +89,7 @@ __END__;
 
 { mine documentation
 + ../doc/ local
++ #themineproject project documentation
 }
 -
 
@@ -114,6 +115,8 @@ __END__;
 
 : add quick tags
 ' <form method="post" enctype="multipart/form-data" action="bulk-tags.html">
+' <em>simple:</em> drink wine red-wine white-wine merlot ... <p/>
+' <em>smart:</em> drink wine:drink red-wine:wine merlot:red-wine tag:implies1,implies2,... <p/>
 ' <input type="text" size="80" name="bulktags" value=""/> <p/>
 ' <input type="submit" value="submit"/> <input type="reset" value="reset"/>
 ' </form>
