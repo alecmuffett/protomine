@@ -22,38 +22,38 @@ print $header;
 
 # body
 while (<DATA>) {
-    next if /^\s*(\#.*)?$/o;	# ski blanks
+    next if /^\s*(\#.*)?$/o;    # ski blanks
     chop;
 
     ($cmd, @rest) = split;
 
-    if ($cmd eq ':') {		# start block / header
+    if ($cmd eq ':') {          # start block / header
 	$anchor = "@rest";
 	$anchor =~ s!\W+!!go;
 	print "<h2><A NAME=\"$anchor\" HREF=\"#$anchor\">@rest</a></h2>\n";
 	print "<UL>\n";
     }
-    elsif ($cmd eq '-') {	# end block
+    elsif ($cmd eq '-') {       # end block
 	print "</UL>\n";
     }
-    elsif ($cmd eq '{') {	# start manual LI
+    elsif ($cmd eq '{') {       # start manual LI
 	print "<LI>\n";
 	print "<$emphasis>@rest:</$emphasis>\n";
     }
-    elsif ($cmd eq '}') {	# end manual LI
+    elsif ($cmd eq '}') {       # end manual LI
 	print "</LI>\n";
     }
-    elsif ($cmd eq '+') {	# manual text
+    elsif ($cmd eq '+') {       # manual text
 	$url = shift(@rest);
 	push(@rest, $url) if ($#rest < 0);
 	print "<A HREF=\"$url\"><button>@rest</button></A>\n";
     }
-    elsif ($cmd eq '.') {	# automatic LI
+    elsif ($cmd eq '.') {       # automatic LI
 	$url = shift(@rest);
 	push(@rest, $url) if ($#rest < 0);
 	print "<LI><A HREF=\"$url\">@rest</A></LI>\n";
     }
-    elsif ($cmd eq '\'') {	# verbatim quote
+    elsif ($cmd eq '\'') {      # verbatim quote
 	print "@rest\n";
     }
 }
@@ -70,14 +70,15 @@ __END__;
 + create-object.html upload file
 }
 
-{ my relationships
-+ list-relations.html list
-+ create-relation.html create
-}
-
 { my tags
 + list-tags.html list
 + create-tag.html create
++ #addquicktags create quick
+}
+
+{ my relationships
++ list-relations.html list
++ create-relation.html create
 }
 
 { mine configuration
@@ -86,7 +87,7 @@ __END__;
 + version.html version
 }
 
-{ mine documentation 
+{ mine documentation
 + ../doc/ local
 }
 -
@@ -107,7 +108,14 @@ __END__;
 ' <input type="radio" name="objectStatus" value="public"/> public
 ' <p/>
 ' <input type="hidden" name="objectType" value="text/html" />
-' <input type="submit" value="submit"/> <input type="reset" value="reset"/> 
+' <input type="submit" value="submit"/> <input type="reset" value="reset"/>
+' </form>
+-
+
+: add quick tags
+' <form method="post" enctype="multipart/form-data" action="bulk-tags.html">
+' <input type="text" size="80" name="bulktags" value=""/> <p/>
+' <input type="submit" value="submit"/> <input type="reset" value="reset"/>
 ' </form>
 -
 
@@ -139,7 +147,7 @@ __END__;
 ' <hr/>
 ' <p/>
 
-' &copy; 2008-2009 Adriana Lukas &amp; Alec Muffett; 
+' &copy; 2008-2009 Adriana Lukas &amp; Alec Muffett;
 ' protomine is open source software distributed under the Apache 2.0 license,
 ' please see the <A HREF="http://code.google.com/p/protomine/w/list">project home page</A> for details
 

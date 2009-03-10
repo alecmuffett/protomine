@@ -154,8 +154,8 @@ sub ui_clone_object_oid {
 
 # ui_create_object --
 push (@raw_action_list, [ '/ui/create-object.html', 'GET', \&ui_create_object ]);
-push (@raw_action_list, [ '/ui/create-object.html', 
-			  'POST', \&postwrapper, 
+push (@raw_action_list, [ '/ui/create-object.html', 'POST',
+			  \&postwrapper,
 			  \&api_create_object, undef, 'list-objects.html' ]);
 
 sub ui_create_object {
@@ -187,8 +187,8 @@ sub ui_create_object {
 
 # ui_create_relation --
 push (@raw_action_list, [ '/ui/create-relation.html', 'GET', \&ui_create_relation ]);
-push (@raw_action_list, [ '/ui/create-relation.html', 
-			  'POST', \&postwrapper, 
+push (@raw_action_list, [ '/ui/create-relation.html', 'POST',
+			  \&postwrapper,
 			  \&api_create_relation, undef, 'list-relations.html' ]);
 
 sub ui_create_relation {
@@ -216,8 +216,8 @@ sub ui_create_relation {
 
 # ui_create_tag --
 push (@raw_action_list, [ '/ui/create-tag.html', 'GET', \&ui_create_tag ]);
-push (@raw_action_list, [ '/ui/create-tag.html', 
-			  'POST', \&postwrapper, 
+push (@raw_action_list, [ '/ui/create-tag.html', 'POST',
+			  \&postwrapper,
 			  \&api_create_tag, undef, 'list-tags.html' ]);
 
 sub ui_create_tag {
@@ -320,7 +320,7 @@ sub ui_read_object_oid {
     }
 
     $p->addFileTemplate('template/get-thing.html',
-			&loopify($hashref, 
+			&loopify($hashref,
 				 ROOT => 'object',
 				 EXTRA => [ IS_OBJECT => 1,
 					    BODY => $body,
@@ -534,10 +534,9 @@ sub ui_update_data_oid {
 
 # ui_update_object_oid --
 push (@raw_action_list, [ '/ui/update-object/OID.html', 'GET', \&ui_update_object_oid, 'OID' ]);
-push (@raw_action_list, [ '/ui/update-object/OID.html', 
-			  'POST', \&postwrapper, 
-			  \&api_create_keys_oid, undef, 'list-objects.html', 
-			  'OID']);
+push (@raw_action_list, [ '/ui/update-object/OID.html', 'POST',
+			  \&postwrapper,
+			  \&api_create_keys_oid, undef, 'list-objects.html', 'OID']);
 
 sub ui_update_object_oid {
     my ($ctx, $info, $phr, $oid) = @_;
@@ -564,9 +563,9 @@ sub ui_update_object_oid {
 
 # ui_update_relation_rid --
 push (@raw_action_list, [ '/ui/update-relation/RID.html', 'GET', \&ui_update_relation_rid, 'RID' ]);
-push (@raw_action_list, [ '/ui/update-relation/RID.html', 
-			  'POST', \&postwrapper, 
-			  \&api_create_keys_rid, undef, 'list-relations.html', 
+push (@raw_action_list, [ '/ui/update-relation/RID.html', 'POST',
+			  \&postwrapper,
+			  \&api_create_keys_rid, undef, 'list-relations.html',
 			  'RID']);
 
 sub ui_update_relation_rid {
@@ -591,9 +590,9 @@ sub ui_update_relation_rid {
 
 # ui_update_tag_tid --
 push (@raw_action_list, [ '/ui/update-tag/TID.html', 'GET', \&ui_update_tag_tid, 'TID' ]);
-push (@raw_action_list, [ '/ui/update-tag/TID.html', 
-			  'POST', \&postwrapper, 
-			  \&api_create_keys_tid, undef, 'list-tags.html', 
+push (@raw_action_list, [ '/ui/update-tag/TID.html', 'POST',
+			  \&postwrapper,
+			  \&api_create_keys_tid, undef, 'list-tags.html',
 			  'TID']);
 
 sub ui_update_tag_tid {
@@ -630,5 +629,46 @@ sub ui_version {
 
 
 ##################################################################
+##################################################################
+##################################################################
+# EASE OF USE ROUTINES
+##################################################################
+##################################################################
+##################################################################
+
+push (@raw_action_list, [ '/ui/bulk-tags.html', 'POST',
+			  \&postwrapper,
+			  \&ui_bulk_create_tags, undef, 'list-tags.html' ]);
+
+sub ui_bulk_create_tags {
+    my ($ctx, $info, $phr) = @_;
+
+    my $q = $ctx->cgi;
+    my $bulktagparam = $q->param('bulktags');
+    my %results;
+
+    Log->msg( "bulktagparam=$bulktagparam\n");
+
+    foreach my $bulktag (split(" ", $bulktagparam)) {
+
+	Log->msg( "bulktag=$bulktag\n");
+
+	my ($tagname, $tagparents) = split(m!:!o, $bulktag);
+	my (@tagimplies) = split(m!,!o, $tagparents);
+
+	Log->msg( "1 $tagname\n");
+	Log->msg( "2 @tagimplies\n");
+
+       	my $t = Tag->new;
+	$t->set('tagName', $tagname);
+	$t->set('tagImplies', "@tagimplies") if (@tagimplies);
+	$results{$bulktag} = $t->save;
+    }
+
+    return \%results;
+}
+
+##################################################################
+
 
 1;
