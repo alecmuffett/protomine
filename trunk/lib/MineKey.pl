@@ -41,8 +41,6 @@ sub new {
 
     my ($method, $depth, $rid, $rvsn, $oid, $opt) = @_;
 
-    warn "MineKey new($method, $depth, $rid, $rvsn, $oid, $opt)\n";
-
     my $self = {};
 
     bless $self, $class;
