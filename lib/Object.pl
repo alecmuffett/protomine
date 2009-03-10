@@ -248,7 +248,7 @@ sub matchInterestsBlob {
 
     # verbose debugging switch in this code
     # bitmask: 0x01 = debug FAILs, 0x02 = debug PASSes
-    my $mdebug = 0x03;
+    my $mdebug = 0x02;
 
     # upon whose we are checking
     my $rid = $iblob->{rid};
@@ -277,8 +277,12 @@ sub matchInterestsBlob {
     #	return 0;
     # }
 
-    # split the raw tags on space
-    my @tags = split(" ", $rawtags);
+    my @tags = ();
+
+    if (defined($rawtags)) {
+	@tags = split(" ", $rawtags); # split the raw tags on space
+    }
+
     my $tag;
 
     # first sweep: fail fast if "not:RELATION"

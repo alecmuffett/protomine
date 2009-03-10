@@ -88,7 +88,7 @@ sub do_remote_get {
 	my $page = Page->newAtom;
 
 
-	my $feed_title = sprintf "feed for %s (%s)", $r->name, $r->get('relationInterests');
+	my $feed_title = sprintf "feed for %s (debug: %s)", $r->name, $r->get('relationInterests');
 	my $feed_mk = MineKey->newFromRelation($r);
 	my $feed_link = $feed_mk->permalink;
 	my $feed_updated = &atom_format(time);
