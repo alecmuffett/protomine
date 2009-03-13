@@ -5,6 +5,7 @@ are probably most easily installed by performing the following as
 root:
 
 	sudo perl -MCPAN -e 'install JSON::XS'
+
 	sudo perl -MCPAN -e 'install HTML::Template'
 
 (Use "su" and skip using "sudo" on platforms where that's inappropriate)
@@ -43,21 +44,32 @@ Commands:
 ---------
 
   cd
+
   svn checkout http://protomine.googlecode.com/svn/trunk/ protomine
+
   cd protomine
+
   ./osx-setup.sh
+
   make
+
   ./populate-mine.sh
+
   ./open-browser.pl
+
 
 ------------------------------------------------------------------
 
 Ubuntu installation:
 
 Subversion
+
 GNU Make
+
 curl
+
 perl
+
 apache2
 
 apt-get install subversion make curl perl apache2
