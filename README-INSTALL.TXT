@@ -1,11 +1,14 @@
 General installation: (ALL PLATFORMS)
 
-Protomine requires the Perl JSON::XS and HTML::Template modules, which
-are probably most easily installed by performing the following as
-root:
+Protomine requires the following Perl modules, which are probably most
+easily installed by performing the following as root:
 
-	sudo perl -MCPAN -e 'install JSON::XS'
+	sudo perl -MCPAN -e 'install Crypt::CBC'
+	sudo perl -MCPAN -e 'install Crypt::DES'
+	sudo perl -MCPAN -e 'install Crypt::OpenSSL::AES'
+	sudo perl -MCPAN -e 'install Crypt::Rijndael'
 	sudo perl -MCPAN -e 'install HTML::Template'
+	sudo perl -MCPAN -e 'install JSON::XS'
 
 (Use "su" and skip using "sudo" on platforms where that's inappropriate)
 

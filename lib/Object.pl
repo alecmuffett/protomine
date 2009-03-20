@@ -248,7 +248,7 @@ sub matchInterestsBlob {
 
     # verbose debugging switch in this code
     # bitmask: 0x01 = debug FAILs, 0x02 = debug PASSes
-    my $mdebug = 0x02;
+    my $mdebug = 0x03;
 
     # upon whose we are checking
     my $rid = $iblob->{rid};

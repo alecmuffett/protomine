@@ -18,14 +18,62 @@
 
 package Crypto;
 
+use Crypt::CBC;
+
 use strict;
 use warnings;
 
 ##################################################################
 
+sub reset { 			# **** CLASS METHOD
+    my $keyfile = "database/config/key.txt";
+
+    my $iv = Crypt::CBC->random_bytes(16);
+    my $key = Crypt::CBC->random_bytes(32);
+
+    my $iv_hex = unpack("H*", $iv);
+    my $key_hex = unpack("H*", $key);
+    
+    die "Crypto: reset: $keyfile already exists, will not clobber.\n" if (-f $keyfile);
+
+    open(KEY, ">$keyfile") or die "open: >$keyfile: $!\n";
+    print KEY "$iv_hex\n$key_hex\n";
+    close(KEY); 
+}
+
+##################################################################
+
 sub new {
     my $class = shift;
+
     my $self = { };
+
+    my $keyfile = "database/config/key.txt";
+
+    my $iv_hex;
+    my $key_hex;
+
+    open(KEY, $keyfile) or die "open: $keyfile: $!\n";
+    chomp($iv_hex = <KEY>); 
+    chomp($key_hex = <KEY>);
+    close(KEY);
+
+    my $iv = pack("H*", $iv_hex);
+    my $key = pack("H*", $key_hex);
+
+    die "corrupt hex iv '$iv_hex'\n" unless (length($iv) == 16);
+    die "corrupt hex key '$key_hex'\n" unless (length($key) == 32);
+
+    my $cipher = Crypt::CBC->new( 
+	-iv => $iv,
+	-key => $key,
+	-literal_key => 1, 
+	-cipher => "Crypt::Rijndael",
+	-header => 'none',
+	);
+
+    $self->{cipher} = $cipher;
+
     bless $self, $class;
     return $self;
 }
@@ -33,34 +81,23 @@ sub new {
 ##################################################################
 
 sub encrypt {
-    my ($class, $plaintext) = @_;
-    my $ciphertext = unpack("H*", $plaintext); # coersce scalar context
-    # warn "encrypt $plaintext -> $ciphertext\n";
-    return $ciphertext;
+    my ($self, $plaintext) = @_;
+    return $self->{cipher}->encrypt_hex($plaintext);
 }
 
 ##################################################################
 
 sub decrypt {
-    my ($class, $ciphertext) = @_;
-    my $plaintext = pack("H*", $ciphertext); # coersce scalar context
-    # warn "decrypt $ciphertext -> $plaintext\n";
-    return $plaintext;
+    my ($self, $ciphertext) = @_;
+    return $self->{cipher}->decrypt_hex($ciphertext);
 }
 
 ##################################################################
 
 sub hashify {
-    my ($class, $plaintext) = @_;
+    my ($self, $plaintext) = @_;
     my $hashify = unpack("%C*", $plaintext);
-    # warn "hash $plaintext -> $hashify\n";
     return $hashify;
-}
-
-##################################################################
-
-sub resetPrivateKey {
-    die "resetPrivateKey not yet implemented";
 }
 
 ##################################################################

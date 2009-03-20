@@ -51,8 +51,6 @@ my %FLAG;
 while ($ARGV[0] =~ m!^-(\w+)!o) {
     my $switches = $1;
 
-    warn "@ARGV\n";
-
     foreach my $switch (split(//o, $switches)) {
 	if ($switch eq 'v') {
 	    $FLAG{'verbose'}++;
