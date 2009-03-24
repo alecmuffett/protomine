@@ -173,8 +173,40 @@ sub encode {
     # make the plaintext
     my $plaintext = "$csum,$body";
 
+    ##################################################################
+    # The next bit is quite subtle; normal crypto practice would
+    # demand a random IV but the nature of the mine is that minekeys
+    # equate to URLs, and thus should be invariant for any given
+    # object in any given context.  
+
+    # If you want secrecy, try SSL.
+
+    # But what is an 'object'/'context' in this sense?  Well, it's the
+    # tuple which allows someone to access an item, so it is
+    # {depthremaining,rid,rvsn,oid} - essentially all of the plaintext
+    # for crypto.  Because you don't want the IV for the crypto to be
+    # a pure hash of the plaintext, the IV is generated from the salt
+    # by appending 256 random bits, taking a SHA256 of the whole and
+    # truncating it to the leftmost 128 bits.
+
+    # In an ideal world you would book a random IV against every tuple
+    # of {depthremaining,rid,rvsn,oid} and reuse that where need
+    # demanded, but the amount of data storage would be immense, thus
+    # this mechanism exists.
+
+    # Remember, the point of a minekey is not to afford cryptosecrecy,
+    # but instead it affords opacity - it should be hard to forge one,
+    # and impractical to deconstruct one from the ciphertext alone.
+    # That they are repeated twice as HREFs in a HTML document and
+    # therefore refer to the same thing twice, is a given.  You could
+    # probably work that sort of thing out from document context.
+    # Exposing multiple ciphertexts for evidently the same plaintext,
+    # would be *bad*.
+
+    ##################################################################
+
     # encrypt and encode
-    my $salt = sprintf "%s,%s", $self->{rid}, $self->{oid};
+    my $salt = sprintf "%s,%s,%s,%s", $self->{depth}, $self->{rid}, $self->{rvsn}, $self->{oid};
     my $ciphertext = $crypto->encrypt($salt, $plaintext);
 
     # return
