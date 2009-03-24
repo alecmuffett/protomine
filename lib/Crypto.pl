@@ -49,6 +49,7 @@ sub new {
 
     my $self = { };
     my $keyfile = "database/config/key.txt";
+
     my $nonce_hex;
     my $key_hex;
 
@@ -65,7 +66,6 @@ sub new {
     die "corrupt hex key '$key_hex'\n" unless (length($key) == 32);
     $self->{key} = $key;
 
-
     bless $self, $class;
     return $self;
 }
@@ -76,11 +76,7 @@ sub encrypt {
     my ($self, $salt, $plaintext) = @_;
 
     my $iv_pre_digest = $salt . ',' . $self->{nonce};
-
-    Log->msg("set iv_pre_digest $iv_pre_digest");
- 
     my $iv_allbits = $self->digest($iv_pre_digest);
-
     my $iv = substr($iv_allbits, 0, 16); # AES IV takes 128 bits / 16 bytes
 
     my $cipher =
@@ -93,7 +89,6 @@ sub encrypt {
 	);
 
     my $iv_hex = unpack("H*", $iv);
-
     my $ciphertext = $cipher->encrypt_hex($plaintext);
 
     return sprintf "%s:%s", $iv_hex, $ciphertext;
