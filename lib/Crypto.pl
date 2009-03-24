@@ -19,6 +19,7 @@
 package Crypto;
 
 use Crypt::CBC;
+use Digest::SHA;
 
 use strict;
 use warnings;
@@ -28,17 +29,17 @@ use warnings;
 sub reset { 			# **** CLASS METHOD
     my $keyfile = "database/config/key.txt";
 
-    my $iv = Crypt::CBC->random_bytes(16);
+    my $nonce = Crypt::CBC->random_bytes(32);
     my $key = Crypt::CBC->random_bytes(32);
 
-    my $iv_hex = unpack("H*", $iv);
+    my $nonce_hex = unpack("H*", $nonce);
     my $key_hex = unpack("H*", $key);
-    
+
     die "Crypto: reset: $keyfile already exists, will not clobber.\n" if (-f $keyfile);
 
     open(KEY, ">$keyfile") or die "open: >$keyfile: $!\n";
-    print KEY "$iv_hex\n$key_hex\n";
-    close(KEY); 
+    print KEY "$nonce_hex\n$key_hex\n";
+    close(KEY);
 }
 
 ##################################################################
@@ -47,32 +48,23 @@ sub new {
     my $class = shift;
 
     my $self = { };
-
     my $keyfile = "database/config/key.txt";
-
-    my $iv_hex;
+    my $nonce_hex;
     my $key_hex;
 
     open(KEY, $keyfile) or die "open: $keyfile: $!\n";
-    chomp($iv_hex = <KEY>); 
+    chomp($nonce_hex = <KEY>);
     chomp($key_hex = <KEY>);
     close(KEY);
 
-    my $iv = pack("H*", $iv_hex);
+    my $nonce = pack("H*", $nonce_hex);
+    die "corrupt hex nonce '$nonce_hex'\n" unless (length($nonce) == 32);
+    $self->{nonce} = $nonce;
+
     my $key = pack("H*", $key_hex);
-
-    die "corrupt hex iv '$iv_hex'\n" unless (length($iv) == 16);
     die "corrupt hex key '$key_hex'\n" unless (length($key) == 32);
+    $self->{key} = $key;
 
-    my $cipher = Crypt::CBC->new( 
-	-iv => $iv,
-	-key => $key,
-	-literal_key => 1, 
-	-cipher => "Crypt::Rijndael",
-	-header => 'none',
-	);
-
-    $self->{cipher} = $cipher;
 
     bless $self, $class;
     return $self;
@@ -81,23 +73,70 @@ sub new {
 ##################################################################
 
 sub encrypt {
-    my ($self, $plaintext) = @_;
-    return $self->{cipher}->encrypt_hex($plaintext);
+    my ($self, $salt, $plaintext) = @_;
+
+    my $iv_pre_digest = $salt . ',' . $self->{nonce};
+
+    Log->msg("set iv_pre_digest $iv_pre_digest");
+ 
+    my $iv_allbits = $self->digest($iv_pre_digest);
+
+    my $iv = substr($iv_allbits, 0, 16); # AES IV takes 128 bits / 16 bytes
+
+    my $cipher =
+	Crypt::CBC->new(
+	    -cipher => "Crypt::Rijndael",
+	    -key => $self->{key},
+	    -literal_key => 1,
+	    -iv => $iv,
+	    -header => 'none',
+	);
+
+    my $iv_hex = unpack("H*", $iv);
+
+    my $ciphertext = $cipher->encrypt_hex($plaintext);
+
+    return sprintf "%s:%s", $iv_hex, $ciphertext;
 }
 
 ##################################################################
 
 sub decrypt {
     my ($self, $ciphertext) = @_;
-    return $self->{cipher}->decrypt_hex($ciphertext);
+
+    my ($iv_hex, $ct_hex) = split(/:/, $ciphertext);
+
+    my $iv = pack("H*", $iv_hex);
+    die "corrupt hex iv '$iv_hex'\n" unless (length($iv) == 16);
+
+    my $cipher =
+	Crypt::CBC->new(
+	    -cipher => "Crypt::Rijndael",
+	    -key => $self->{key},
+	    -literal_key => 1,
+	    -iv => $iv,
+	    -header => 'none',
+	);
+
+    return $cipher->decrypt_hex($ct_hex);
 }
 
 ##################################################################
 
-sub hashify {
+sub digest {
     my ($self, $plaintext) = @_;
-    my $hashify = unpack("%C*", $plaintext);
-    return $hashify;
+
+    my $ctx = Digest::SHA->new(256)->add($plaintext);
+    return $ctx->digest;
+}
+
+##################################################################
+
+sub checksum {
+    my ($self, $plaintext) = @_;
+
+    my $checksum = unpack("%16C*", $plaintext);
+    return $checksum;
 }
 
 ##################################################################
