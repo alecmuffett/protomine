@@ -109,7 +109,7 @@ sub newFromEncoded {
     my ($csum, $minekey) = split(/,/, $plaintext, 2);
 
     # first check pre-parse
-    my $computed = $crypto->hashify($minekey);
+    my $computed = $crypto->checksum($minekey);
     die "newFromEncoded: security pre-parse checksum not numeric\n" if ($csum !~ m!^\d+$!o);
     die "newFromEncoded: security pre-parse checksum failed\n" if ($computed != $csum);
 
@@ -123,7 +123,7 @@ sub newFromEncoded {
     die "newFromEncoded: security bad keyversion in $plaintext\n" unless ($keyversion == 1);
 
     # check the reconstruct (defeats trimming bugs)
-    my $computed2 = $crypto->hashify("mine,$keyversion,$method,$depth,$rid,$rvsn,$oid,$opt");
+    my $computed2 = $crypto->checksum("mine,$keyversion,$method,$depth,$rid,$rvsn,$oid,$opt");
     die "newFromEncoded: security post-parse checksum failed\n" if ($computed2 != $csum);
 
     # the instantition (will reflash keyversion to current)
@@ -168,13 +168,14 @@ sub encode {
     my $crypto = Crypto->new;
 
     # compute the checksum
-    my $csum = $crypto->hashify($body);
+    my $csum = $crypto->checksum($body);
 
     # make the plaintext
     my $plaintext = "$csum,$body";
 
     # encrypt and encode
-    my $ciphertext = $crypto->encrypt($plaintext);
+    my $salt = sprintf "%s,%s", $self->{rid}, $self->{oid};
+    my $ciphertext = $crypto->encrypt($salt, $plaintext);
 
     # return
     return $ciphertext;

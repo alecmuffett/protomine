@@ -138,7 +138,7 @@ errs:
 protomine-config.pl: generate-config.sh
 	test -f $(PRODUCTION_LOCKFILE) || ./generate-config.sh > protomine-config.pl
 	chmod 755 protomine-config.pl
-	./generate-key.pl
+	-./generate-key.pl
 
 ###
 # generate the mine document database homepage

@@ -448,9 +448,9 @@ sub toAtom {
     # object body
 
     my $content = "";
+    $content .= qq(<A HREF="$commentlink"><button>submit comment</button></A><br/>\n);
     $content .= qq(objectId: $oid <br/>\n);
     $content .= qq(objectType: $objectType<br/>\n);
-    $content .= qq(<A HREF="$commentlink">[submit a response regarding this object]</A><p/>\n);
     $content .= qq(objectDescription:<br/>\n);
     $content .= $objectDescription;
     $content .= "<p/>\n<hr/>\n<p/>\n";
