@@ -1,10 +1,10 @@
+fast object-sharing dialogue (share object 42 with rid ...)
+
+fast "list what objects can be seen by RID 69" dialogue
+
 WHEN YOU EVENTUALLY REWRITE THIS IN PYTHON, JUST PUT ALL THE CONTEXT
 INFORMATION INTO A HASH AND SLING THAT AROUND RATHER THAN HAVE COMPLEX
 ARGUMENTS TO THE API AND UI FUNCTIONS...
-
-fast tag creation dialogue
-fast text-object creation dialogue
-
 
 make sure /pub and other directories are hung off home page.
 
