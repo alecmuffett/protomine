@@ -44,7 +44,7 @@ setup: permissions protomine-config.pl syntax webpages test
 ###
 
 test:
-	minectl version
+	./minectl version
 
 ###
 # install webpages into mine document database
