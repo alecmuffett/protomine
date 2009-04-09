@@ -7,8 +7,11 @@ API calls are handled in REST space, with CRUD
 (create/read/update/delete) nomenclature:
 
   CREATE = HTTP POST
+
   READ = HTTP GET
+
   UPDATE = HTTP PUT
+
   DELETE = HTTP DELETE
 
 In addition, HTTP POST, HTTP PUT and HTTP DELETE requests to support
@@ -16,7 +19,7 @@ the above can be faked by submitting GET or POST requests to the URL
 and setting the "_method" parameter to the uppercase request method
 name:
 
-  GET /api/config.json?_method=POST # equivalent to HTTP POST
+  `GET /api/config.json?_method=POST` # equivalent to HTTP POST
 
 This must be implemented to work even if the requests uses POSTDATA
 (multipart upload, etc) for transfer; a URI-attached fake method must
@@ -28,7 +31,7 @@ take precedence over post-data.
   * flag *RO* denotes read-only key
   * flag *GT0* denotes "greater than zero"
   * flag *RAW* denotes a function returning raw HTTP object data, rather than a data structure
-  * term 'object' is to be replaced by 'item' throughout, v1.0
+  * *term 'object' is to be replaced by 'item' throughout, in v1.0 pymine*
 
 =Non-API URLs =
 
