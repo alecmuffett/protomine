@@ -1,0 +1,2 @@
+#summary Comprehensive specification of Mine! ReST API and management
+#labels Featured,Phase-Implementation,API
