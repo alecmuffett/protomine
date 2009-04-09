@@ -22,7 +22,7 @@ This must be implemented to work even if the requests uses POSTDATA
 (multipart upload, etc) for transfer; a URI-attached fake method must
 take precedence over post-data.
 
-==Notes==
+=Notes=
 
   * flag *TODO* denotes work in progress as of april 2009
   * flag *RO* denotes read-only key
@@ -170,9 +170,9 @@ non-zero == success (either a useful number, or integer 1)
   * `data`
   -- the data described by the object, eg: a JPEG image
 
-Because the `data` key has its own MIME-type, it is not available via
-a READ of `/api/object/OID/key/data.FMT`, however it may be CREATEd,
-UPDATEd or DELETEd.
+  *NOTE1* : Because the `data` key has its own MIME-type, it is not available via
+  a READ of `/api/object/OID/key/data.FMT`, however it may be CREATEd,
+  UPDATEd or DELETEd.
 
   * `objectCreated` *RO*
   -- decimal unix time
