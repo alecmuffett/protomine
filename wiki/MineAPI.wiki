@@ -1,20 +1,22 @@
 #summary Comprehensive specification of Mine! ReST API and management
 #labels Featured,Phase-Implementation,API
 
+=Introduction=
+
 API calls are handled in REST space, with CRUD
 (create/read/update/delete) nomenclature:
 
-    CREATE == HTTP POST
-    READ == HTTP GET 
-    UPDATE == HTTP PUT 
-    DELETE == HTTP DELETE 
+  CREATE = HTTP POST
+  READ = HTTP GET
+  UPDATE = HTTP PUT
+  DELETE = HTTP DELETE
 
 In addition, HTTP POST, HTTP PUT and HTTP DELETE requests to support
 the above can be faked by submitting GET or POST requests to the URL
 and setting the "_method" parameter to the uppercase request method
 name:
 
-     GET /api/config.json?_method=POST # equivalent to HTTP POST
+  GET /api/config.json?_method=POST # equivalent to HTTP POST
 
 This must be implemented to work even if the requests uses POSTDATA
 (multipart upload, etc) for transfer; a URI-attached fake method must
@@ -44,12 +46,12 @@ take precedence over post-data.
 
 =API Nomenclature=
 
-  * FMT - `xml` or `json` -- the format in which to return status, or data
+  * FMT - `xml` or `json`; the format in which to return status, or data
   * KEY - string name one of the relevant keys (eg: `objectName`) being accessed or manipulated
   * OID - decimal index number of an object, range 1..bignum
   * CID - decimal index number of a comment for a given OID, range 1..bignum
   * RID - decimal index number of a relation, range 1..bignum
-  * TID  - decimal index number of a tag, range 1..bignum.
+  * TID - decimal index number of a tag, range 1..bignum.
 
 =API call return values=
 
@@ -57,112 +59,197 @@ non-zero == success (either a useful number, or integer 1)
 
 =API URLs=
 
-  * `/api/config.FMT` (read) *TODO* -- returns a list of configuration keys
-  * `/api/config/KEY.FMT` (create) *TODO* -- updates multiple keys from valid config keys supplied in postdata, returns number of successful updates
-  * `/api/config/KEY.FMT` (delete) *TODO* -- deletes KEY from configuration, returns status
-  * `/api/config/KEY.FMT` (read) *TODO* -- reads KEY from configuration, returns value
-  * `/api/config/KEY.FMT` (update) *TODO* -- updates KEY in configuration, returns status
+  * `/api/config.FMT` (read) *TODO*
+  -- returns a list of configuration keys
+  * `/api/config/KEY.FMT` (create) *TODO*
+  -- updates multiple keys from valid config keys supplied in postdata, returns number of successful updates
+  * `/api/config/KEY.FMT` (delete) *TODO*
+  -- deletes KEY from configuration, returns status
+  * `/api/config/KEY.FMT` (read) *TODO*
+  -- reads KEY from configuration, returns value
+  * `/api/config/KEY.FMT` (update) *TODO*
+  -- updates KEY in configuration, returns status
 
-  * `/api/object.FMT` (create) -- creates an object from valid object keys supplied in postdata, returns oid
-  * `/api/object.FMT` (read) -- returns a list of oids, sorted most-recently-interesting-first
-  * `/api/object/OID` (read) *NOTE1* -- returns the data associated with OID, eg: a JPEG file
-  * `/api/object/OID.FMT` (delete) -- deletes OID, returns status
-  * `/api/object/OID.FMT` (read) -- returns all metadata associated with OID
-  * `/api/object/OID/key.FMT` (create) -- updates multiple keys for OID from valid object keys supplied in postdata, returns number of successful updates
-  * `/api/object/OID/key/KEY.FMT` (delete) -- deletes KEY from OID, returns status
-  * `/api/object/OID/key/KEY.FMT` (read) *NOTE1* -- reads KEY from OID, returns value
-  * `/api/object/OID/key/KEY.FMT` (update) -- updates KEY in OID, returns status
+  * `/api/object.FMT` (create)
+  -- creates an object from valid object keys supplied in postdata, returns oid
+  * `/api/object.FMT` (read)
+  -- returns a list of oids, sorted most-recently-interesting-first
+  * `/api/object/OID` (read) *NOTE1*
+  -- returns the data associated with OID, eg: a JPEG file
+  * `/api/object/OID.FMT` (delete)
+  -- deletes OID, returns status
+  * `/api/object/OID.FMT` (read)
+  -- returns all metadata associated with OID
+  * `/api/object/OID/key.FMT` (create)
+  -- updates multiple keys for OID from valid object keys supplied in postdata, returns number of successful updates
+  * `/api/object/OID/key/KEY.FMT` (delete)
+  -- deletes KEY from OID, returns status
+  * `/api/object/OID/key/KEY.FMT` (read) *NOTE1*
+  -- reads KEY from OID, returns value
+  * `/api/object/OID/key/KEY.FMT` (update)
+  -- updates KEY in OID, returns status
 
-  * `/api/object/OID/comment.FMT` (create) *TODO* -- creates a comment (for OID) from valid comment keys supplied in postdata, returns cid
-  * `/api/object/OID/comment.FMT` (read) *TODO* -- returns a list of cids (for OID) sorted most-recently-interesting-first
-  * `/api/object/OID/CID.FMT` (delete) *TODO* -- deletes CID (for OID), returns status
-  * `/api/object/OID/CID.FMT` (read) *TODO* -- returns all metadata associated with CID
-  * `/api/object/OID/CID/key.FMT` (create) *TODO* -- updates multiple keys for CID (of OID) from valid comment keys supplied in postdata, returns number of successful updates
-  * `/api/object/OID/CID/key/KEY.FMT` (delete) *TODO* -- deletes KEY from CID (of OID), returns status
-  * `/api/object/OID/CID/key/KEY.FMT` (read) *TODO* -- reads KEY from CID (of OID), returns value
-  * `/api/object/OID/CID/key/KEY.FMT` (update) *TODO* -- updates KEY in CID (of OID), returns status
+  * `/api/object/OID/comment.FMT` (create) *TODO*
+  -- creates a comment (for OID) from valid comment keys supplied in postdata, returns cid
+  * `/api/object/OID/comment.FMT` (read) *TODO*
+  -- returns a list of cids (for OID) sorted most-recently-interesting-first
+  * `/api/object/OID/CID.FMT` (delete) *TODO*
+  -- deletes CID (for OID), returns status
+  * `/api/object/OID/CID.FMT` (read) *TODO*
+  -- returns all metadata associated with CID
+  * `/api/object/OID/CID/key.FMT` (create) *TODO*
+  -- updates multiple keys for CID (of OID) from valid comment keys supplied in postdata, returns number of successful updates
+  * `/api/object/OID/CID/key/KEY.FMT` (delete) *TODO*
+  -- deletes KEY from CID (of OID), returns status
+  * `/api/object/OID/CID/key/KEY.FMT` (read) *TODO*
+  -- reads KEY from CID (of OID), returns value
+  * `/api/object/OID/CID/key/KEY.FMT` (update) *TODO*
+  -- updates KEY in CID (of OID), returns status
 
-  * `/api/object/OID/clone.FMT` (create) *TODO* -- clones OID (sans comments), returns new OID
-  * `/api/object/OID/clone.FMT` (read) *TODO* -- returns list of oids that are clones of OID
+  * `/api/object/OID/clone.FMT` (create) *TODO*
+  -- clones OID (sans comments), returns new OID
+  * `/api/object/OID/clone.FMT` (read) *TODO*
+  -- returns list of oids that are clones of OID
 
-  * `/api/relation.FMT` (create) -- creates a relation from valid relation keys supplied in postdata, returns rid
-  * `/api/relation.FMT` (read) -- returns a list of rids, sorted most-recently-interesting-first
-  * `/api/relation/RID.FMT` (delete) -- deletes RID, returns status
-  * `/api/relation/RID.FMT` (read) -- returns all metadata associated with RID
-  * `/api/relation/RID/key.FMT` (create) -- updates multiple keys for RID from valid relation keys supplied in postdata, returns number of successful updates
-  * `/api/relation/RID/key/KEY.FMT` (delete) -- deletes KEY from RID, returns status
-  * `/api/relation/RID/key/KEY.FMT` (read) -- reads KEY from RID, returns value
-  * `/api/relation/RID/key/KEY.FMT` (update) -- updates KEY in RID, returns status
+  * `/api/relation.FMT` (create)
+  -- creates a relation from valid relation keys supplied in postdata, returns rid
+  * `/api/relation.FMT` (read)
+  -- returns a list of rids, sorted most-recently-interesting-first
+  * `/api/relation/RID.FMT` (delete)
+  -- deletes RID, returns status
+  * `/api/relation/RID.FMT` (read)
+  -- returns all metadata associated with RID
+  * `/api/relation/RID/key.FMT` (create)
+  -- updates multiple keys for RID from valid relation keys supplied in postdata, returns number of successful updates
+  * `/api/relation/RID/key/KEY.FMT` (delete)
+  -- deletes KEY from RID, returns status
+  * `/api/relation/RID/key/KEY.FMT` (read)
+  -- reads KEY from RID, returns value
+  * `/api/relation/RID/key/KEY.FMT` (update)
+  -- updates KEY in RID, returns status
 
-  * `/api/select/object.FMT` (read) *TODO* -- tbd
-  * `/api/select/relation.FMT` (read) *TODO* -- tbd
-  * `/api/select/tag.FMT` (read) *TODO* -- tbd
-  * `/api/share/raw/RID/RVSN/OID.FMT` (read) *TODO* -- tbd
-  * `/api/share/redirect/RID.FMT` (read) *TODO* -- tbd
-  * `/api/share/redirect/RID/OID.FMT` (read) *TODO* -- tbd
-  * `/api/share/url/RID.FMT` (read) *TODO* -- tbd
-  * `/api/share/url/RID/OID.FMT` (read) *TODO* -- tbd
+  * `/api/select/object.FMT` (read) *TODO*
+  -- tbd
+  * `/api/select/relation.FMT` (read) *TODO*
+  -- tbd
+  * `/api/select/tag.FMT` (read) *TODO*
+  -- tbd
+  * `/api/share/raw/RID/RVSN/OID.FMT` (read) *TODO*
+  -- tbd
+  * `/api/share/redirect/RID.FMT` (read) *TODO*
+  -- tbd
+  * `/api/share/redirect/RID/OID.FMT` (read) *TODO*
+  -- tbd
+  * `/api/share/url/RID.FMT` (read) *TODO*
+  -- tbd
+  * `/api/share/url/RID/OID.FMT` (read) *TODO*
+  -- tbd
 
-  * `/api/tag.FMT` (create) -- creates a tag from valid tag keys supplied in postdata, returns tid
-  * `/api/tag.FMT` (read) -- returns a list of tids, sorted most-recently-interesting-first
-  * `/api/tag/TID.FMT` (delete) -- deletes TID, returns status
-  * `/api/tag/TID.FMT` (read) -- returns all metadata associated with TID
-  * `/api/tag/TID/key.FMT` (create) -- updates multiple keys for TID from valid tag keys supplied in postdata, returns number of successful updates
-  * `/api/tag/TID/key/KEY.FMT` (delete) -- deletes KEY from TID, returns status
-  * `/api/tag/TID/key/KEY.FMT` (read) -- reads KEY from TID, returns value
-  * `/api/tag/TID/key/KEY.FMT` (update) -- updates KEY in TID, returns status
+  * `/api/tag.FMT` (create)
+  -- creates a tag from valid tag keys supplied in postdata, returns tid
+  * `/api/tag.FMT` (read)
+  -- returns a list of tids, sorted most-recently-interesting-first
+  * `/api/tag/TID.FMT` (delete)
+  -- deletes TID, returns status
+  * `/api/tag/TID.FMT` (read)
+  -- returns all metadata associated with TID
+  * `/api/tag/TID/key.FMT` (create)
+  -- updates multiple keys for TID from valid tag keys supplied in postdata, returns number of successful updates
+  * `/api/tag/TID/key/KEY.FMT` (delete)
+  -- deletes KEY from TID, returns status
+  * `/api/tag/TID/key/KEY.FMT` (read)
+  -- reads KEY from TID, returns value
+  * `/api/tag/TID/key/KEY.FMT` (update)
+  -- updates KEY in TID, returns status
 
-  * `/api/version.FMT` (read) -- 
+  * `/api/version.FMT` (read)
+  --
 
 =valid object-related keys=
 
-  * `data` -- the data described by the object, eg: a JPEG image
+  * `data`
+  -- the data described by the object, eg: a JPEG image
 
 Because the `data` key has its own MIME-type, it is not available via
 a READ of `/api/object/OID/key/data.FMT`, however it may be CREATEd,
 UPDATEd or DELETEd.
 
-  * `objectCreated` -- decimal unix time  *RO*
-  * `objectDescription` -- HTML
-  * `objectHideAfter` -- decimal unix time 
-  * `objectHideBefore` -- decimal unix time 
-  * `objectId` -- decimal integer *GT0* *RO*
-  * `objectLastModified` -- decimal unix time  *RO*
-  * `objectName` -- plaintext
-  * `objectStatus` -- one of: `draft`, `final`, or `public`, plaintext
-  * `objectTags` -- tag-text
-  * `objectType` -- valid object mime type
+  * `objectCreated` *RO*
+  -- decimal unix time
+  * `objectDescription`
+  -- HTML
+  * `objectHideAfter`
+  -- decimal unix time
+  * `objectHideBefore`
+  -- decimal unix time
+  * `objectId` *RO* *GT0*
+  -- decimal integer
+  * `objectLastModified` *RO*
+  -- decimal unix time
+  * `objectName`
+  -- plaintext
+  * `objectStatus`
+  -- one of: `draft`, `final`, or `public`, plaintext
+  * `objectTags`
+  -- tag-text
+  * `objectType`
+  -- valid object mime type
 
 =valid comment-related keys=
 
-  * `commentBody` -- HTML
-  * `commentCreated` -- decimal unix time  *RO*
-  * `commentId` -- decimal integer *GT0* *RO*
-  * `commentLastModified` -- decimal unix time  *RO*
-  * `commentRelationId` -- decimal integer *GT0*, RID
-  * `commentSubject` -- plaintext
+  * `commentBody`
+  -- HTML
+  * `commentCreated` *RO*
+  -- decimal unix time
+  * `commentId` *RO* *GT0*
+  -- decimal integer
+  * `commentLastModified` *RO*
+  -- decimal unix time
+  * `commentRelationId` *GT0*
+  -- decimal integer RID
+  * `commentSubject`
+  -- plaintext
 
 =valid relation-related keys=
 
-  * `relationContactEmail` -- rfc822 email address, plaintext
-  * `relationContactURL` -- URL, plaintext
-  * `relationCreated` -- decimal unix time  *RO*
-  * `relationDescription` -- HTML
-  * `relationEmbargoAfter` -- decimal unix time 
-  * `relationEmbargoBefore` -- decimal unix time 
-  * `relationIPAddress` -- CIDR (eg: `192.168.1.0/24`) *or* ip-address-prefix (eg: `192.168.1.`), of feed-reader, plaintext
-  * `relationId` -- decimal integer *GT0* *RO*
-  * `relationImageURL` -- URL
-  * `relationInterests` -- relation-tag-text
-  * `relationLastModified` -- decimal unix time  *RO*
-  * `relationName` -- plaintext
-  * `relationURL` -- URL
-  * `relationVersion` -- decimal integer *GT0*
+  * `relationContactEmail`
+  -- rfc822 email address, plaintext
+  * `relationContactURL`
+  -- URL, plaintext
+  * `relationCreated` *RO*
+  -- decimal unix time
+  * `relationDescription`
+  -- HTML
+  * `relationEmbargoAfter`
+  -- decimal unix time
+  * `relationEmbargoBefore`
+  -- decimal unix time
+  * `relationIPAddress`
+  -- CIDR (eg: `192.168.1.0/24`) *or* ip-address-prefix (eg: `192.168.1.`), of feed-reader, plaintext
+  * `relationId` *RO* *GT0*
+  -- decimal integer
+  * `relationImageURL`
+  -- URL
+  * `relationInterests`
+  -- relation-tag-text
+  * `relationLastModified` *RO*
+  -- decimal unix time
+  * `relationName`
+  -- plaintext
+  * `relationURL`
+  -- URL
+  * `relationVersion` *GT0*
+  -- decimal integer
 
 =valid tag-related keys=
 
-  * `tagCreated` -- decimal unix time  *RO*
-  * `tagId` -- decimal integer *GT0* *RO*
-  * `tagImplies` -- tag-name
-  * `tagLastModified` -- decimal unix time  *RO*
-  * `tagName` -- tag-name
+  * `tagCreated` *RO*
+  -- decimal unix time
+  * `tagId` *RO* *GT0*
+  -- decimal integer
+  * `tagImplies`
+  -- tag-name
+  * `tagLastModified` *RO*
+  -- decimal unix time
+  * `tagName`
+  -- tag-name
