@@ -6,13 +6,10 @@
 API calls are handled in REST space, with CRUD
 (create/read/update/delete) nomenclature:
 
-  CREATE = HTTP POST
-
-  READ = HTTP GET
-
-  UPDATE = HTTP PUT
-
-  DELETE = HTTP DELETE
+  * CREATE = HTTP POST
+  * READ = HTTP GET
+  * UPDATE = HTTP PUT
+  * DELETE = HTTP DELETE
 
 In addition, HTTP POST, HTTP PUT and HTTP DELETE requests to support
 the above can be faked by submitting GET or POST requests to the URL
