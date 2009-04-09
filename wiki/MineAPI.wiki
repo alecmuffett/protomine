@@ -25,44 +25,44 @@ take precedence over post-data.
 
 =Notes=
 
+  * *the terms _object/oid_ are to be replaced by _item/iid_ throughout, in pymine v1.0 and onwards*
   * flag *TODO* denotes work in progress as of april 2009
   * flag *RO* denotes read-only key
   * flag *GT0* denotes "greater than zero"
   * flag *RAW* denotes a function returning raw HTTP object data, rather than a data structure
-  * *term 'object' is to be replaced by 'item' throughout, in v1.0 pymine*
 
 =Non-API URLs=
 
   * `/pub` (get)
   * `/pub/*` (get)
 
-  -- where unprotected, public-access files live, eg: flash player binaries
+  - where unprotected, public-access files live, eg: flash player binaries
 
   * `/doc` (get)
   * `/doc/*` (get)
 
-  -- authenticated access to documentation for this mine
+  - authenticated access to documentation for this mine
 
   * `/ui` (get)
   * `/ui/*` (get)
 
-  -- root directory for user interface pages
+  - root directory for user interface pages
 
 =Minekey URLs=
 
   * `/get?key=MINEKEY` (get)
   * `/get?key=MINEKEY` (post) *TODO*
 
-  -- the only "public" URLs in a mine are either those under `/pub`, or those accessed via the Minekey interface `/get`; minekeys are opaque blobs referring to tuples of OID and RID, which may or may not yield data retreival.  All `/get` retreivals are audited.
+  - the only "public" URLs in a mine are either those under `/pub`, or those accessed via the Minekey interface `/get`; minekeys are opaque blobs referring to tuples of OID and RID, which may or may not yield data retreival.  All `/get` retreivals are audited.
 
 =API Nomenclature=
 
-  * FMT -- `xml` or `json`; the format in which to return status, or data
-  * KEY -- string name one of the relevant keys (eg: `objectName`) being accessed or manipulated
-  * OID -- decimal index number of an object, range 1..bignum
-  * CID -- decimal index number of a comment for a given OID, range 1..bignum
-  * RID -- decimal index number of a relation, range 1..bignum
-  * TID -- decimal index number of a tag, range 1..bignum.
+  * FMT - `xml` or `json`; the format in which to return status, or data
+  * KEY - string name one of the relevant keys (eg: `objectName`) being accessed or manipulated
+  * OID - decimal index number of an object, range 1..bignum
+  * CID - decimal index number of a comment for a given OID, range 1..bignum
+  * RID - decimal index number of a relation, range 1..bignum
+  * TID - decimal index number of a tag, range 1..bignum.
 
 =API call return values=
 
@@ -224,54 +224,53 @@ take precedence over post-data.
 
 =valid object-related keys=
 
-  * `data` -- the data described by the object metadata, eg: a JPEG image
+  * `data` - the data described by the object metadata, eg: a JPEG image
 
   NOTE1: Because the `data` key has its own MIME-type, it is not
   available via a READ of `/api/object/OID/key/data.FMT`, however
   `data` may be CREATEd, UPDATEd or DELETEd.
 
-  * `objectCreated` *RO* -- decimal unix time
-  * `objectDescription` -- HTML
-  * `objectHideAfter` -- decimal unix time
-  * `objectHideBefore` -- decimal unix time
-  * `objectId` *RO* *GT0* -- decimal integer
-  * `objectLastModified` *RO* -- decimal unix time
-  * `objectName` -- plaintext
-  * `objectStatus` -- one of: `draft`, `final`, or `public`, plaintext
-  * `objectTags` -- tag-text
-  * `objectType` -- valid object mime type
+  * `objectCreated` *RO* - decimal unix time
+  * `objectDescription` - HTML
+  * `objectHideAfter` - decimal unix time
+  * `objectHideBefore` - decimal unix time
+  * `objectId` *RO* *GT0* - decimal integer
+  * `objectLastModified` *RO* - decimal unix time
+  * `objectName` - plaintext
+  * `objectStatus` - one of: `draft`, `final`, or `public`, plaintext
+  * `objectTags` - tag-text
+  * `objectType` - valid object mime type
 
 =valid comment-related keys=
 
-  * `commentBody` -- HTML
-  * `commentCreated` *RO* -- decimal unix time
-  * `commentId` *RO* *GT0* -- decimal integer
-  * `commentLastModified` *RO* -- decimal unix time
-  * `commentRelationId` *GT0* -- decimal integer RID
-  * `commentSubject` -- plaintext
+  * `commentBody` - HTML
+  * `commentCreated` *RO* - decimal unix time
+  * `commentId` *RO* *GT0* - decimal integer
+  * `commentLastModified` *RO* - decimal unix time
+  * `commentRelationId` *GT0* - decimal integer RID
+  * `commentSubject` - plaintext
 
 =valid relation-related keys=
 
-  * `relationContactEmail` -- rfc822 email address, plaintext
-  * `relationContactURL` -- URL, plaintext
-  * `relationCreated` *RO* -- decimal unix time
-  * `relationDescription` -- HTML
-  * `relationEmbargoAfter` -- decimal unix time
-  * `relationEmbargoBefore` -- decimal unix time
-  * `relationIPAddress` -- IP address from which this relation accesses you; 
-  -- as CIDR (eg: `192.168.1.0/24`) *or* ip-address-prefix (eg: `192.168.1.`)
-  * `relationId` *RO* *GT0* -- decimal integer
-  * `relationImageURL` -- URL
-  * `relationInterests` -- relation-tag-text
-  * `relationLastModified` *RO* -- decimal unix time
-  * `relationName` -- plaintext
-  * `relationURL` -- URL
-  * `relationVersion` *GT0* -- decimal integer
+  * `relationContactEmail` - rfc822 email address, plaintext
+  * `relationContactURL` - URL, plaintext
+  * `relationCreated` *RO* - decimal unix time
+  * `relationDescription` - HTML
+  * `relationEmbargoAfter` - decimal unix time
+  * `relationEmbargoBefore` - decimal unix time
+  * `relationIPAddress` - IP address from which this relation accesses you; as CIDR (eg: `192.168.1.0/24`) *or* ip-address-prefix (eg: `192.168.1.`)
+  * `relationId` *RO* *GT0* - decimal integer
+  * `relationImageURL` - URL
+  * `relationInterests` - relation-tag-text
+  * `relationLastModified` *RO* - decimal unix time
+  * `relationName` - plaintext
+  * `relationURL` - URL
+  * `relationVersion` *GT0* - decimal integer
 
 =valid tag-related keys=
 
-  * `tagCreated` *RO* -- decimal unix time
-  * `tagId` *RO* *GT0* -- decimal integer
-  * `tagImplies` -- tag-name
-  * `tagLastModified` *RO* -- decimal unix time
-  * `tagName` -- tag-name
+  * `tagCreated` *RO* - decimal unix time
+  * `tagId` *RO* *GT0* - decimal integer
+  * `tagImplies` - tag-name
+  * `tagLastModified` *RO* - decimal unix time
+  * `tagName` - tag-name
