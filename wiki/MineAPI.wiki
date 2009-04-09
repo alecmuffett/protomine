@@ -29,7 +29,7 @@ take precedence over post-data.
   * flag *RAW* denotes a function returning raw HTTP object data, rather than a data structure
   * *term 'object' is to be replaced by 'item' throughout, in v1.0 pymine*
 
-=Non-API URLs =
+=Non-API URLs=
 
   * `/pub` (get)
   * `/pub/*` (get)
@@ -169,7 +169,7 @@ non-zero == success (either a useful number, or integer 1)
   * `data`
   -- the data described by the object, eg: a JPEG image
 
-  *NOTE1* : Because the `data` key has its own MIME-type, it is not available via
+  NOTE1: Because the `data` key has its own MIME-type, it is not available via
   a READ of `/api/object/OID/key/data.FMT`, however it may be CREATEd,
   UPDATEd or DELETEd.
 
