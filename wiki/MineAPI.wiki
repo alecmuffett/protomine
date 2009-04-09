@@ -70,6 +70,13 @@ take precedence over post-data.
 
 =API URLs=
 
+==core API==
+
+  * `/api/version.FMT` (read)
+  _returns:_ version information as a structure
+
+==config and directory API==
+
   * `/api/config.FMT` (read) *TODO*
   _returns:_ a list of configuration keys
   * `/api/config/KEY.FMT` (create) *TODO*
@@ -84,6 +91,8 @@ take precedence over post-data.
   * `/api/config/KEY.FMT` (update) *TODO*
   _action:_ updates KEY in configuration
   _returns:_ status
+
+==object API==
 
   * `/api/object.FMT` (create)
   _action:_ creates an object from valid object keys supplied in postdata
@@ -110,6 +119,8 @@ take precedence over post-data.
   _action:_ updates KEY in OID
   _returns:_ status
 
+==comment API==
+
   * `/api/object/OID/comment.FMT` (create) *TODO*
   _action:_ creates a comment (for OID) from valid comment keys supplied in postdata
   _returns:_ cid
@@ -133,11 +144,15 @@ take precedence over post-data.
   _action:_ updates KEY in CID (of OID)
   _returns:_ status
 
+==clone API==
+
   * `/api/object/OID/clone.FMT` (create) *TODO*
   _action:_ clones OID (sans comments)
   _returns:_ new OID
   * `/api/object/OID/clone.FMT` (read) *TODO*
   _returns:_ list of oids that are clones of OID
+
+==relation API==
 
   * `/api/relation.FMT` (create)
   _action:_ creates a relation from valid relation keys supplied in postdata
@@ -162,22 +177,7 @@ take precedence over post-data.
   _action:_ updates KEY in RID
   _returns:_ status
 
-  * `/api/select/object.FMT` (read) *TODO*
-  _action:_ tbd
-  * `/api/select/relation.FMT` (read) *TODO*
-  _action:_ tbd
-  * `/api/select/tag.FMT` (read) *TODO*
-  _action:_ tbd
-  * `/api/share/raw/RID/RVSN/OID.FMT` (read) *TODO*
-  _action:_ tbd
-  * `/api/share/redirect/RID.FMT` (read) *TODO*
-  _action:_ tbd
-  * `/api/share/redirect/RID/OID.FMT` (read) *TODO*
-  _action:_ tbd
-  * `/api/share/url/RID.FMT` (read) *TODO*
-  _action:_ tbd
-  * `/api/share/url/RID/OID.FMT` (read) *TODO*
-  _action:_ tbd
+==tag API==
 
   * `/api/tag.FMT` (create)
   _action:_ creates a tag from valid tag keys supplied in postdata
@@ -202,12 +202,29 @@ take precedence over post-data.
   _action:_ updates KEY in TID
   _returns:_ status
 
-  * `/api/version.FMT` (read)
-  _returns:_ version information as a structure
+==search and selection API==
+
+  * `/api/select/object.FMT` (read) *TODO*
+  _action:_ tbd
+  * `/api/select/relation.FMT` (read) *TODO*
+  _action:_ tbd
+  * `/api/select/tag.FMT` (read) *TODO*
+  _action:_ tbd
+  * `/api/share/raw/RID/RVSN/OID.FMT` (read) *TODO*
+  _action:_ tbd
+  * `/api/share/redirect/RID.FMT` (read) *TODO*
+  _action:_ tbd
+  * `/api/share/redirect/RID/OID.FMT` (read) *TODO*
+  _action:_ tbd
+  * `/api/share/url/RID.FMT` (read) *TODO*
+  _action:_ tbd
+  * `/api/share/url/RID/OID.FMT` (read) *TODO*
+  _action:_ tbd
+
 
 =valid object-related keys=
 
-  * `data` -- the data described by the object, eg: a JPEG image
+  * `data` -- the data described by the object metadata, eg: a JPEG image
 
   NOTE1: Because the `data` key has its own MIME-type, it is not
   available via a READ of `/api/object/OID/key/data.FMT`, however
