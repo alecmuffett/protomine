@@ -3,8 +3,7 @@
 
 =Introduction=
 
-API calls are handled in REST space, with CRUD
-(create/read/update/delete) nomenclature:
+API calls are handled in REST space, with CRUD (create/read/update/delete) nomenclature:
 
   * CREATE = HTTP POST
   * READ = HTTP GET
