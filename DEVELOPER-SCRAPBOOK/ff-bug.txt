@@ -1,0 +1,85 @@
+I am running into the firefox double-get bug documented here:
+
+  http://forums.mozillazine.org/viewtopic.php?p=3246092#3246092
+
+and here:
+
+  http://brian.pontarelli.com/2006/05/02/is-your-browser-requesting-a-page-twice/#comment-2100
+
+and here:
+
+  https://bugzilla.mozilla.org/show_bug.cgi?id=236858
+
+which has the summary:
+
+  Doubled page loads are usually due to one of two factors: 1)
+  Mismatched character sets specified in the HTTP headers and in the
+  HTML meta tags (triggering bug 236858), or 2) empty src attributes
+  in img tags (which cause the browser to resolve theirs locations to
+  the current URL, re-loading the page for each instance).
+
+  OK, I just found the #3 cause for this, and here's a link to where I
+  discovered it: [brian.pontarelli.com] When there's a "url()"
+  specified in inline CSS, it triggers a second page load.
+
+The doubled-get is breaking ReST because it deletes an object twice,
+the first succeeds, the second fails, and the user is confused.  I am
+watching the requests go past using the LiveHTTPHeaders plugin.
+
+
+I am staring at my HTML below - I pulled a copy with 'curl' - and can't see what aspect of it might cause something like:
+
+  https://bugzilla.mozilla.org/show_bug.cgi?id=236858#c9
+
+  I also was suffering this problem with my cart.  I spent about 40
+  minutes trying to fix it on the server side, and then I decided to
+  check the request via LiveHTTPHeaders.  It was then I noticed that
+  the file was being re-requested.  After a quick search on Bugzilla I
+  found this bug, noticed that comments regarding the charset (I set
+  one in the source, but not via HTTP Headers), and sent the charset
+  via the headers. It now works fine.  The PHP code to send the
+  charset via headers is header("Content-type: text/html;
+  charset=ISO-8859-1"); if anyone is interested.
+
+There must be something causing the double-get but I can't see it, unless charsets are case-sensitive and ISO-8859-1 != iso-8859-1 ?
+
+Any ideas?
+
+	- alec
+
+
+
+10:24:59 zephyr:protomine $ curl --verbose --fail http://127.0.0.1/~alecm/mine/ui/get-tag/1.html
+* About to connect() to 127.0.0.1 port 80 (#0)
+*   Trying 127.0.0.1... connected
+* Connected to 127.0.0.1 (127.0.0.1) port 80 (#0)
+
+> GET /~alecm/mine/ui/get-tag/1.html HTTP/1.1
+> User-Agent: curl/7.16.3 (powerpc-apple-darwin9.0) libcurl/7.16.3 OpenSSL/0.9.7l zlib/1.2.3
+> Host: 127.0.0.1
+> Accept: */*
+
+< HTTP/1.1 200 OK
+< Date: Tue, 27 Jan 2009 10:24:59 GMT
+< Server: Apache/2.2.9 (Unix) mod_ssl/2.2.9 OpenSSL/0.9.7l DAV/2
+< Transfer-Encoding: chunked
+< Content-Type: text/html; charset=ISO-8859-1
+ 
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>GET /ui/get-tag/1.html</title>
+<base href="http://127.0.0.1/~alecm/mine/ui/" />
+<link rel="stylesheet" type="text/css" href="http://127.0.0.1/~alecm/mine/ui/bits/mine.css" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+<ul>
+<li><em>tagName:</em> animals</li>
+<li><em>tagId:</em> 1</li>
+</ul>
+</body>
+* Connection #0 to host 127.0.0.1 left intact
+* Closing connection #0
