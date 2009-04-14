@@ -5,6 +5,7 @@ easily installed by performing the following as root:
 
 	sudo perl -MCPAN -e 'install Crypt::CBC'
 	sudo perl -MCPAN -e 'install Crypt::DES'
+	sudo perl -MCPAN -e 'install Digest::SHA'
 	sudo perl -MCPAN -e 'install Crypt::OpenSSL::AES'
 	sudo perl -MCPAN -e 'install Crypt::Rijndael'
 	sudo perl -MCPAN -e 'install HTML::Template'
