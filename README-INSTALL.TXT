@@ -70,7 +70,35 @@ apt-get install subversion make curl perl apache2
 
 OpenSolaris installation:
 
-to be written up
+note: CPAN installation of Crypt::Rijndael barfs badly, with an error
+that looks like:
+
+#     Failed test (t/cbc.t at line 7)
+#     Tried to require '/root/.cpan/build/Crypt-Rijndael-1.07/t/lib/mode.pl'.
+#     Error:  Bareword "cpan" not allowed while "strict subs" in use at (eval 1) line 2.
+# Bareword "build" not allowed while "strict subs" in use at (eval 1) line 2.
+# Bareword "Crypt" not allowed while "strict subs" in use at (eval 1) line 2.
+# Bareword "Rijndael" not allowed while "strict subs" in use at (eval 1) line 2.
+# Bareword "t" not allowed while "strict subs" in use at (eval 1) line 2.
+# Bareword "lib" not allowed while "strict subs" in use at (eval 1) line 2.
+# Bareword "mode" not allowed while "strict subs" in use at (eval 1) line 2.
+# Bareword "pl" not allowed while "strict subs" in use at (eval 1) line 2.
+Undefined subroutine &main::crypt_decrypt called at t/cbc.t line 16.
+# Looks like you failed 1 tests of 3.
+# Looks like your test died just after 3.
+
+
+The issue is hinted at by 'Bareword "cpan" not allowed'; something in
+the Crypt::Rijndael test script suite is trying to require() on a
+bareword, not expecting that the filename contains a dot (ie: '.cpan')
+and thereby barfs badly.
+
+The solution? 
+
+	cd /root/.cpan/build/Crypt-Rijndael-1.07
+	make install
+
+...since the code actually works OK.
 
 ------------------------------------------------------------------
 
