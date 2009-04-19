@@ -50,7 +50,7 @@ take precedence over post-data.
 
   * `/v/*` (get) (post) *TODO*
 
-  - vanity naming space, maps /v/FOO(/BAR)* to minekey of a public relationship for traditional blog-type one-to-many communication.
+  - vanity naming space, maps /v/FOO(/BAR) to minekey of a public relationship for traditional blog-type one-to-many communication; also acts as a tinyurl clone
 
   * `/r/*` (get) (post) *TODO*
 
