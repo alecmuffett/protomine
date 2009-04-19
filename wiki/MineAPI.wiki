@@ -48,6 +48,11 @@ take precedence over post-data.
 
   - root directory for user interface pages
 
+  * `/v/` (get)
+  * `/v/*` (get) (post) *TODO*
+
+  - vanity naming space, maps /v/FOO(/BAR)* to minekey of a public relationship for traditional blog-type one-to-many communication.
+
 =Minekey URLs=
 
   * `/get?key=MINEKEY` (get)
