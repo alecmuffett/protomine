@@ -241,6 +241,7 @@ take precedence over post-data.
   * `objectCreated` *RO* - decimal unix time
   * `objectDescription` - HTML
   * `objectHideAfter` - decimal unix time
+  * `objectDeleteAfter` - decimal unix time  # *TODO* for GC of tweets, etc
   * `objectHideBefore` - decimal unix time
   * `objectId` *RO* *GT0* - decimal integer
   * `objectLastModified` *RO* - decimal unix time
