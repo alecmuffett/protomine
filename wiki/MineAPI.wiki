@@ -252,6 +252,7 @@ take precedence over post-data.
 =valid comment-related keys=
 
   * `commentBody` - HTML
+  * `commentData` - octets, non-HTML payload, limited in size (eg: identi.ca)
   * `commentCreated` *RO* - decimal unix time
   * `commentId` *RO* *GT0* - decimal integer
   * `commentLastModified` *RO* - decimal unix time
