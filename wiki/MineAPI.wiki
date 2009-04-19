@@ -251,6 +251,8 @@ take precedence over post-data.
 
 =valid comment-related keys=
 
+  Question: should contentData carry a content-type, or its usage be implicit 
+via the object it hangs-off?
   * `commentBody` - HTML
   * `commentData` - octets, non-HTML payload, limited in size (eg: identi.ca)
   * `commentCreated` *RO* - decimal unix time
