@@ -13,7 +13,7 @@ thing
 	items # list of keyfiles in the dir, matching __keyre
 	commit # updates utimes on a 'stamp' file
 	delete # renames 42 to 42~
-	get('key') -> __getitem__
+	get('key') -> __getitem__ # returns param object
 	getfile('key')
 	set('key', 'value') -> __setitem__
 	setfile('key', file)
@@ -24,8 +24,15 @@ thing
 	to_string -> __repr__
 	lock? 
 	unlock?
-	lastmodified
-	lastaccessed
+	created
+	last_modified
+	last_accessed
+param					### THIS NEEDS WORK
+	.key
+	.value
+	.type
+	.size
+	.lastmodified
 
 relations(things)
 
@@ -39,7 +46,7 @@ relation(thing)
 items(things)
 
 item(thing)
-	__keyre = r'^item\w+';
+	__keyre = r'^(item\w+|data)$';
 	map_key
 	unmap_key
 	match_interests

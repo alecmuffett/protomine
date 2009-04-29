@@ -123,6 +123,9 @@ require 'pm-ui.pl';
 push (@raw_action_list,
       [  '/ui',         'GET',  \&do_document,  'database/ui',  '.'       ],
       [  '/ui/SUFFIX',  'GET',  \&do_document,  'database/ui',  'SUFFIX'  ],
+
+      [  '/ui-mb',         'GET',  \&do_document,  'database/ui-mb',  '.'       ],
+      [  '/ui-mb/SUFFIX',  'GET',  \&do_document,  'database/ui-mb',  'SUFFIX'  ],
     );
 
 # objects we will need

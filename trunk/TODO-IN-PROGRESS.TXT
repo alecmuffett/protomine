@@ -1,3 +1,31 @@
+
+
+CAN YOU GET AWAY FROM USING EXPLICIT OIDS BY MEANS OF USING A HASH OF
+A FULL PATHNAME AS THE OID?  ISSUE IS THE REVERSE LOOKUP.  IS THERE A
+PROBLEM SHARING THE FULLPATHNAME UNDER A MINEKEY?  YES.  ENCODING AND
+ESCAPING.  HMMM.  SUGGEST THE MINEKEY IN PYMINE BE a SERIALISED
+DICTIONARY UNDER JSON ENCODING?  WOULD THIS MAKE THE MINE MORE
+INTUITIVE AND REDUCE THE LEARNING CURVE BY ESSENTIALLY SHIMMING ATOP
+APACHE/THE WEBSERVER?
+
+ALSO:CONTACT SIMONW ABOUT THE LIGHTWEIGHT CACHING WEBSERVER
+
+INVESTIGATE MEMCACHE IN PYTHON.
+
+
+re-encode status as 1 2 3 (GT0) - and provide names like 
+
+	private
+	semiprivate
+	protected (= semiprivate with required auth)
+	public
+
+
+
+OPTION: mark a relationship with a boolean which determines whether
+comments/feedback are "exposed" to any reader, which would make a
+"public relationship" into a blog-equivalent.
+
 fast object-sharing dialogue (share object 42 with rid ...)
 
 fast "list what objects can be seen by RID 69" dialogue
