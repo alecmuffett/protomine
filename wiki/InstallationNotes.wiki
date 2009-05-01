@@ -1,3 +1,5 @@
+#summary How to get the Protomine software, and how to install it on OSX/Linux/Solaris
+
 This page changes too rapidly, so for the moment has been replaced by README-INSTALL.TXT in the code repository.  
 
 Please see that document instead.
