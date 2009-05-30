@@ -1,3 +1,11 @@
+
+mine
+	.relations
+	.items
+	.tags
+	.config
+
+
 relations(things)
 
 relation(thing)

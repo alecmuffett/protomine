@@ -1,0 +1,18 @@
+
+geolocation feed handler - publish location over mine
+	- examine Google Latitude
+	- FireEagle
+	- other services
+	- direct publication
+
+recipe ocr and storage / index
+
+delicious clone
+
+flickr clone
+
+blog engine
+
+tinyurl engine
+	take control of your own tinyurls, 
+	also for vanity relation feeds
