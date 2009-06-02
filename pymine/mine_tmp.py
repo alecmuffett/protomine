@@ -127,21 +127,14 @@ class Things:
 
 ##################################################################
 
-class Thing(UserDict):
+def populateThingCommon(prefix, settings):
 
-    """base class for all Mine database objects, and parent for classes of similar functionality below."""
+    """subclasses cannot inherit class-attribute initialisation code, but
+    most of it is common with Things and their subclasses and need
+    only be done once at class-initiation time, so this routine
+    factors that code out."""
 
-    keyPrefix = 'thing'
-    keyRegexp = '^thing[A-Z]'
-    keyNamesUnique = True
-
-    # keySettings is critical - syntax:
-    # keysuffix : ( isReadOnly, isRequired, isLine, isVirtual, enumeration )
-
-    keySettings = {
-	'Id' : ( True, True, True, True, None ),    
-	'Name' : ( False, True, True, False, None ), 
-	} 
+    thingSettings = {}
 
     keyId = keyPrefix + "Id"
     keyName = keyPrefix + "Name"
@@ -160,6 +153,53 @@ class Thing(UserDict):
         if (isLine): dictLine[key] = True
         if (isVirtual): dictVirtual[key] = True
         if (enumtuple): dictEnumeration = enumtuple
+
+    thingSettings['keyId'] = keyId
+    thingSettings['keyName'] = keyName
+    thingSettings['dictValidKeys'] = dictValidKeys
+    thingSettings['dictReadOnly'] = dictReadOnly
+    thingSettings['dictRequired'] = dictRequired
+    thingSettings['dictLine'] = dictLine
+    thingSettings['dictVirtual'] = dictVirtual
+    thingSettings['dictEnumeration'] = dictEnumeration
+
+    return thingSettings
+
+
+class Thing(UserDict):
+
+    """base class for all Mine database objects, and parent for classes of similar functionality below."""
+
+    # what is the name of this Thing / prefix for keys
+    keyPrefix = 'thing'
+
+    # regexp which matches keys
+    keyRegexp = '^thing[A-Z]'
+
+    # are names of Things meant to be unique?
+    keyNamesUnique = True
+
+    # what are the settings per-key
+    # keysuffix : ( isReadOnly, isRequired, isLine, isVirtual, enumeration )
+    keySettings = {
+	'Id' : ( True, True, True, True, None ),    
+	'Name' : ( False, True, True, False, None ), 
+	} 
+
+    # do some magic once only, at compile time
+    thingSettings = populateThingCommon(prefix, settings)
+    keyId = thingSettings['keyId']
+    keyName = thingSettings['keyName']
+    dictValidKeys = thingSettings['dictValidKeys']
+    dictReadOnly = thingSettings['dictReadOnly']
+    dictRequired = thingSettings['dictRequired']
+    dictLine = thingSettings['dictLine']
+    dictVirtual = thingSettings['dictVirtual']
+    dictEnumeration = thingSettings['dictEnumeration']
+
+
+
+    # instance methods from here down
 
     def __init__(self, parent, id):
 
