@@ -25,6 +25,8 @@ from cache import Cache
 
 import os
 
+##################################################################
+
 class Mine:
     """the master container-object for a per-username Mine"""
 
@@ -66,3 +68,4 @@ class Mine:
     def Export(self, file, srchctx):
 	"""returns a filehandle on a zipfile representing the mine with items represented by srchctx, or all if None"""
 	pass
+

@@ -17,6 +17,7 @@
 
 import os
 from UserDict import UserDict
+from exception import MineException
 
 ##################################################################
 
@@ -69,16 +70,20 @@ class Thing(UserDict):
             if (isVirtual): tclass.dictVirtual[key] = True
             if (etuple): tclass.dictEnumeration[key] = etuple
 
+    @classmethod
+    def Describe(self, key):
+	"""returns string, provides description of 'key', its meaning and usage"""
+	return self.dictValidKey[key]
+
     ###
     # instance methods from here on down
 
-    def __init__(self, aggregator, id):
+    def __init__(self, aggregator, id): # THIS MUST BE LOW COST !!!
 
 	"""set up the thing object-tables"""
 
 	UserDict.__init__(self) # we are a UserDict
 	self.aggregator = aggregator # memorise my aggregator/parent
-	self.mine = aggregator.mine # memorise my mine
 	self.id = id # and my id
         self.path = os.path.join(aggregator.path, str(id)) # where my directory is
 
@@ -108,6 +113,9 @@ class Thing(UserDict):
 
     def Get(self, key): # __get_item__
 	"""retreives value (string) of key 'key' and returns it after passing through MapInbound()"""
+
+        if (key not in self.dictValidKey):
+            raise MineException("invalid key passed to Get: " + key)
 
 	if (key in self.dictVirtual):
 	    if (key == self.keyId): return str(self.id)
@@ -150,10 +158,6 @@ class Thing(UserDict):
 
     def Has(self, key):
 	"""returns boolean, does this Thing have a key named 'key'"""
-	return True
-
-    def Describe(self, key):
-	"""returns string, provides description of 'key', its meaning and usage"""
 	return True
 
     def Compare(self, thing): # __cmp__
