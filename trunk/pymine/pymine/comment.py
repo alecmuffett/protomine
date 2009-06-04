@@ -20,13 +20,16 @@ from thing import Thing, Things
 class Comment(Thing):
 
     """..."""
+    keySuffixName = 'Subject'
     keyPrefix = 'comment'
     keyRegexp = '^comment[A-Z]'
     keyNamesUnique = False
     # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
     keySettings = {
-	'Id' : ( True, True, True, True, None ),
-	'Name' : ( False, True, True, False, None ),
+	'Id' : ( True, True, True, True, None, 'unique numeric identifier for this comment (under this object)' ),
+	'Subject' : ( False, False, True, False, None, 'optional subject line for this comment' ),
+	'Body' : ( False, False, False, False, None, 'optional body for this comment (multiline, HTML)' ),
+	'RelationId' : ( False, True, True, False, None, 'relationId for the creator of this comment' ),
 	}
 
     def __init__(self, parent):

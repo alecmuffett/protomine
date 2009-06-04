@@ -25,8 +25,10 @@ class Tag(Thing):
     keyNamesUnique = True
     # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
     keySettings = {
-	'Id' : ( True, True, True, True, None ),
-	'Name' : ( False, True, True, False, None ),
+	'Id' : ( True, True, True, True, None, 'numeric identifier for this tag' ),
+	'Implied' : ( False, False, True, False, None,
+                      """list of more general tags implied by this one, eg: 'cheese' tag may imply 'food' tag""" ),
+	'Name' : ( False, True, True, False, None, 'unique alphanumeric tagname' ),
 	}
 
     def __init__(self, parent):

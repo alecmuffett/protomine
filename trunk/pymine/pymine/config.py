@@ -22,12 +22,8 @@ class Config(Thing):
     """..."""
     keyPrefix = 'config'
     keyRegexp = '^config[A-Z]'
-    keyNamesUnique = True
-    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
-    keySettings = {
-	'Id' : ( True, True, True, True, None ),
-	'Name' : ( False, True, True, False, None ),
-	}
+    keyNamesUnique = False
+    keySettings = {} # this is a hack
 
     def __init__(self, mine):
 	"""..."""
