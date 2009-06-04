@@ -16,6 +16,11 @@
 ## permissions and limitations under the License.
 ##
 
+# Notation:
+# ALLCAPS() -> class or static method/attribute
+# InitialCapital() -> instance method
+# initialLowercase -> instance attribute
+
 import os
 from UserDict import UserDict
 
@@ -129,7 +134,8 @@ class Things:
 
 class Thing(UserDict):
 
-    """base class for all Mine database objects, and parent for classes of similar functionality below."""
+    """base class for all Mine database objects, and parent for classes of
+    similar functionality below."""
 
     keyPrefix = 'thing' # what is the prefix for keys
     keyRegexp = '^thing[A-Z]' # regexp which matches keys
@@ -140,7 +146,39 @@ class Thing(UserDict):
 	'Name' : ( False, True, True, False, None ),
 	}
 
-    # instance methods from here down
+    ###
+    # end of class-specific config data, but see note for BOOT()
+
+    @classmethod
+    def BOOT(tclass):
+
+        """Thing and its subclasses cannot inherit class-attribute
+        initialisation code, but most of it is common and need only be
+        done once at class-initiation time, so this routine factors
+        that code out; it MUST be run once for each Thing
+        subclass..."""
+
+        tclass.keyId = tclass.keyPrefix + "Id" # for the Id() method
+        tclass.keyName = tclass.keyPrefix + "Name" # for the Name() method
+
+        tclass.dictEnumeration = {}
+        tclass.dictOneLine = {}
+        tclass.dictReadOnly = {}
+        tclass.dictRequired = {}
+        tclass.dictValidKey = {}
+        tclass.dictVirtual = {}
+
+        for suffix, ( isReadOnly, isRequired, isOneLine, isVirtual, enumtuple ) in tclass.keySettings.items():
+            key = tclass.keyPrefix + suffix
+            tclass.dictValidKey[key] = True
+            if (isReadOnly): tclass.dictReadOnly[key] = True
+            if (isRequired): tclass.dictRequired[key] = True
+            if (isOneLine): tclass.dictOneLine[key] = True
+            if (isVirtual): tclass.dictVirtual[key] = True
+            if (enumtuple): tclass.dictEnumeration[key] = enumtuple
+
+    ###
+    # instance methods from here on down
 
     def __init__(self, parent, id):
 
@@ -259,8 +297,8 @@ class Tags(Things):
 class Tag(Thing):
 
     """..."""
-    keyPrefix = 'thing'
-    keyRegexp = '^thing[A-Z]'
+    keyPrefix = 'tag'
+    keyRegexp = '^tag[A-Z]'
     keyNamesUnique = True
     # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
     keySettings = {
@@ -293,8 +331,8 @@ class Relations(Things):
 class Relation(Thing):
 
     """..."""
-    keyPrefix = 'thing'
-    keyRegexp = '^thing[A-Z]'
+    keyPrefix = 'relation'
+    keyRegexp = '^relation[A-Z]'
     keyNamesUnique = True
     # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
     keySettings = {
@@ -327,14 +365,25 @@ class Items(Things):
 class Item(Thing):
 
     """..."""
-    keyPrefix = 'thing'
-    keyRegexp = '^thing[A-Z]'
-    keyNamesUnique = True
+    keyPrefix = 'item'
+    keyRegexp = '^item[A-Z]'
+    keyNamesUnique = False
     # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
     keySettings = {
 	'Id' : ( True, True, True, True, None ),
 	'Name' : ( False, True, True, False, None ),
+	'Status' : ( False, True, True, False, ( 0, 1, 2 ) ),
 	}
+
+    # itemStatus enumeration:
+    # 0: private
+    # 1: semiprivate
+    # 2: private
+    # 3: reserved0
+    # 4: reserved1
+    # 5: reserved2
+    # 6: reserved3
+    # 7: reserved4
 
     def __init__(self, parent):
 	"""..."""
@@ -361,9 +410,9 @@ class Comments(Things):
 class Comment(Thing):
 
     """..."""
-    keyPrefix = 'thing'
-    keyRegexp = '^thing[A-Z]'
-    keyNamesUnique = True
+    keyPrefix = 'comment'
+    keyRegexp = '^comment[A-Z]'
+    keyNamesUnique = False
     # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
     keySettings = {
 	'Id' : ( True, True, True, True, None ),
@@ -451,42 +500,22 @@ class CryptoEngine:
 
 ##################################################################
 
-def setupThingStaticData(c):
-
-    """Thing and its subclasses cannot inherit class-attribute
-    initialisation code, but most of it is common and need only be
-    done once at class-initiation time, so this routine factors that
-    code out..."""
-
-    c.keyId = c.keyPrefix + "Id" # for the Id() method
-    c.keyName = c.keyPrefix + "Name" # for the Name() method
-
-    c.dictEnumeration = {}
-    c.dictOneLine = {}
-    c.dictReadOnly = {}
-    c.dictRequired = {}
-    c.dictValidKeys = {}
-    c.dictVirtual = {}
-
-    for suffix, ( isReadOnly, isRequired, isOneLine, isVirtual, enumtuple ) in c.keySettings.items():
-	key = c.keyPrefix + suffix
-	c.dictValidKeys[key] = True
-	if (isReadOnly): c.dictReadOnly[key] = True
-	if (isRequired): c.dictRequired[key] = True
-	if (isOneLine): c.dictOneLine[key] = True
-	if (isVirtual): c.dictVirtual[key] = True
-	if (enumtuple): c.dictEnumeration = enumtuple
 
 ##################################################################
 
 if __name__ == '__main__':
 
-    setupThingStaticData(Thing)
-    setupThingStaticData(Tag)
-    setupThingStaticData(Relation)
-    setupThingStaticData(Item)
-    setupThingStaticData(Comment)
+    Thing.BOOT()
+    Tag.BOOT()
+    Relation.BOOT()
+    Item.BOOT()
+    Comment.BOOT()
 
     mine = Mine("alecm")
 
-    print Thing.dictValidKeys
+    print Thing.dictValidKey
+    print Tag.dictValidKey
+    print Relation.dictValidKey
+    print Item.dictValidKey
+    print Item.dictEnumeration
+    print Comment.dictValidKey
