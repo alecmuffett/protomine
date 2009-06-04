@@ -25,22 +25,22 @@ class Mine:
     def __init__(self, username):
 	"""initialise a mine for user 'username'"""
 
-        # who am i?
+	# who am i?
 	self.username = username
 
-        # where shall we find the Things?
+	# where shall we find the Things?
 	self.path = os.path.join("database", username)
 
-        # hack for Config to become a Thing without an aggregator
-        self.mine = self 
+	# hack for Config to become a Thing without an aggregator
+	self.mine = self
 
-        # primary importance: configuration
-        self.config = Config(self)
+	# primary importance: configuration
+	self.config = Config(self)
 
-        # secondary importance: cache (so the rest can reference it)
+	# secondary importance: cache (so the rest can reference it)
 	self.cache = Cache(self)
 
-        # the remainder; items come last, and have comments beneath them
+	# the remainder; items come last, and have comments beneath them
 	self.tags = Tags(self)
 	self.relations = Relations(self)
 	self.items = Items(self)
@@ -58,13 +58,13 @@ class Mine:
 class Cache:
     def __init__(self, mine):
 	"""setup"""
-        self.mine = mine
+	self.mine = mine
 
     def get(self, wotsit):
-        pass
+	pass
 
     def put(self, wotsit):
-        pass
+	pass
 
 ##################################################################
 
@@ -81,16 +81,16 @@ class Things:
 	"""setup"""
 
 	self.mine = mine
-        self.path = os.path.join(mine.path, self.subpath)
+	self.path = os.path.join(mine.path, self.subpath)
 
     def New(self):
 	"""
-        Returns a new Thing, properly initialised under this Things
-        aggregator, rather than using a direct constructor.
+	Returns a new Thing, properly initialised under this Things
+	aggregator, rather than using a direct constructor.
 
-        This Thing /may/ not be visible to List() (etc) until Commit()
-        is performed
-        """
+	This Thing /may/ not be visible to List() (etc) until Commit()
+	is performed
+	"""
 	pass
 
     def ListIds(self):
@@ -127,77 +127,18 @@ class Things:
 
 ##################################################################
 
-def populateThingCommon(prefix, settings):
-
-    """subclasses cannot inherit class-attribute initialisation code, but
-    most of it is common with Things and their subclasses and need
-    only be done once at class-initiation time, so this routine
-    factors that code out."""
-
-    thingSettings = {}
-
-    keyId = keyPrefix + "Id"
-    keyName = keyPrefix + "Name"
-    dictValidKeys = {}
-    dictReadOnly = {}
-    dictRequired = {}
-    dictLine = {}
-    dictVirtual = {}
-    dictEnumeration = {}
-
-    for suffix, ( isReadOnly, isRequired, isLine, isVirtual, enumtuple ) in keySettings.items():
-        key = keyPrefix + suffix
-        dictValidKeys[key] = True
-        if (isReadOnly): dictReadOnly[key] = True
-        if (isRequired): dictRequired[key] = True
-        if (isLine): dictLine[key] = True
-        if (isVirtual): dictVirtual[key] = True
-        if (enumtuple): dictEnumeration = enumtuple
-
-    thingSettings['keyId'] = keyId
-    thingSettings['keyName'] = keyName
-    thingSettings['dictValidKeys'] = dictValidKeys
-    thingSettings['dictReadOnly'] = dictReadOnly
-    thingSettings['dictRequired'] = dictRequired
-    thingSettings['dictLine'] = dictLine
-    thingSettings['dictVirtual'] = dictVirtual
-    thingSettings['dictEnumeration'] = dictEnumeration
-
-    return thingSettings
-
-
 class Thing(UserDict):
 
     """base class for all Mine database objects, and parent for classes of similar functionality below."""
 
-    # what is the name of this Thing / prefix for keys
-    keyPrefix = 'thing'
-
-    # regexp which matches keys
-    keyRegexp = '^thing[A-Z]'
-
-    # are names of Things meant to be unique?
-    keyNamesUnique = True
-
-    # what are the settings per-key
-    # keysuffix : ( isReadOnly, isRequired, isLine, isVirtual, enumeration )
+    keyPrefix = 'thing' # what is the prefix for keys
+    keyRegexp = '^thing[A-Z]' # regexp which matches keys
+    keyNamesUnique = True # are names of Things meant to be unique?
+    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
     keySettings = {
-	'Id' : ( True, True, True, True, None ),    
-	'Name' : ( False, True, True, False, None ), 
-	} 
-
-    # do some magic once only, at compile time
-    thingSettings = populateThingCommon(prefix, settings)
-    keyId = thingSettings['keyId']
-    keyName = thingSettings['keyName']
-    dictValidKeys = thingSettings['dictValidKeys']
-    dictReadOnly = thingSettings['dictReadOnly']
-    dictRequired = thingSettings['dictRequired']
-    dictLine = thingSettings['dictLine']
-    dictVirtual = thingSettings['dictVirtual']
-    dictEnumeration = thingSettings['dictEnumeration']
-
-
+	'Id' : ( True, True, True, True, None ),
+	'Name' : ( False, True, True, False, None ),
+	}
 
     # instance methods from here down
 
@@ -205,32 +146,23 @@ class Thing(UserDict):
 
 	"""set up the thing object-tables"""
 
-        # we are a UserDict
-        UserDict.__init__(self)
-
-	# memorise my aggregator/parent
-	self.parent = parent
-
-	# memorise my mine
-	self.mine = parent.mine
-
-        # and my id
-        self.id = id
-
-    # ----
+	UserDict.__init__(self) # we are a UserDict
+	self.parent = parent # memorise my aggregator/parent
+	self.mine = parent.mine # memorise my mine
+	self.id = id # and my id
 
     def MapOutbound(self, key, value):
 	"""
-        Takes string 'value' and maps/processes it, returning the data
-        in on-disk format for key 'key'
+	Takes string 'value' and maps/processes it, returning the data
+	in on-disk format for key 'key'
 
-        In this, the superclass version which MUST be called, it
-        rewrites any 'isLine' keys as a single line of text without
-        newline and with single whitespaces.
+	In this, the superclass version which MUST be called, it
+	rewrites any 'isOneLine' keys as a single line of text without
+	newline and with single whitespaces.
 
-        Blobs are left verbatim.
-        """
-        if (key in self.dictLine): value = " ".join(value.split())
+	Blobs are left verbatim.
+	"""
+	if (key in self.dictOneLine): value = " ".join(value.split())
 	return value
 
     def Set(self, key, value): # __set_item__
@@ -246,8 +178,8 @@ class Thing(UserDict):
     def Get(self, key): # __get_item__
 	"""retreives value (string) of key 'key' and returns it after passing through MapInbound()"""
 
-        if (key in self.dictVirtual):
-            if (key == self.keyId): return str(self.id)
+	if (key in self.dictVirtual):
+	    if (key == self.keyId): return str(self.id)
 
     # ----
 
@@ -305,6 +237,8 @@ class Thing(UserDict):
 	"""unlocks this Thing (see Lock)"""
 	pass
 
+
+
 ##################################################################
 ##################################################################
 ##################################################################
@@ -325,6 +259,14 @@ class Tags(Things):
 class Tag(Thing):
 
     """..."""
+    keyPrefix = 'thing'
+    keyRegexp = '^thing[A-Z]'
+    keyNamesUnique = True
+    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
+    keySettings = {
+	'Id' : ( True, True, True, True, None ),
+	'Name' : ( False, True, True, False, None ),
+	}
 
     def __init__(self, parent):
 	"""..."""
@@ -351,6 +293,14 @@ class Relations(Things):
 class Relation(Thing):
 
     """..."""
+    keyPrefix = 'thing'
+    keyRegexp = '^thing[A-Z]'
+    keyNamesUnique = True
+    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
+    keySettings = {
+	'Id' : ( True, True, True, True, None ),
+	'Name' : ( False, True, True, False, None ),
+	}
 
     def __init__(self, parent):
 	"""..."""
@@ -377,6 +327,14 @@ class Items(Things):
 class Item(Thing):
 
     """..."""
+    keyPrefix = 'thing'
+    keyRegexp = '^thing[A-Z]'
+    keyNamesUnique = True
+    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
+    keySettings = {
+	'Id' : ( True, True, True, True, None ),
+	'Name' : ( False, True, True, False, None ),
+	}
 
     def __init__(self, parent):
 	"""..."""
@@ -403,6 +361,14 @@ class Comments(Things):
 class Comment(Thing):
 
     """..."""
+    keyPrefix = 'thing'
+    keyRegexp = '^thing[A-Z]'
+    keyNamesUnique = True
+    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
+    keySettings = {
+	'Id' : ( True, True, True, True, None ),
+	'Name' : ( False, True, True, False, None ),
+	}
 
     def __init__(self, parent):
 	"""..."""
@@ -416,6 +382,14 @@ class Comment(Thing):
 class Config(Thing):
 
     """..."""
+    keyPrefix = 'config'
+    keyRegexp = '^config[A-Z]'
+    keyNamesUnique = True
+    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
+    keySettings = {
+	'Id' : ( True, True, True, True, None ),
+	'Name' : ( False, True, True, False, None ),
+	}
 
     def __init__(self, mine):
 	"""..."""
@@ -477,6 +451,42 @@ class CryptoEngine:
 
 ##################################################################
 
-if __name__ == '__main__':
-    foo = Mine("alecm")
+def setupThingStaticData(c):
 
+    """Thing and its subclasses cannot inherit class-attribute
+    initialisation code, but most of it is common and need only be
+    done once at class-initiation time, so this routine factors that
+    code out..."""
+
+    c.keyId = c.keyPrefix + "Id" # for the Id() method
+    c.keyName = c.keyPrefix + "Name" # for the Name() method
+
+    c.dictEnumeration = {}
+    c.dictOneLine = {}
+    c.dictReadOnly = {}
+    c.dictRequired = {}
+    c.dictValidKeys = {}
+    c.dictVirtual = {}
+
+    for suffix, ( isReadOnly, isRequired, isOneLine, isVirtual, enumtuple ) in c.keySettings.items():
+	key = c.keyPrefix + suffix
+	c.dictValidKeys[key] = True
+	if (isReadOnly): c.dictReadOnly[key] = True
+	if (isRequired): c.dictRequired[key] = True
+	if (isOneLine): c.dictOneLine[key] = True
+	if (isVirtual): c.dictVirtual[key] = True
+	if (enumtuple): c.dictEnumeration = enumtuple
+
+##################################################################
+
+if __name__ == '__main__':
+
+    setupThingStaticData(Thing)
+    setupThingStaticData(Tag)
+    setupThingStaticData(Relation)
+    setupThingStaticData(Item)
+    setupThingStaticData(Comment)
+
+    mine = Mine("alecm")
+
+    print Thing.dictValidKeys
