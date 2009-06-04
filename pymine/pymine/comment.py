@@ -1,4 +1,4 @@
-import Thing
+from thing import Thing, Things
 
 class Comment(Thing):
 

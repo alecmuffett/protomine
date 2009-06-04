@@ -1,9 +1,12 @@
-import Thing
-import Tag
-import Relation
-import Item
-import Comment
-import Config
+from thing import Thing, Things
+from tag import Tag, Tags
+from relation import Relation, Relations
+from item import Item, Items
+from comment import Comment, Comments
+from config import Config
+from cache import Cache
+
+import os
 
 class Mine:
     """the master container-object for a per-username Mine"""
