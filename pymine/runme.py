@@ -8,5 +8,6 @@ if __name__ == '__main__':
     m = Mine(user)
 
     t = m.items.Open(30)
-    v = t.Get('itemName')
+    print t.Describe('itemName')
+    v = t.Get('itemName*')
     print v
