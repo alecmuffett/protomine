@@ -25,15 +25,20 @@ class Item(Thing):
     keyNamesUnique = False
     # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
     keySettings = {
-	'Id' : ( True, True, True, True, None ),
-	'Name' : ( False, True, True, False, None ),
-	'Status' : ( False, True, True, False, ( 0, 1, 2 ) ),
+	'Id' : ( True, True, True, True, None, 'unique numeric identifier for this item' ),
+	'Name' : ( False, True, True, False, None, 'optional name for this item' ),
+	'Status' : ( False, True, True, False, ( 0, 1, 2 ), 'status of this item (private, semiprivate, public)' ),
+	'Description' : ( False, False, True, False, None, 'optional description for this item (multiline, HTML)' ),
+	'HideBefore' : ( False, False, True, False, None, 'optional date before which this object is hidden from others' ),
+	'HideAfter' : ( False, False, True, False, None, 'optional date after which this object is hidden from others' ),
+	'Tags' : ( False, False, True, False, None, 'optional tags describing this item (tags must already exist)' ),
+	'Type' : ( False, False, True, False, None, 'HTTP mime-type relevant to this item' ),
 	}
 
     # itemStatus enumeration:
     # 0: private
     # 1: semiprivate
-    # 2: private
+    # 2: public
     # 3: reserved0
     # 4: reserved1
     # 5: reserved2

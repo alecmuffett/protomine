@@ -25,17 +25,17 @@ class Thing(UserDict):
     """base class for all Mine database objects, and parent for classes of
     similar functionality below."""
 
+    keySuffixId = "Id"
+    keySuffixName = "Name"
+
     keyPrefix = 'thing' # what is the prefix for keys
-
     keyRegexp = '^thing[A-Z]' # regexp which matches keys
-
     keyNamesUnique = True # are names of Things meant to be unique?
 
-    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
-
+    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration, description )
     keySettings = {
-	'Id' : ( True, True, True, True, None ),
-	'Name' : ( False, True, True, False, None ),
+	'Id' : ( True, True, True, True, None, 'unique numeric identifier for this thing' ),
+	'Name' : ( False, True, True, False, None, 'unique textual name for this thing' ),
 	}
 
     ###
@@ -50,8 +50,8 @@ class Thing(UserDict):
         that code out; it MUST be run once for each Thing
         subclass..."""
 
-        tclass.keyId = tclass.keyPrefix + "Id" # for the Id() method
-        tclass.keyName = tclass.keyPrefix + "Name" # for the Name() method
+        tclass.keyId = tclass.keyPrefix + tclass.keySuffixId # for the Id() method
+        tclass.keyName = tclass.keyPrefix + tclass.keySuffixName # for the Name() method
 
         tclass.dictEnumeration = {}
         tclass.dictOneLine = {}
@@ -60,14 +60,14 @@ class Thing(UserDict):
         tclass.dictValidKey = {}
         tclass.dictVirtual = {}
 
-        for suffix, ( isReadOnly, isRequired, isOneLine, isVirtual, enumtuple ) in tclass.keySettings.items():
+        for suffix, ( isReadOnly, isRequired, isOneLine, isVirtual, etuple, desc ) in tclass.keySettings.items():
             key = tclass.keyPrefix + suffix
-            tclass.dictValidKey[key] = True
+            tclass.dictValidKey[key] = desc
             if (isReadOnly): tclass.dictReadOnly[key] = True
             if (isRequired): tclass.dictRequired[key] = True
             if (isOneLine): tclass.dictOneLine[key] = True
             if (isVirtual): tclass.dictVirtual[key] = True
-            if (enumtuple): tclass.dictEnumeration[key] = enumtuple
+            if (etuple): tclass.dictEnumeration[key] = etuple
 
     ###
     # instance methods from here on down
