@@ -32,9 +32,9 @@ class Comment(Thing):
 	'RelationId' : ( False, True, True, False, None, 'relationId for the creator of this comment' ),
 	}
 
-    def __init__(self, parent):
+    def __init__(self, aggregator, id):
 	"""..."""
-	Thing.__init__(self, parent)
+	Thing.__init__(self, aggregator, id)
 	pass
 
 ##################################################################
