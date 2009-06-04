@@ -1,3 +1,10 @@
+import Thing
+import Tag
+import Relation
+import Item
+import Comment
+import Config
+
 class Mine:
     """the master container-object for a per-username Mine"""
 

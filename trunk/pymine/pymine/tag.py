@@ -1,3 +1,5 @@
+import Thing
+
 class Tag(Thing):
 
     """..."""

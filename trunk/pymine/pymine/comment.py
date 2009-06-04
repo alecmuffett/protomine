@@ -1,3 +1,5 @@
+import Thing
+
 class Comment(Thing):
 
     """..."""
