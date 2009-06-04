@@ -14,8 +14,3 @@
 ## implied. See the License for the specific language governing
 ## permissions and limitations under the License.
 ##
-
-# Notation:
-# ALLCAPS() -> class or static method/attribute
-# InitialCapital() -> instance method
-# initialLowercase -> instance attribute

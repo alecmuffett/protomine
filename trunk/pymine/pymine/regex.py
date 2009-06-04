@@ -15,22 +15,10 @@
 ## permissions and limitations under the License.
 ##
 
-from UserDict import UserDict
+import re
 
 ##################################################################
 
-class Cache(UserDict):
-    """..."""
-
-    def __init__(self, mine):
-	"""cache setup"""
-	self.mine = mine
-
-    def get(self, wotsit):
-	pass
-
-    def put(self, wotsit):
-	pass
-
-    def delete(self, wotsit):
-	pass
+class Regex:
+    digitString = re.compile('^[0-9]+$')
+    tokenString = re.compile('[a-z]\w+')

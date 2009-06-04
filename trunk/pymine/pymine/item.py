@@ -17,9 +17,12 @@
 
 from thing import Thing, Things
 
+##################################################################
+
 class Item(Thing):
 
     """..."""
+
     keyPrefix = 'item'
     keyRegexp = '^item[A-Z]'
     keyNamesUnique = False
@@ -27,7 +30,7 @@ class Item(Thing):
     keySettings = {
 	'Id' : ( True, True, True, True, None, 'unique numeric identifier for this item' ),
 	'Name' : ( False, True, True, False, None, 'optional name for this item' ),
-	'Status' : ( False, True, True, False, ( 0, 1, 2 ), 'status of this item (private, semiprivate, public)' ),
+	'Status' : ( False, True, True, False, ( 0, 1, 2 ), 'status of this item (private, shared, public)' ),
 	'Description' : ( False, False, True, False, None, 'optional description for this item (multiline, HTML)' ),
 	'HideBefore' : ( False, False, True, False, None, 'optional date before which this object is hidden from others' ),
 	'HideAfter' : ( False, False, True, False, None, 'optional date after which this object is hidden from others' ),
@@ -37,7 +40,7 @@ class Item(Thing):
 
     # itemStatus enumeration:
     # 0: private
-    # 1: semiprivate
+    # 1: shared
     # 2: public
     # 3: reserved0
     # 4: reserved1

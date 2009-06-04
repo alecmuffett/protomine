@@ -17,6 +17,8 @@
 
 from thing import Thing, Things
 
+##################################################################
+
 class Relation(Thing):
 
     """..."""

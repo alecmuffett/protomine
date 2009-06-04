@@ -17,9 +17,12 @@
 
 from thing import Thing, Things
 
+##################################################################
+
 class Comment(Thing):
 
     """..."""
+
     keySuffixName = 'Subject'
     keyPrefix = 'comment'
     keyRegexp = '^comment[A-Z]'
@@ -43,12 +46,10 @@ class Comments(Things):
 
     """..."""
 
-    subpath = ".../comments" # fix this
+    subpath = None
     genclass = Comment
 
-    def __init__(self, mine):
+    def __init__(self, mine, itemid):
 	"""..."""
+        subpath = os.path.join("items", str(itemid), "comments")
 	Things.__init__(self, mine)
-	pass
-
-
