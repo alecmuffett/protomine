@@ -31,10 +31,9 @@ class Tag(Thing):
 	'Name' : ( False, True, True, False, None, 'unique alphanumeric tagname' ),
 	}
 
-    def __init__(self, parent):
+    def __init__(self, aggregator, id):
 	"""..."""
-	Thing.__init__(self, parent)
-	pass
+	Thing.__init__(self, aggregator, id)
 
 ##################################################################
 

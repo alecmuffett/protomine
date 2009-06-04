@@ -39,10 +39,9 @@ class Relation(Thing):
 	'Version' : ( False, True, True, False, None, 'relationship revision number' ),
 	}
 
-    def __init__(self, parent):
+    def __init__(self, aggregator, id):
 	"""..."""
-	Thing.__init__(self, parent)
-	pass
+	Thing.__init__(self, aggregator, id)
 
 ##################################################################
 

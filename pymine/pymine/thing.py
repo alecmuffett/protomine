@@ -72,14 +72,15 @@ class Thing(UserDict):
     ###
     # instance methods from here on down
 
-    def __init__(self, parent, id):
+    def __init__(self, aggregator, id):
 
 	"""set up the thing object-tables"""
 
 	UserDict.__init__(self) # we are a UserDict
-	self.parent = parent # memorise my aggregator/parent
-	self.mine = parent.mine # memorise my mine
+	self.aggregator = aggregator # memorise my aggregator/parent
+	self.mine = aggregator.mine # memorise my mine
 	self.id = id # and my id
+        self.path = os.path.join(aggregator.path, str(id)) # where my directory is
 
     # ----
 
@@ -101,8 +102,6 @@ class Thing(UserDict):
 	"""stores value (string) of key 'key, passing it through MapOutbound() before storage'"""
 	pass
 
-    # ----
-
     def MapInbound(self, key, value):
 	"""takes string 'value' and maps/processes it, returning the data in userland format for key 'key'"""
 	return value
@@ -113,8 +112,12 @@ class Thing(UserDict):
 	if (key in self.dictVirtual):
 	    if (key == self.keyId): return str(self.id)
 
-    # ----
+        fname = os.path.join(self.path, key)
+        f = open(fname, "r")
+        value = f.read()
+        f.close()
 
+        return value
 
     def Id(self):
 	"""returns this Thing's id (integer > 0)"""
@@ -147,6 +150,10 @@ class Thing(UserDict):
 
     def Has(self, key):
 	"""returns boolean, does this Thing have a key named 'key'"""
+	return True
+
+    def Describe(self, key):
+	"""returns string, provides description of 'key', its meaning and usage"""
 	return True
 
     def Compare(self, thing): # __cmp__
@@ -187,26 +194,27 @@ class Things:
 	self.mine = mine
 	self.path = os.path.join(mine.path, self.subpath)
 
-    def New(self):
-	"""
-	Returns a new Thing, properly initialised under this Things
-	aggregator, rather than using a direct constructor.
-
-	This Thing /may/ not be visible to List() (etc) until Commit()
-	is performed
-	"""
+    def Create(self):
+	"""Returns a new Thing, properly initialised under this Things'
+	aggregator, rather than using a direct constructor.  This
+	Thing /may/ not be visible to List() (etc) until Commit() is
+	performed."""
 	pass
 
-    def ListIds(self):
-	"""returns a list of all Thing.id (ie: list of int) known to this Thing aggregator"""
+    def Open(self, id):
+	"""returns a Thing with id 'id'"""
+        return self.genclass(self, id)
+
+    def Exists(self, id):
+	"""returns a boolean, does the Thing numbered 'id' exist?"""
 	pass
 
     def List(self):
 	"""returns a list of all Thing (ie: list of Thing objects) known to this Thing aggregator"""
 	pass
 
-    def Exists(self, id):
-	"""returns a boolean, does the Thing numbered 'id' exist?"""
+    def ListIds(self):
+	"""returns a list of all Thing.id (ie: list of int) known to this Thing aggregator"""
 	pass
 
     def Named(self, name):
