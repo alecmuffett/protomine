@@ -19,6 +19,9 @@ from UserDict import UserDict
 
 ##################################################################
 
+# inspiration
+# http://code.sixapart.com/svn/memcached/trunk/server/doc/protocol.txt
+
 class Cache(UserDict):
     """..."""
 
@@ -26,11 +29,24 @@ class Cache(UserDict):
 	"""cache setup"""
 	self.mine = mine
 
-    def get(self, wotsit):
-	pass
+    def set(self):
+        pass
 
-    def put(self, wotsit):
-	pass
+    def add(self):
+        pass
 
-    def delete(self, wotsit):
-	pass
+    def replace(self):
+        pass
+
+    def get(self):
+        pass
+
+    def delete(self):
+        pass
+
+    def flush(self):
+        pass
+
+    def stats(self):
+        pass
+
