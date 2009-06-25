@@ -23,6 +23,7 @@ class Comment(Thing):
 
     """..."""
 
+    booted = False # must set this to false in the definition of every subclass
     keySuffixName = 'Subject'
     keyPrefix = 'comment'
     keyRegexp = '^comment[A-Z]'
