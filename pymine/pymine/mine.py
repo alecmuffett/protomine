@@ -31,12 +31,12 @@ class Mine:
     """the master container-object for a per-username Mine"""
 
     # boot the Thing classes once, and once only
-    Thing.BOOT()
-    Tag.BOOT()
-    Relation.BOOT()
-    Item.BOOT()
-    Comment.BOOT()
-    Config.BOOT()
+    Thing.Boot()
+    Tag.Boot()
+    Relation.Boot()
+    Item.Boot()
+    Comment.Boot()
+    Config.Boot()
 
     def __init__(self, username):
 	"""initialise a mine for user 'username'"""
