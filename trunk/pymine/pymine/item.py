@@ -23,6 +23,7 @@ class Item(Thing):
 
     """..."""
 
+    booted = False # must set this to false in the definition of every subclass
     keyPrefix = 'item'
     keyRegexp = '^item[A-Z]'
     keyNamesUnique = False
