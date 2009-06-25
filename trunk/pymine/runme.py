@@ -9,5 +9,5 @@ if __name__ == '__main__':
 
     t = m.items.Open(30)
     print t.Describe('itemName')
-    v = t.Get('itemName*')
+    v = t.Get('itemName')
     print v
