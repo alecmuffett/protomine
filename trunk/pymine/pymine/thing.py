@@ -26,9 +26,9 @@ class Thing(UserDict):
     """base class for all Mine database objects, and parent for classes of
     similar functionality below."""
 
+    booted = False # must set this to false in the definition of every subclass
     keySuffixId = "Id"
     keySuffixName = "Name"
-
     keyPrefix = 'thing' # what is the prefix for keys
     keyRegexp = '^thing[A-Z]' # regexp which matches keys
     keyNamesUnique = True # are names of Things meant to be unique?
@@ -40,35 +40,49 @@ class Thing(UserDict):
 	}
 
     ###
-    # end of class-specific config data, but see note for BOOT()
+    # end of class-specific config data, but see note for Boot()
 
     @classmethod
-    def BOOT(tclass):
+    def Boot(thingclass):
 
         """Thing and its subclasses cannot inherit class-attribute
         initialisation code, but most of it is common and need only be
         done once at class-initiation time, so this routine factors
-        that code out; it MUST be run once for each Thing
-        subclass..."""
+        that code out; it MUST be run once for each Thing subclass.
+        Metaclasses may sort this out but they are a big hammer to
+        crack a small nut."""
 
-        tclass.keyId = tclass.keyPrefix + tclass.keySuffixId # for the Id() method
-        tclass.keyName = tclass.keyPrefix + tclass.keySuffixName # for the Name() method
+        if (thingclass.booted):
+            print "skipping trying to re-boot", thingclass
+            return
+        else:
+            print "booting", thingclass
 
-        tclass.dictEnumeration = {}
-        tclass.dictOneLine = {}
-        tclass.dictReadOnly = {}
-        tclass.dictRequired = {}
-        tclass.dictValidKey = {}
-        tclass.dictVirtual = {}
+        thingclass.keyId = thingclass.keyPrefix + thingclass.keySuffixId # for the Id() method
+        thingclass.keyName = thingclass.keyPrefix + thingclass.keySuffixName # for the Name() method
 
-        for suffix, ( isReadOnly, isRequired, isOneLine, isVirtual, etuple, desc ) in tclass.keySettings.items():
-            key = tclass.keyPrefix + suffix
-            tclass.dictValidKey[key] = desc
-            if (isReadOnly): tclass.dictReadOnly[key] = True
-            if (isRequired): tclass.dictRequired[key] = True
-            if (isOneLine): tclass.dictOneLine[key] = True
-            if (isVirtual): tclass.dictVirtual[key] = True
-            if (etuple): tclass.dictEnumeration[key] = etuple
+        thingclass.dictEnumeration = {}
+        thingclass.dictOneLine = {}
+        thingclass.dictReadOnly = {}
+        thingclass.dictRequired = {}
+        thingclass.dictValidKey = {}
+        thingclass.dictVirtual = {}
+
+        for suffix, ( isReadOnly, isRequired, isOneLine, isVirtual, etuple, desc ) in thingclass.keySettings.items():
+            key = thingclass.keyPrefix + suffix
+
+            print "configuring", thingclass, "attribute", key
+
+            thingclass.dictValidKey[key] = desc
+
+            if (isReadOnly): thingclass.dictReadOnly[key] = True
+            if (isRequired): thingclass.dictRequired[key] = True
+            if (isOneLine): thingclass.dictOneLine[key] = True
+            if (isVirtual): thingclass.dictVirtual[key] = True
+            if (etuple): thingclass.dictEnumeration[key] = etuple
+
+        # done
+        thingclass.booted = True
 
     @classmethod
     def Describe(self, key):
