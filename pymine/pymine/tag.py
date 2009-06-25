@@ -22,6 +22,7 @@ from thing import Thing, Things
 class Tag(Thing):
 
     """..."""
+    booted = False # must set this to false in the definition of every subclass
     keyPrefix = 'tag'
     keyRegexp = '^tag[A-Z]'
     keyNamesUnique = True
