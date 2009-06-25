@@ -22,6 +22,8 @@ from thing import Thing, Things
 class Config(Thing):
 
     """..."""
+
+    booted = False # must set this to false in the definition of every subclass
     keyPrefix = 'config'
     keyRegexp = '^config[A-Z]'
     keyNamesUnique = False
