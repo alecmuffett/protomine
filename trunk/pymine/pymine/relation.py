@@ -22,6 +22,8 @@ from thing import Thing, Things
 class Relation(Thing):
 
     """..."""
+
+    booted = False # must set this to false in the definition of every subclass
     keyPrefix = 'relation'
     keyRegexp = '^relation[A-Z]'
     keyNamesUnique = True
