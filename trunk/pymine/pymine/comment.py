@@ -28,12 +28,12 @@ class Comment(Thing):
     keyPrefix = 'comment'
     keyRegexp = '^comment[A-Z]'
     keyNamesUnique = False
-    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
+    # -> keysuffix : ( isReadWrite, isRequired, isOneLine, isVirtual, ArgTuple )
     keySettings = {
-	'Id' : ( True, True, True, True, None, 'unique numeric identifier for this comment (under this object)' ),
-	'Subject' : ( False, False, True, False, None, 'optional subject line for this comment' ),
-	'Body' : ( False, False, False, False, None, 'optional body for this comment (multiline, HTML)' ),
-	'RelationId' : ( False, True, True, False, None, 'relationId for the creator of this comment' ),
+	'Id' : ( False, True, True, True, None, 'unique numeric identifier for this comment (under this object)' ),
+	'Subject' : ( True, False, True, False, None, 'optional subject line for this comment' ),
+	'Body' : ( True, False, False, False, None, 'optional body for this comment (multiline, HTML)' ),
+	'RelationId' : ( True, True, True, False, None, 'relationId for the creator of this comment' ),
 	}
 
     def __init__(self, aggregator, id):

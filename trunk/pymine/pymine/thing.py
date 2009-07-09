@@ -33,10 +33,10 @@ class Thing(UserDict):
     keyRegexp = '^thing[A-Z]' # regexp which matches keys
     keyNamesUnique = True # are names of Things meant to be unique?
 
-    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, argTuple, description )
+    # -> keysuffix : ( isReadWrite, isRequired, isOneLine, isVirtual, argTuple, description )
     keySettings = {
-	'Id' : ( True, True, True, True, None, 'unique numeric identifier for this thing' ),
-	'Name' : ( False, True, True, False, None, 'unique textual name for this thing' ),
+	'Id' : ( False, True, True, True, None, 'unique numeric identifier for this thing' ),
+	'Name' : ( True, True, True, False, None, 'unique textual name for this thing' ),
 	}
 
     ###
@@ -53,33 +53,46 @@ class Thing(UserDict):
         crack a small nut."""
 
         if (thingclass.booted):
-            print "skipping trying to re-boot", thingclass
+            print "skipping attempt to re-boot", thingclass
             return
         else:
-            print "booting", thingclass
+            print "thing.Boot for", thingclass
 
         thingclass.keyId = thingclass.keyPrefix + thingclass.keySuffixId # for the Id() method
         thingclass.keyName = thingclass.keyPrefix + thingclass.keySuffixName # for the Name() method
 
         thingclass.dictArgTuple = {}
         thingclass.dictOneLine = {}
-        thingclass.dictReadOnly = {}
+        thingclass.dictReadWrite = {}
         thingclass.dictRequired = {}
         thingclass.dictValidKey = {}
         thingclass.dictVirtual = {}
 
-        for suffix, ( isReadOnly, isRequired, isOneLine, isVirtual, argtup, desc ) in thingclass.keySettings.items():
+        for suffix, ( isReadWrite, isRequired, isOneLine, isVirtual, argtup, desc ) in thingclass.keySettings.items():
             key = thingclass.keyPrefix + suffix
 
-            print "configuring", thingclass, "attribute", key
+            print "thing.Boot configuring", thingclass, "attr", key
 
             thingclass.dictValidKey[key] = desc
 
-            if (isReadOnly): thingclass.dictReadOnly[key] = True
-            if (isRequired): thingclass.dictRequired[key] = True
-            if (isOneLine): thingclass.dictOneLine[key] = True
-            if (isVirtual): thingclass.dictVirtual[key] = True
-            if (argtup): thingclass.dictArgTuple[key] = argtup
+            if (isReadWrite): 
+                thingclass.dictReadWrite[key] = True
+
+
+            if (isRequired): 
+                thingclass.dictRequired[key] = True
+
+
+            if (isOneLine): 
+                thingclass.dictOneLine[key] = True
+
+
+            if (isVirtual):
+                thingclass.dictVirtual[key] = True
+
+
+            if (argtup): 
+                thingclass.dictArgTuple[key] = argtup
 
         # done
         thingclass.booted = True
@@ -122,6 +135,12 @@ class Thing(UserDict):
 
     def Set(self, key, value): # __set_item__
 	"""stores value (string) of key 'key, passing it through MapOutbound() before storage'"""
+
+        if (key not in self.dictValidKey):
+            raise MineException("invalid key passed to set: " + key)
+
+
+
 	pass
 
     def MapInbound(self, key, value):
