@@ -33,7 +33,7 @@ class Thing(UserDict):
     keyRegexp = '^thing[A-Z]' # regexp which matches keys
     keyNamesUnique = True # are names of Things meant to be unique?
 
-    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration, description )
+    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, argTuple, description )
     keySettings = {
 	'Id' : ( True, True, True, True, None, 'unique numeric identifier for this thing' ),
 	'Name' : ( False, True, True, False, None, 'unique textual name for this thing' ),
@@ -42,7 +42,7 @@ class Thing(UserDict):
     ###
     # end of class-specific config data, but see note for Boot()
 
-    @classmethod
+    @classmethod # <------------------------------------------------------------------ CLASSMETHOD
     def Boot(thingclass):
 
         """Thing and its subclasses cannot inherit class-attribute
@@ -61,14 +61,14 @@ class Thing(UserDict):
         thingclass.keyId = thingclass.keyPrefix + thingclass.keySuffixId # for the Id() method
         thingclass.keyName = thingclass.keyPrefix + thingclass.keySuffixName # for the Name() method
 
-        thingclass.dictEnumeration = {}
+        thingclass.dictArgTuple = {}
         thingclass.dictOneLine = {}
         thingclass.dictReadOnly = {}
         thingclass.dictRequired = {}
         thingclass.dictValidKey = {}
         thingclass.dictVirtual = {}
 
-        for suffix, ( isReadOnly, isRequired, isOneLine, isVirtual, etuple, desc ) in thingclass.keySettings.items():
+        for suffix, ( isReadOnly, isRequired, isOneLine, isVirtual, argtup, desc ) in thingclass.keySettings.items():
             key = thingclass.keyPrefix + suffix
 
             print "configuring", thingclass, "attribute", key
@@ -79,12 +79,12 @@ class Thing(UserDict):
             if (isRequired): thingclass.dictRequired[key] = True
             if (isOneLine): thingclass.dictOneLine[key] = True
             if (isVirtual): thingclass.dictVirtual[key] = True
-            if (etuple): thingclass.dictEnumeration[key] = etuple
+            if (argtup): thingclass.dictArgTuple[key] = argtup
 
         # done
         thingclass.booted = True
 
-    @classmethod
+    @classmethod # <------------------------------------------------------------------ CLASSMETHOD
     def Describe(self, key):
 	"""returns string, provides description of 'key', its meaning and usage"""
 	return self.dictValidKey[key]
@@ -92,9 +92,12 @@ class Thing(UserDict):
     ###
     # instance methods from here on down
 
-    def __init__(self, aggregator, id): # THIS MUST BE LOW COST !!!
+    def __init__(self, aggregator, id):
 
-	"""set up the thing object-tables"""
+	"""
+        set up the thing object-tables; putting more code here is
+        discouraged as thing-creation needs to be cheap
+        """
 
 	UserDict.__init__(self) # we are a UserDict
 	self.aggregator = aggregator # memorise my aggregator/parent
@@ -114,7 +117,7 @@ class Thing(UserDict):
 
 	Blobs are left verbatim.
 	"""
-	if (key in self.dictOneLine): value = " ".join(value.split())
+	if (key in self.dictOneLine): value = " ".join(value.split()) # surprisingly efficient
 	return value
 
     def Set(self, key, value): # __set_item__
