@@ -27,19 +27,19 @@ class Item(Thing):
     keyPrefix = 'item'
     keyRegexp = '^item[A-Z]'
     keyNamesUnique = False
-    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
+    # -> keysuffix : ( isReadWrite, isRequired, isOneLine, isVirtual, ArgTuple )
     keySettings = {
-	'Id' : ( True, True, True, True, None, 'unique numeric identifier for this item' ),
-	'Name' : ( False, True, True, False, None, 'optional name for this item' ),
-	'Status' : ( False, True, True, False, ( 0, 1, 2 ), 'status of this item (private, shared, public)' ),
-	'Description' : ( False, False, True, False, None, 'optional description for this item (multiline, HTML)' ),
-	'HideBefore' : ( False, False, True, False, None, 'optional date before which this object is hidden from others' ),
-	'HideAfter' : ( False, False, True, False, None, 'optional date after which this object is hidden from others' ),
-	'Tags' : ( False, False, True, False, None, 'optional tags describing this item (tags must already exist)' ),
-	'Type' : ( False, False, True, False, None, 'HTTP mime-type relevant to this item' ),
+	'Id' : ( False, True, True, True, None, 'unique numeric identifier for this item' ),
+	'Name' : ( True, True, True, False, None, 'optional name for this item' ),
+	'Status' : ( True, True, True, False, ( 0, 1, 2 ), 'status of this item (private, shared, public)' ),
+	'Description' : ( True, False, True, False, None, 'optional description for this item (multiline, HTML)' ),
+	'HideBefore' : ( True, False, True, False, None, 'optional date before which this object is hidden from others' ),
+	'HideAfter' : ( True, False, True, False, None, 'optional date after which this object is hidden from others' ),
+	'Tags' : ( True, False, True, False, None, 'optional tags describing this item (tags must already exist)' ),
+	'Type' : ( True, False, True, False, None, 'HTTP mime-type relevant to this item' ),
 	}
 
-    # itemStatus enumeration:
+    # itemStatus ArgTuple:
     # 0: private
     # 1: shared
     # 2: public

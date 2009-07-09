@@ -26,12 +26,12 @@ class Tag(Thing):
     keyPrefix = 'tag'
     keyRegexp = '^tag[A-Z]'
     keyNamesUnique = True
-    # -> keysuffix : ( isReadOnly, isRequired, isOneLine, isVirtual, enumeration )
+    # -> keysuffix : ( isReadWrite, isRequired, isOneLine, isVirtual, ArgTuple )
     keySettings = {
-	'Id' : ( True, True, True, True, None, 'numeric identifier for this tag' ),
-	'Implied' : ( False, False, True, False, None,
+	'Id' : ( False, True, True, True, None, 'numeric identifier for this tag' ),
+	'Implied' : ( True, False, True, False, None,
                       """list of more general tags implied by this one, eg: 'cheese' tag may imply 'food' tag""" ),
-	'Name' : ( False, True, True, False, None, 'unique alphanumeric tagname' ),
+	'Name' : ( True, True, True, False, None, 'unique alphanumeric tagname' ),
 	}
 
     def __init__(self, aggregator, id):
