@@ -71,28 +71,33 @@ class Thing(UserDict):
         for suffix, ( isReadWrite, isRequired, isOneLine, isVirtual, argtup, desc ) in thingclass.keySettings.items():
             key = thingclass.keyPrefix + suffix
 
-            print "thing.Boot configuring", thingclass, "attr", key
+            print "thing.Boot configuring", thingclass, "attr", key,
 
             thingclass.dictValidKey[key] = desc
 
             if (isReadWrite): 
                 thingclass.dictReadWrite[key] = True
-
+                print "RW",
+            else:
+                print "RO",
 
             if (isRequired): 
                 thingclass.dictRequired[key] = True
-
+                print "REQD",
 
             if (isOneLine): 
                 thingclass.dictOneLine[key] = True
-
+                print "LINE",
 
             if (isVirtual):
                 thingclass.dictVirtual[key] = True
-
+                print "VIRT",
 
             if (argtup): 
                 thingclass.dictArgTuple[key] = argtup
+                print "TUPLE", argtup,
+
+            print
 
         # done
         thingclass.booted = True
@@ -109,7 +114,7 @@ class Thing(UserDict):
 
 	"""
         set up the thing object-tables; putting more code here is
-        discouraged as thing-creation needs to be cheap
+        discouraged as thing-creation needs to be really cheap
         """
 
 	UserDict.__init__(self) # we are a UserDict
@@ -117,9 +122,9 @@ class Thing(UserDict):
 	self.id = id # and my id
         self.path = os.path.join(aggregator.path, str(id)) # where my directory is
 
-    # ----
+    ##################################################################
 
-    def MapOutbound(self, key, value):
+    def RewriteForSet(self, key, value):
 	"""
 	Takes string 'value' and maps/processes it, returning the data
 	in on-disk format for key 'key'
@@ -130,25 +135,24 @@ class Thing(UserDict):
 
 	Blobs are left verbatim.
 	"""
-	if (key in self.dictOneLine): value = " ".join(value.split()) # surprisingly efficient
+	if (key in self.dictOneLine): 
+            value = " ".join(value.split()) # surprisingly efficient
 	return value
 
     def Set(self, key, value): # __set_item__
-	"""stores value (string) of key 'key, passing it through MapOutbound() before storage'"""
-
+	"""stores value (string) of key 'key, passing it through RewriteForSet() before storage'"""
         if (key not in self.dictValidKey):
             raise MineException("invalid key passed to set: " + key)
-
-
-
 	pass
 
-    def MapInbound(self, key, value):
+    ##################################################################
+
+    def RewriteForGet(self, key, value):
 	"""takes string 'value' and maps/processes it, returning the data in userland format for key 'key'"""
 	return value
 
     def Get(self, key): # __get_item__
-	"""retreives value (string) of key 'key' and returns it after passing through MapInbound()"""
+	"""retreives value (string) of key 'key' and returns it after passing through RewriteForGet()"""
 
         if (key not in self.dictValidKey):
             raise MineException("invalid key passed to Get: " + key)
@@ -161,7 +165,9 @@ class Thing(UserDict):
         value = f.read()
         f.close()
 
-        return value
+        return RewriteForGet(value)
+
+    ##################################################################
 
     def Id(self):
 	"""returns this Thing's id (integer > 0)"""

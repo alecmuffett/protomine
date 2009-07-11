@@ -1,4 +1,12 @@
 
+rich data structures returned from searches/queries, for tags must
+include "ImplicitWeight" and "explicitweight" for instance - meta
+information on how many opbjects are referenced by the tag at hand,
+via both methods.
+
+
+
+
 
 CAN YOU GET AWAY FROM USING EXPLICIT OIDS BY MEANS OF USING A HASH OF
 A FULL PATHNAME AS THE OID?  ISSUE IS THE REVERSE LOOKUP.  IS THERE A
