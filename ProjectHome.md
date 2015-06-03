@@ -1,0 +1,27 @@
+Protomine is the first and reference implementation of The Mine Project.
+
+See http://themineproject.org/ for details.
+
+See also http://code.google.com/p/jmine/ and http://code.google.com/p/pymine/ (both in planning)
+
+Three GoogleGroups are in use:
+
+
+**http://groups.google.com/group/themineproject / themineproject@googlegroups.com**
+
+This is the general discussion group for mine software; it's not meant
+to cover developer issues (that's for the "-devel" list) but should
+cover all other mine software topics
+
+
+**http://groups.google.com/group/themineproject-devel /themineproject-devel@googlegroups.com**
+
+Developer list: for discussion of implementation-related issues,
+protomine, pymine, jmine, scrapers, uploaders, APIs and the like.
+
+
+**http://groups.google.com/group/themineproject-announce / themineproject-announce@googlegroups.com**
+
+Announcments-only list (low traffic) - traffic here will be replicated
+to the discussion list, if you're a member of that you don't need to
+subscribe to this list.
